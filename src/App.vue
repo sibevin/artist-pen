@@ -14,6 +14,7 @@ import HelloWorld from "./components/HelloWorld.vue";
     </a>
   </div>
   <HelloWorld msg="Vite + Vue" />
+  <button class="btn btn-primary">Test</button>
 </template>
 
 <style scoped>

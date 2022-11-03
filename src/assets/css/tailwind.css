@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+
+.select:focus {
+  outline: none;
+}
+
+.btn {
+  @apply h-9 px-3 select-none;
+  @apply font-normal;
+  &-xs {
+    @apply h-6 px-2 min-h-0;
+    font-size: 0.75rem;
+  }
+  &-sm {
+    @apply h-8 px-3 min-h-0;
+    font-size: 0.875rem;
+  }
+  &-md {
+    @apply h-12 px-4 min-h-0;
+    font-size: 0.875rem;
+  }
+  &-lg {
+    @apply h-16 px-6 min-h-0;
+    font-size: 1.125rem;
+  }
+  &-func {
+    @apply h-10 px-5 min-h-0;
+  }
+  &-help {
+    @apply h-6 w-6 rounded-full p-0 min-h-0;
+  }
+  &-wide {
+    @apply w-64;
+  }
+  &-block {
+    @apply w-full;
+  }
+  &-square {
+    @apply h-12 w-12 p-0;
+    &:where(.btn-xs) {
+      @apply h-6 w-6 p-0;
+    }
+    &:where(.btn-sm) {
+      @apply h-8 w-8 p-0;
+    }
+    &:where(.btn-md) {
+      @apply h-12 w-12 p-0;
+    }
+    &:where(.btn-lg) {
+      @apply h-16 w-16 p-0;
+    }
+  }
+  &-circle {
+    @apply h-12 w-12 rounded-full p-0;
+    &:where(.btn-xs) {
+      @apply h-6 w-6 rounded-full p-0;
+    }
+    &:where(.btn-sm) {
+      @apply h-8 w-8 rounded-full p-0;
+    }
+    &:where(.btn-md) {
+      @apply h-12 w-12 rounded-full p-0;
+    }
+    &:where(.btn-lg) {
+      @apply h-16 w-16 rounded-full p-0;
+    }
+  }
+}
+
+.cell-block {
+  @apply border rounded-md;
+}
+
+.cell-title {
+  @apply font-bold bg-base-100 w-fit px-2 select-none;
+  margin-top: -0.6rem;
+  margin-left: 0.5rem;
+}
+
+.scroll-always-on {
+  @apply pr-5;
+  scrollbar-color: #333 #ddd;
+  scrollbar-width: 0.5rem;
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+    background-color: #ddd;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #333;
+  }
+}
+
+.font-fs-xs {
+  @apply text-xs;
+}
+.font-fs-s {
+  @apply text-sm;
+}
+.font-fs-m {
+  @apply text-base;
+}
+.font-fs-l {
+  @apply text-lg;
+}
+.font-fs-xl {
+  @apply text-xl;
+}
+
+.font-ff-sans_serif {
+  @apply font-sans;
+}
+.font-ff-serif {
+  @apply font-serif;
+}
+
+.font-ls-xs {
+  @apply tracking-tighter;
+}
+.font-ls-s {
+  @apply tracking-tight;
+}
+.font-ls-m {
+  @apply tracking-normal;
+}
+.font-ls-l {
+  @apply tracking-wide;
+}
+.font-ls-xl {
+  @apply tracking-wider;
+}
+
+.font-lh-xs {
+  @apply leading-4;
+}
+.font-lh-s {
+  @apply leading-5;
+}
+.font-lh-m {
+  @apply leading-6;
+}
+.font-lh-l {
+  @apply leading-7;
+}
+.font-lh-xl {
+  @apply leading-8;
+}
+
+@tailwind utilities;
