@@ -1,7 +1,12 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "isolatedModules": true,
+    "useDefineForClassFields": true,
+    "moduleResolution": "node",
+    "types": ["vite/client"],
     "baseUrl": ".",
-    "target": "es6",
+    "target": "es2022",
     "paths": {
       "@/*": ["./src/*"]
     }
