@@ -21,6 +21,7 @@
     "@vueuse/core": "^9.4.0",
     "autoprefixer": "^10.4.13",
     "daisyui": "^2.38.0",
+    "dexie": "^3.2.2",
     "eslint": "^8.26.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
