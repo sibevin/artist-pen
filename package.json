@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint --ext .ts,.js,.vue .",
-    "lint:fix": "eslint --ext .ts,.js,.vue --fix ."
+    "lint:fix": "eslint --ext .ts,.js,.vue --fix .",
+    "test": "vitest --config ./vitest.config.ts",
+    "coverage": "vitest --config ./vitest.config.ts run --coverage"
   },
   "dependencies": {
     "vue": "^3.2.41"
@@ -27,12 +29,15 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.7.0",
+    "fake-indexeddb": "^4.0.0",
     "i18next": "^22.0.4",
+    "jsdom": "^20.0.2",
     "postcss": "^8.4.18",
     "prettier": "^2.7.1",
     "tailwindcss": "^3.2.1",
     "typescript": "^4.8.4",
     "vite": "^3.2.0",
+    "vitest": "^0.24.5",
     "vue-meta": "^3.0.0-alpha.10",
     "vue-router": "^4.1.6"
   }
