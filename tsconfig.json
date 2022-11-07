@@ -4,7 +4,9 @@
     "isolatedModules": true,
     "useDefineForClassFields": true,
     "moduleResolution": "node",
-    "types": ["vite/client"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "types": ["vite/client", "vitest/globals"],
     "baseUrl": ".",
     "target": "es2022",
     "paths": {
