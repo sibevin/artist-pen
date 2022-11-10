@@ -78,6 +78,10 @@
   margin-left: 0.5rem;
 }
 
+.page-mark {
+  @apply select-none flex items-center p-2 bg-base-content text-base-100
+}
+
 .scroll-always-on {
   @apply pr-5;
   scrollbar-color: #333 #ddd;
