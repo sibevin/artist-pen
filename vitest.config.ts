@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [Vue()],
   resolve: {
     alias: {
-      "@": resolve(__dirname, "./src"),
+      "~": resolve(__dirname, "./src"),
     },
   },
   test: {
