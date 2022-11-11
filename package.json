@@ -16,6 +16,7 @@
     "vue": "^3.2.41"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@mdi/js": "^7.0.96",
     "@sibevin/random-token": "^1.0.2",
     "@typescript-eslint/eslint-plugin": "^5.42.0",
