@@ -1,0 +1,47 @@
+{
+  "serviceName": "藝術家的筆",
+  "action": {
+    "cancel": "取消",
+    "changeOrder": "變更順序",
+    "close": "關閉",
+    "confirm": "確認",
+    "create": "建立",
+    "disable": "關閉",
+    "delete": "刪除",
+    "edit": "編輯",
+    "enable": "啓動",
+    "login": "登入",
+    "next": "下一步",
+    "moveForward": "往前移",
+    "moveBackward": "往後移",
+    "prev": "上一步",
+    "redo": "重做",
+    "save": "儲存",
+    "search": "搜尋",
+    "send": "送出",
+    "undo": "復原",
+    "update": "更新",
+    "view": "檢視"
+  },
+  "error": {
+    "createFailed": "建立失敗，請稍後再試一次。",
+    "updateFailed": "更新失敗，請稍後再試一次。",
+    "deleteFailed": "刪除失敗，請稍後再試一次。"
+  },
+  "menu": {
+    "about": "關於",
+    "account": "帳號",
+    "settings": "設定"
+  },
+  "nav": {
+    "hotkey": "瀏覽快捷鍵",
+    "up": "向上",
+    "down": "向下",
+    "left": "向左",
+    "right": "向右",
+    "next": "下一個",
+    "confirm": "確認",
+    "cancel": "取消選取",
+    "hint": "提示"
+  }
+}

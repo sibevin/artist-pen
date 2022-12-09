@@ -5,6 +5,10 @@
   outline: none;
 }
 
+.input:focus {
+  outline: none;
+}
+
 .btn {
   @apply h-9 px-3 select-none;
   @apply font-normal;
@@ -69,17 +73,26 @@
 }
 
 .cell-block {
-  @apply border rounded-md;
+  @apply border rounded-md relative pt-2;
+  &.selected {
+    @apply border-4;
+  }
 }
 
 .cell-title {
-  @apply font-bold bg-base-100 w-fit px-2 select-none;
-  margin-top: -0.6rem;
-  margin-left: 0.5rem;
+  @apply font-bold bg-base-100 w-fit px-2 select-none absolute -top-3 left-2;
+}
+
+.cell-sub-title {
+  @apply font-bold bg-base-100 w-fit px-2 select-none absolute -top-3 right-2;
 }
 
 .page-mark {
-  @apply select-none flex items-center p-2 bg-base-content text-base-100
+  @apply select-none flex items-center p-2 bg-base-content text-base-100;
+}
+
+.hotkey-mark {
+  @apply badge font-mono px-2 py-3 flex justify-center items-center rounded bg-base-content text-base-100 font-bold;
 }
 
 .scroll-always-on {
@@ -148,6 +161,10 @@
 }
 .font-lh-xl {
   @apply leading-8;
+}
+
+.input-hint-block {
+  @apply text-sm text-base-300
 }
 
 @tailwind utilities;

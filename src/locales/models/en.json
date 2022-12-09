@@ -1,0 +1,104 @@
+{
+  "app": {
+    "config": {
+      "field": {
+        "locale": "Language",
+        "timeZone": "Time Zone",
+        "theme": "Theme"
+      },
+      "enum": {
+        "theme": {
+          "snow": "Snow",
+          "obsidian": "Obsidian",
+          "ocean": "Ocean",
+          "sakura": "Sakura",
+          "forest": "Forest",
+          "antique": "Antique"
+        }
+      }
+    }
+  },
+  "dwdy": {
+    "diary": {
+      "name": "Diary",
+      "field": {
+        "title": "Name",
+        "enabledFeatures": "Enabled features",
+        "layout": "Layout"
+      },
+      "hint": {
+        "enabledFeatures": "Enable / disable features to show / hide related interfaces. This setting only affects the interface display, existing data are hidden (not deleted) when the feature is disabled.",
+        "layout": {
+          "calendar": "Provide a calendar to quickly access contents for a particular date.",
+          "timeline": "Display the whole-month contents in a timeline.",
+          "notebook": "A pure notebook. It stores contents without date, but you can give a title for each pages. It cannot be changed to Calendar or Timeline layout after it is created."
+        }
+      },
+      "enum": {
+        "feature": {
+          "text": "Text",
+          "image": "Image",
+          "sticker": "Sticker",
+          "illustration": "Drawing",
+          "tag": "Tag",
+          "sound": "Sound",
+          "video": "Video",
+          "location": "Location",
+          "todoList": "Todo",
+          "dataList": "Data"
+        },
+        "layout": {
+          "calendar": "Calendar",
+          "timeline": "Timeline",
+          "notebook": "Notebook"
+        }
+      }
+    },
+    "config": {
+      "field": {
+        "password": "Password",
+        "protectedByPassword": "Enable password",
+        "diariesSortedBy": "Diaries sorted by",
+        "highlightedWeekDays": "Highlighted days of the week",
+        "firstWeekDay": "Calendar started day of the week",
+        "isWeekShown": "Show weeks of the year",
+        "timelineOrder": "Timeline order (from top to bottom)",
+        "locale": "Language",
+        "font": "Font",
+        "fontFamily": "Family",
+        "fontSize": "Size",
+        "fontLineHeight": "Line Height",
+        "fontLetterSpacing": "Letter Spacing"
+      },
+      "hint": {
+        "protectedByPasswordHint": "When password is enabled, you need provide a password to access diaries. Please remember your password, otherwise you are not able to access your diaries anymore.",
+        "highlightedWeekDays": "Decide which days of the week need to be highlighted.",
+        "firstWeekDay": "Decide which day of the week the calendar started with.",
+        "font": "This is a diary essay preview, please choose the settings which make you most comfortable. 🙂"
+      },
+      "enum": {
+        "diariesSortedBy": {
+          "titleAsc": "By title",
+          "updateDesc": "By latest update"
+        },
+        "timelineOrder": {
+          "dIndexAsc": "Early > Late",
+          "dIndexDesc": "Late > Early"
+        },
+        "fontFamily": {
+          "sansSerif": "Sans serif",
+          "sansSerifVariant": "",
+          "serif": "Serif",
+          "serifVariant": ""
+        },
+        "fontFormatSize": {
+          "xs": "XS",
+          "s": "S",
+          "m": "M",
+          "l": "L",
+          "xl": "XL"
+        }
+      }
+    }
+  }
+}

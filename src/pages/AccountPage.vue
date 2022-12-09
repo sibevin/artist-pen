@@ -1,35 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useMeta } from "vue-meta";
-import { mdiMenu, mdiBookshelf, mdiStar } from "@mdi/js";
+import { mdiMenu, mdiBookshelf, mdiAccountBox } from "@mdi/js";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import { LocaleActor } from "~/services/locale";
-import { HotkeyProvider } from "~/services/hotkeyProvider";
 const la = new LocaleActor("app");
-useMeta({
-  title: "About",
-});
-
-const hk = ref<HotkeyProvider>(new HotkeyProvider());
-
-hk.value.initDefaultHotKeys();
-hk.value.activated = true;
-hk.value.switchScope("about");
-
-function changeScope(givenScope: string) {
-  hk.value.switchScope(givenScope);
-}
 </script>
 
 <template>
-  <MainLayout menu-hotkey-scope="about">
-    <div>About</div>
-    <div>{{ hk.scope }}</div>
-    <div>{{ hk.inHotkeyMode }}</div>
-    <div>hk.isMarkShown('about'): {{ hk.isMarkShown("about") }}</div>
-    <button class="btn" @click="changeScope('none')">None</button>
-    <button class="btn" @click="changeScope('about')">About</button>
+  <MainLayout menu-hotkey-scope="account">
+    <div>Account</div>
     <template #header-title>
       {{ la.t(".serviceName") }}
     </template>
@@ -38,11 +17,11 @@ function changeScope(givenScope: string) {
         <SvgIcon
           class="mr-2"
           icon-set="mdi"
-          :path="mdiStar"
+          :path="mdiAccountBox"
           :size="20"
         ></SvgIcon>
         <div class="text-xs">
-          {{ la.t(".menu.about") }}
+          {{ la.t(".menu.account") }}
         </div>
       </div>
     </template>

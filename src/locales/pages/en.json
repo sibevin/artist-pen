@@ -1,0 +1,9 @@
+{
+  "dwdy": {
+    "DiariesPage": {
+      "newDiary": "New Diary",
+      "creationHint": "You can change these settings after the diary is created.",
+      "queryKeywordHint": "Title"
+    }
+  }
+}

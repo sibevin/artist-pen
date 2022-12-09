@@ -1,51 +1,23 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { useMeta } from "vue-meta";
-import { mdiMenu, mdiBookshelf, mdiStar } from "@mdi/js";
+import { mdiMenu, mdiBookshelf } from "@mdi/js";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import { LocaleActor } from "~/services/locale";
-import { HotkeyProvider } from "~/services/hotkeyProvider";
-const la = new LocaleActor("app");
+import { dispatchEntry } from "~/services/flow/auth";
+
 useMeta({
-  title: "About",
+  title: "Entry",
 });
 
-const hk = ref<HotkeyProvider>(new HotkeyProvider());
+const la = new LocaleActor("app");
 
-hk.value.initDefaultHotKeys();
-hk.value.activated = true;
-hk.value.switchScope("about");
-
-function changeScope(givenScope: string) {
-  hk.value.switchScope(givenScope);
-}
+await dispatchEntry();
 </script>
 
 <template>
-  <MainLayout menu-hotkey-scope="about">
-    <div>About</div>
-    <div>{{ hk.scope }}</div>
-    <div>{{ hk.inHotkeyMode }}</div>
-    <div>hk.isMarkShown('about'): {{ hk.isMarkShown("about") }}</div>
-    <button class="btn" @click="changeScope('none')">None</button>
-    <button class="btn" @click="changeScope('about')">About</button>
-    <template #header-title>
-      {{ la.t(".serviceName") }}
-    </template>
-    <template #header-panel>
-      <div class="page-mark">
-        <SvgIcon
-          class="mr-2"
-          icon-set="mdi"
-          :path="mdiStar"
-          :size="20"
-        ></SvgIcon>
-        <div class="text-xs">
-          {{ la.t(".menu.about") }}
-        </div>
-      </div>
-    </template>
+  <MainLayout menu-hotkey-scope="entry">
+    <div></div>
     <template #layout-overlay-bottom-panel>
       <div
         class="select-none w-full border-base-100 backdrop-blur-sm bg-base-100/80 flex justify-between items-center p-3"

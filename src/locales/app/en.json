@@ -1,0 +1,47 @@
+{
+  "serviceName": "Artist's Pen",
+  "action": {
+    "cancel": "Cancel",
+    "changeOrder": "Change order",
+    "confirm": "Confirm",
+    "close": "Close",
+    "create": "Create",
+    "delete": "Delete",
+    "disable": "Disable",
+    "edit": "Edit",
+    "enable": "Enable",
+    "login": "Login",
+    "next": "Next",
+    "moveForward": "Move forward",
+    "moveBackward": "Move backward",
+    "prev": "Previous",
+    "redo": "Redo",
+    "save": "Save",
+    "search": "Search",
+    "send": "Send",
+    "undo": "Undo",
+    "update": "Update",
+    "view": "View"
+  },
+  "error": {
+    "createFailed": "Creation failed, please try again later.",
+    "updateFailed": "Update failed, please try again later.",
+    "deleteFailed": "Deletion failed, please try again later."
+  },
+  "menu": {
+    "about": "About",
+    "account": "Account",
+    "settings": "Settings"
+  },
+  "nav": {
+    "hotkey": "Browsing hotkeys",
+    "up": "Up",
+    "down": "Down",
+    "left": "Left",
+    "right": "Right",
+    "next": "Next",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "hint": "Hint"
+  }
+}

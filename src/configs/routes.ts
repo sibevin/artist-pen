@@ -1,15 +1,51 @@
-import Home from "@/pages/HomePage.vue";
-import About from "@/pages/AboutPage.vue";
+import EntryPage from "~/pages/EntryPage.vue";
+import DiariesPage from "~/pages/dwdy/DiariesPage.vue";
+import DiaryPage from "~/pages/dwdy/DiaryPage.vue";
+import SettingsPage from "~/pages/SettingsPage.vue";
+import AccountPage from "~/pages/AccountPage.vue";
+import AboutPage from "~/pages/AboutPage.vue";
+import ErrorPage from "~/pages/ErrorPage.vue";
 
 export const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    name: "entry",
+    component: EntryPage,
+  },
+  {
+    path: "/dwdy/diaries",
+    name: "diaries",
+    component: DiariesPage,
+  },
+  {
+    path: "/dwdy/diary/:uid",
+    name: "diary",
+    component: DiaryPage,
+  },
+  {
+    path: "/settings",
+    name: "settings",
+    component: SettingsPage,
+  },
+  {
+    path: "/account",
+    name: "account",
+    component: AccountPage,
   },
   {
     path: "/about",
-    name: "About",
-    component: About,
+    name: "about",
+    component: AboutPage,
+  },
+  {
+    path: "/error",
+    name: "error",
+    component: ErrorPage,
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: () => {
+      return { path: "/error", query: { err: "not_found" } };
+    },
   },
 ];

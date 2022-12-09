@@ -1,0 +1,9 @@
+{
+  "dwdy": {
+    "DiariesPage": {
+      "newDiary": "建立日記本",
+      "creationHint": "您可以在建立日記本之後隨時變更這些設定。",
+      "queryKeywordHint": "日記名稱"
+    }
+  }
+}
