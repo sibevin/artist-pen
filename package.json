@@ -27,6 +27,7 @@
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "@vitejs/plugin-vue": "^3.2.0",
     "@vueup/vue-quill": "^1.0.1",
+    "@vueuse/components": "^9.10.0",
     "@vueuse/core": "^9.4.0",
     "autoprefixer": "^10.4.13",
     "daisyui": "^2.38.0",
