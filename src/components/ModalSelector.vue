@@ -130,18 +130,13 @@ function triggerModelUpdate() {
     emit("update:modelValue", isModalOn.value);
   }
 }
-
-function blockHotkey(): void {
-  appState.hk.value.block();
-}
-defineExpose({ blockHotkey });
 </script>
 <template>
   <ModalBase
     ref="selectorModel"
     v-model="isModalOn"
     class="fixed z-10"
-    modal-base-id="props.modalId"
+    :modal-base-id="props.modalId"
     :outside-close-enabled="true"
     :current-selected-btn="pn.isCurrent('modal-close-btn') ? 'close' : ''"
     :show-hotkey-hint="appState.hk.value.isMarkShown(props.modalId)"

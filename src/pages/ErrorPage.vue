@@ -20,7 +20,7 @@ const route = useRoute();
     </template>
     <template #layout-overlay-bottom-panel>
       <div
-        class="select-none w-full border-base-100 backdrop-blur-sm bg-base-100/80 flex justify-between items-center p-3"
+        class="w-full border-base-100 backdrop-blur-sm bg-base-100/60 flex justify-between items-center p-3"
       >
         <label for="whole-drawer" class="btn btn-circle btn-ghost rounded-full">
           <SvgIcon

@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, computed } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useFocus } from "@vueuse/core";
 import { mdiPlus, mdiCheck, mdiClose, mdiArrowLeftBottom } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useAppState } from "~/states/useAppState";
-import { Diary, DiaryAttrs, DEFAULT_ATTRS } from "~/models/dwdy/diary";
-import { DiaryFeature, featureOpts } from "~/models/dwdy/feature";
+import { Diary, DiaryDocParams, DEFAULT_ATTRS } from "~/models/dwdy/diary";
+import {
+  DiaryFeature,
+  featureOpts,
+  AVAILABLE_FEATURES,
+} from "~/models/dwdy/feature";
 import { DiaryLayout, layoutOpts } from "~/models/dwdy/layout";
 import SvgIcon from "~/components/SvgIcon.vue";
 import ModalBase from "~/components/ModalBase.vue";
@@ -25,13 +29,16 @@ const emit = defineEmits<{
 const la = new LocaleActor("pages.dwdy.DiariesPage");
 const appState = useAppState();
 const router = useRouter();
-const newDiaryAttrs = ref<DiaryAttrs>(Object.assign({}, DEFAULT_ATTRS));
+const newDiaryAttrs = ref<DiaryDocParams>(
+  Object.assign({}, DEFAULT_ATTRS, { enabledFeatures: AVAILABLE_FEATURES })
+);
 const isModalOn = ref(false);
 const diaryCreationModel = ref();
 const pageScope = "diary-creation-modal";
 const diaryTitleInputScope = "diary-title-input";
 const newDiaryTitleInput = ref();
 const { focused: isNewDiaryTitleInputFocused } = useFocus(newDiaryTitleInput);
+const modalCurrentSelectedBtn = ref<string>();
 
 const navCellSpecs: NavCellSpec[] = [];
 const navMaxCol = Math.max(layoutOpts(la).length, featureOpts(la).length);
@@ -44,7 +51,6 @@ navCellSpecs.push({
   callback: {
     trigger: () => {
       isNewDiaryTitleInputFocused.value = !isNewDiaryTitleInputFocused.value;
-      appState.hk.value.block();
       pn.value.resetCurrent();
     },
   },
@@ -72,17 +78,19 @@ featureOpts(la).forEach((featureOpt, index) => {
     },
     callback: {
       trigger: () => {
-        if (isFeatureSelected(featureOpt.value)) {
-          const foundIndex = newDiaryAttrs.value.enabledFeatures.indexOf(
-            featureOpt.value as DiaryFeature
-          );
-          if (foundIndex >= 0) {
-            newDiaryAttrs.value.enabledFeatures.splice(foundIndex, 1);
+        if (newDiaryAttrs.value.enabledFeatures) {
+          if (isFeatureSelected(featureOpt.value)) {
+            const foundIndex = newDiaryAttrs.value.enabledFeatures.indexOf(
+              featureOpt.value as DiaryFeature
+            );
+            if (foundIndex >= 0) {
+              newDiaryAttrs.value.enabledFeatures.splice(foundIndex, 1);
+            }
+          } else {
+            newDiaryAttrs.value.enabledFeatures.push(
+              featureOpt.value as DiaryFeature
+            );
           }
-        } else {
-          newDiaryAttrs.value.enabledFeatures.push(
-            featureOpt.value as DiaryFeature
-          );
         }
       },
     },
@@ -119,8 +127,14 @@ navCellSpecs.push({
     end: [navMaxCol - 1, 5],
   },
   callback: {
+    enter: () => {
+      modalCurrentSelectedBtn.value = "close";
+    },
     trigger: () => {
       closeModal();
+    },
+    leave: () => {
+      modalCurrentSelectedBtn.value = undefined;
     },
   },
 });
@@ -131,8 +145,14 @@ navCellSpecs.push({
     end: [navMaxCol, 5],
   },
   callback: {
+    enter: () => {
+      modalCurrentSelectedBtn.value = "help";
+    },
     trigger: () => {
       console.log("help-btn");
+    },
+    leave: () => {
+      modalCurrentSelectedBtn.value = undefined;
     },
   },
 });
@@ -233,18 +253,12 @@ function triggerModelUpdate() {
 }
 
 function isFeatureSelected(value: string): boolean {
-  return newDiaryAttrs.value.enabledFeatures.includes(value as DiaryFeature);
+  if (newDiaryAttrs.value.enabledFeatures) {
+    return newDiaryAttrs.value.enabledFeatures.includes(value as DiaryFeature);
+  } else {
+    return false;
+  }
 }
-
-const modalCurrentSelectedBtn = computed<string | undefined>(() => {
-  if (pn.value.isCurrent("close-btn")) {
-    return "close";
-  }
-  if (pn.value.isCurrent("help-btn")) {
-    return "help";
-  }
-  return undefined;
-});
 
 async function onDiaryCreationSubmitted(): Promise<void> {
   const newDiary = new Diary(newDiaryAttrs.value);
@@ -278,37 +292,42 @@ async function onDiaryCreationSubmitted(): Promise<void> {
     <template #modal-content>
       <div>
         <div class="flex items-center">
-          <label
-            class="grow"
-            :class="pn.isCurrent('diary-title-input') ? 'input-group' : ''"
-          >
-            <input
-              ref="newDiaryTitleInput"
-              v-model="newDiaryAttrs.title"
-              class="input input-bordered border-base-200 w-full"
-              :class="pn.isCurrent('diary-title-input') ? 'border-4' : ''"
-              type="text"
-              name="title"
-              :placeholder="la.t('models.dwdy.diary.field.title') as string"
-            />
-            <span
-              class="bg-base-200 px-2"
-              :class="pn.isCurrent('diary-title-input') ? '' : 'hidden'"
+          <div class="grow">
+            <div class="font-bold -mb-3 z-10 relative">
+              <div class="mx-2 px-2 bg-base-100 inline-block">
+                {{ la.t("models.dwdy.diary.field.title") }}
+              </div>
+            </div>
+            <label
+              :class="pn.isCurrent('diary-title-input') ? 'input-group' : ''"
             >
-              <SvgIcon
-                icon-set="mdi"
-                :path="mdiArrowLeftBottom"
-                :size="20"
-              ></SvgIcon>
-            </span>
-          </label>
+              <input
+                ref="newDiaryTitleInput"
+                v-model="newDiaryAttrs.title"
+                class="input input-bordered border-base-200 w-full pt-2 h-14"
+                :class="pn.isCurrent('diary-title-input') ? 'border-4' : ''"
+                type="text"
+                name="title"
+              />
+              <span
+                class="bg-base-200 px-2"
+                :class="pn.isCurrent('diary-title-input') ? '' : 'hidden'"
+              >
+                <SvgIcon
+                  icon-set="mdi"
+                  :path="mdiArrowLeftBottom"
+                  :size="20"
+                ></SvgIcon>
+              </span>
+            </label>
+          </div>
           <span
             v-if="appState.hk.value.isMarkShown(pageScope)"
-            class="hotkey-mark mx-4"
+            class="hotkey-mark mx-4 mt-3"
             >0</span
           >
         </div>
-        <div class="cell-block mt-6 mb-2 max-w-md">
+        <div class="cell-block mt-6 mb-2">
           <div class="cell-title">
             {{ la.t("models.dwdy.diary.field.layout") }}
           </div>
@@ -362,7 +381,7 @@ async function onDiaryCreationSubmitted(): Promise<void> {
             </div>
           </div>
         </div>
-        <div class="cell-block mt-6 mb-2 max-w-md">
+        <div class="cell-block mt-6 mb-2">
           <div class="cell-title">
             {{ la.t("models.dwdy.diary.field.enabledFeatures") }}
           </div>

@@ -1,6 +1,6 @@
 import { DIndex } from "~/models/dwdy/diary";
 
-export type MoveDirection = "prev" | "next";
+export type MoveDirection = "prev" | "next" | "current";
 export type MoveUnit = "month" | "day";
 
 export function dIndexToDt(dIndex: DIndex): Date {
@@ -24,7 +24,7 @@ export function getNeighborDt(
 ): Date {
   let newMonth = baseDt.getMonth();
   let newDate = baseDt.getDate();
-  if (moveAmount === 0) {
+  if (moveAmount === 0 || moveDirection === "current") {
     if (moveUnit === "month") {
       if (moveDirection === "next") {
         newDate = 0;
@@ -65,7 +65,11 @@ export function isInSameMonth(dt1: Date, dt2: Date): boolean {
   );
 }
 
-export function isSameDt(dt1: Date, dt2: Date, range = "day"): boolean {
+export function isSameDt(
+  dt1: Date,
+  dt2: Date,
+  range: "day" | "month" | "year" = "day"
+): boolean {
   if (range === "year" || dt1.getFullYear() !== dt2.getFullYear()) {
     return dt1.getFullYear() === dt2.getFullYear();
   }
@@ -77,4 +81,11 @@ export function isSameDt(dt1: Date, dt2: Date, range = "day"): boolean {
 
 export function isToday(givenDt: Date): boolean {
   return isSameDt(givenDt, new Date());
+}
+
+export function isDateDIndex(givenDIndex?: DIndex): boolean {
+  if (!givenDIndex) {
+    return false;
+  }
+  return /^\d{8}$/.test(givenDIndex);
 }

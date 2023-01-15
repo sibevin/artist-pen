@@ -4,6 +4,41 @@
       "newDiary": "建立日記本",
       "creationHint": "您可以在建立日記本之後隨時變更這些設定。",
       "queryKeywordHint": "日記名稱"
+    },
+    "DiaryPage": {
+      "menu": {
+        "settings": "設定"
+      },
+      "settingsModal": {
+        "tab": {
+          "general": "一般設定",
+          "calendar": "日曆時間",
+          "feature": "功能",
+          "data": "資料管理"
+        },
+        "featurePanel": {
+          "enabledFeatures": "已開啓功能",
+          "disabledFeatures": "已關閉功能",
+          "calendar": "日曆",
+          "date": "日期",
+          "hint": "這些設定只會顯示或隱藏相關的操作界面，關閉功能時並不會刪除已經存在的資料。"
+        },
+        "dataPanel": {
+          "statistics": "統計",
+          "operation": "資料操作",
+          "totalSize": "總計",
+          "others": "其他"
+        }
+      },
+      "dateSelector": {
+        "title": "選擇日期"
+      },
+      "calendar": {
+        "navMenu": {
+          "calendar": "日曆",
+          "today": "今天"
+        }
+      }
     }
   }
 }

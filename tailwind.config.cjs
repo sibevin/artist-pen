@@ -22,11 +22,12 @@ module.exports = {
         fs24: "24rem",
         fs32: "32rem",
         fs36: "36rem",
-        v30: "30vh",
-        v50: "50vh",
+        v30: "calc(var(--vh) * 30)",
+        v50: "calc(var(--vh) * 50)",
       },
       maxHeight: {
-        v90: "90vh",
+        v60: "calc(var(--vh) * 60)",
+        v90: "calc(var(--vh) * 90)",
       },
       width: {
         fs12: "12rem",

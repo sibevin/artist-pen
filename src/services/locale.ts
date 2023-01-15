@@ -31,7 +31,10 @@ export class LocaleActor {
     this.prefixArr = prefix.split(".");
   }
 
-  t(key: string, options?: any): string | i18next.TFunctionDetailedResult {
+  t(
+    key: string,
+    options?: any
+  ): string | string[] | i18next.TFunctionDetailedResult {
     const heading = key.match(/(^\.+)/g);
     if (heading !== null) {
       if (heading[0].length === 1) {

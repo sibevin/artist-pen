@@ -10,10 +10,10 @@
         "theme": {
           "snow": "雪",
           "obsidian": "墨",
-          "ocean": "海",
+          "ocean": "涓",
           "sakura": "櫻",
-          "forest": "森",
-          "antique": "藏"
+          "forest": "碧",
+          "antique": "典"
         }
       }
     }
@@ -24,7 +24,8 @@
       "field": {
         "title": "名稱",
         "enabledFeatures": "開啓功能",
-        "layout": "排版"
+        "layout": "排版",
+        "isCalendarShown": "顯示日曆"
       },
       "hint": {
         "enabledFeatures": "決定那些功能要開啓或隱藏，關閉功能只會隱藏相關的操作界面，並不會刪除已經存在的資料。",
@@ -45,7 +46,8 @@
           "video": "影像",
           "location": "地點",
           "todoList": "代辦清單",
-          "dataList": "資料清單"
+          "dataList": "資料清單",
+          "file": "檔案"
         },
         "layout": {
           "calendar": "日曆",
@@ -99,6 +101,22 @@
           "l": "大",
           "xl": "超大"
         }
+      }
+    },
+    "sticker": {
+      "category": {
+        "recent": "近期",
+        "customized": "個人",
+        "mood": "心情",
+        "weather": "天氣",
+        "food": "吃",
+        "dessert": "點心",
+        "drink": "飲料",
+        "activity": "活動",
+        "sport": "運動",
+        "location": "地點",
+        "transport": "交通",
+        "festival": "節日"
       }
     }
   }

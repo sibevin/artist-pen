@@ -4,6 +4,41 @@
       "newDiary": "New Diary",
       "creationHint": "You can change these settings after the diary is created.",
       "queryKeywordHint": "Title"
+    },
+    "DiaryPage": {
+      "menu": {
+        "settings": "Settings"
+      },
+      "settingsModal": {
+        "tab": {
+          "general": "General",
+          "calendar": "Calendar",
+          "feature": "Feature",
+          "data": "Data"
+        },
+        "featurePanel": {
+          "enabledFeatures": "Enabled Features",
+          "disabledFeatures": "Disabled Features",
+          "calendar": "Calendar",
+          "date": "Date",
+          "hint": "These settings only affect the interface display, existing data are hidden (not deleted) when a feature is disabled."
+        },
+        "dataPanel": {
+          "statistics": "Statistics",
+          "operation": "Operation",
+          "totalSize": "Total",
+          "others": "Others"
+        }
+      },
+      "dateSelector": {
+        "title": "Select date"
+      },
+      "calendar": {
+        "navMenu": {
+          "calendar": "Calendar",
+          "today": "Today"
+        }
+      }
     }
   }
 }

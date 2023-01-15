@@ -5,6 +5,7 @@ export interface NavCell {
   name: NavCellID;
   start: NavPoint;
   end?: NavPoint;
+  skip?: () => boolean;
 }
 interface NavStoredCell extends NavCell {
   end: NavPoint;
@@ -13,8 +14,9 @@ interface NavStoredCell extends NavCell {
 type NavCallback = () => void;
 type NavCellCallbackMap = Record<NavCellID, NavCellCallback | undefined>;
 interface NavCellCallback {
+  enter?: NavCallback;
   trigger?: NavCallback;
-  after?: NavCallback;
+  leave?: NavCallback;
 }
 export interface NavCellSpec {
   cell: NavCell;
@@ -40,6 +42,7 @@ class NavBoard {
         name: cell.name,
         start: cell.start,
         end: cell.end || [cell.start[X_VAL] + 1, cell.start[Y_VAL] + 1],
+        skip: cell.skip,
       };
     });
     this.firstCell = Object.values(this.cellMap)[0];
@@ -53,7 +56,18 @@ class NavBoard {
         this.firstCell = cell;
       }
     } else {
-      this.firstCell = Object.values(this.cellMap)[0];
+      const firstNotSkippedCell = Object.values(this.cellMap).filter((cell) => {
+        if (cell.skip && cell.skip()) {
+          return false;
+        } else {
+          return true;
+        }
+      })[0];
+      if (firstNotSkippedCell) {
+        this.firstCell = firstNotSkippedCell;
+      } else {
+        this.firstCell = Object.values(this.cellMap)[0];
+      }
     }
   }
 
@@ -76,6 +90,9 @@ class NavBoard {
   }
 
   private isSortTargets(cell: NavStoredCell, axis: number): boolean {
+    if (cell.skip && cell.skip()) {
+      return false;
+    }
     if (this.currentCell) {
       return (
         (this.currentCell.start[axis] >= cell.start[axis] &&
@@ -121,7 +138,8 @@ class NavBoard {
     return filteredCells;
   }
 
-  public move(direction: NavPoint): NavCellID | undefined {
+  public move(direction: NavPoint, preview = false): NavCellID | undefined {
+    let targetCell;
     if (this.currentCell) {
       const currentCell = this.currentCell;
       let targetCells: NavStoredCell[] = [];
@@ -140,31 +158,49 @@ class NavBoard {
         const currentIndex = targetCells.findIndex(
           (targetCell) => targetCell.name === currentCell.name
         );
-        const targetCell =
+        targetCell =
           currentIndex + 1 >= targetCells.length
             ? targetCells[0]
             : targetCells[currentIndex + 1];
-        this.currentCell = targetCell;
       }
     } else {
-      this.currentCell = this.firstCell;
+      targetCell = this.firstCell;
     }
-    return this.currentCell?.name;
+    if (preview) {
+      return targetCell?.name;
+    } else {
+      this.currentCell = targetCell;
+      return this.currentCell?.name;
+    }
   }
 
-  public moveNext(): NavCellID | undefined {
+  public moveNext(preview = false): NavCellID | undefined {
+    let targetCell;
     if (this.currentCellId) {
-      const allCellIds: NavCellID[] = Object.keys(this.cellMap) as NavCellID[];
+      const allCellIds: NavCellID[] = Object.keys(this.cellMap).filter(
+        (cellId) => {
+          const skipFn = this.cellMap[cellId].skip;
+          if (skipFn && skipFn()) {
+            return false;
+          } else {
+            return true;
+          }
+        }
+      ) as NavCellID[];
       const currentIndex = allCellIds.indexOf(this.currentCellId);
-      const targetCell =
+      targetCell =
         currentIndex + 1 >= allCellIds.length
           ? this.firstCell
           : this.cellMap[allCellIds[currentIndex + 1]];
-      this.currentCell = targetCell;
     } else {
-      this.currentCell = this.firstCell;
+      targetCell = this.firstCell;
     }
-    return this.currentCell?.name;
+    if (preview) {
+      return targetCell?.name;
+    } else {
+      this.currentCell = targetCell;
+      return this.currentCell?.name;
+    }
   }
 }
 
@@ -186,13 +222,16 @@ export class PageNavigator {
     return cellId === this.navBoard.currentCellId;
   }
 
-  public resetCellSpec(cellSpecs: NavCellSpec[]): void {
+  public resetCellSpec(
+    cellSpecs: NavCellSpec[],
+    resetCellId?: NavCellID | undefined
+  ): void {
     this.navBoard = new NavBoard(cellSpecs.map((cellSpec) => cellSpec.cell));
     this.callbackMap = {};
     cellSpecs.forEach((cellSpec) => {
       this.callbackMap[cellSpec.cell.name] = cellSpec.callback;
     });
-    this.resetCurrent();
+    this.resetCurrent(resetCellId);
   }
 
   public resetFirst(cellId?: NavCellID): void {
@@ -200,12 +239,22 @@ export class PageNavigator {
   }
 
   public resetCurrent(cellId?: NavCellID): void {
+    this.runCurrentLeaveCallback(cellId);
     this.navBoard.resetCurrent(cellId);
   }
 
-  private get currentCellCallback(): NavCellCallback | undefined {
-    if (this.navBoard.currentCellId) {
-      return this.callbackMap[this.navBoard.currentCellId];
+  private runCurrentLeaveCallback(targetCellId?: NavCellID): void {
+    if (targetCellId !== this.currentCellId) {
+      const currentCallback = this.getCellCallback(this.currentCellId);
+      if (currentCallback?.leave) {
+        currentCallback.leave();
+      }
+    }
+  }
+
+  private getCellCallback(cellId?: NavCellID): NavCellCallback | undefined {
+    if (cellId) {
+      return this.callbackMap[cellId];
     } else {
       return undefined;
     }
@@ -215,31 +264,35 @@ export class PageNavigator {
     direction: NavPoint,
     { triggerAfterMoving = false }: NavMoveOption = {}
   ): void {
-    this.navBoard.move(direction);
-    const cellCallback = this.currentCellCallback;
-    if (cellCallback?.after) {
-      cellCallback.after();
+    const targetCellId = this.navBoard.move(direction, true);
+    this.runCurrentLeaveCallback(targetCellId);
+    const targetCallback = this.getCellCallback(targetCellId);
+    if (targetCallback?.enter) {
+      targetCallback.enter();
     }
+    this.navBoard.move(direction);
     if (triggerAfterMoving) {
       this.trigger();
     }
   }
 
   public moveNext({ triggerAfterMoving = false }: NavMoveOption = {}): void {
-    this.navBoard.moveNext();
-    const cellCallback = this.currentCellCallback;
-    if (cellCallback?.after) {
-      cellCallback.after();
+    const targetCellId = this.navBoard.moveNext(true);
+    this.runCurrentLeaveCallback(targetCellId);
+    const targetCallback = this.getCellCallback(targetCellId);
+    if (targetCallback?.enter) {
+      targetCallback.enter();
     }
+    this.navBoard.moveNext();
     if (triggerAfterMoving) {
       this.trigger();
     }
   }
 
   public trigger(): void {
-    const cellCallback = this.currentCellCallback;
-    if (cellCallback?.trigger) {
-      cellCallback.trigger();
+    const currentCallback = this.getCellCallback(this.currentCellId);
+    if (currentCallback?.trigger) {
+      currentCallback.trigger();
     }
   }
 }

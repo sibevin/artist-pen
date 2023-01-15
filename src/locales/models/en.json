@@ -24,10 +24,11 @@
       "field": {
         "title": "Name",
         "enabledFeatures": "Enabled features",
-        "layout": "Layout"
+        "layout": "Layout",
+        "isCalendarShown": "Show calendar"
       },
       "hint": {
-        "enabledFeatures": "Enable / disable features to show / hide related interfaces. This setting only affects the interface display, existing data are hidden (not deleted) when the feature is disabled.",
+        "enabledFeatures": "Enable / disable features to show / hide related interfaces. These setting only affect the interface display, existing data are hidden (not deleted) when a feature is disabled.",
         "layout": {
           "calendar": "Provide a calendar to quickly access contents for a particular date.",
           "timeline": "Display the whole-month contents in a timeline.",
@@ -45,7 +46,8 @@
           "video": "Video",
           "location": "Location",
           "todoList": "Todo",
-          "dataList": "Data"
+          "dataList": "Data",
+          "file": "File"
         },
         "layout": {
           "calendar": "Calendar",
@@ -59,10 +61,10 @@
         "password": "Password",
         "protectedByPassword": "Enable password",
         "diariesSortedBy": "Diaries sorted by",
-        "highlightedWeekDays": "Highlighted days of the week",
-        "firstWeekDay": "Calendar started day of the week",
+        "highlightedWeekDays": "Highlighted days",
+        "firstWeekDay": "Calendar started day",
         "isWeekShown": "Show weeks of the year",
-        "timelineOrder": "Timeline order (from top to bottom)",
+        "timelineOrder": "Timeline order (Top > Bottom)",
         "locale": "Language",
         "font": "Font",
         "fontFamily": "Family",
@@ -98,6 +100,22 @@
           "l": "L",
           "xl": "XL"
         }
+      }
+    },
+    "sticker": {
+      "category": {
+        "recent": "Recent",
+        "customized": "Customized",
+        "mood": "Mood",
+        "weather": "Weather",
+        "food": "Food",
+        "dessert": "Dessert",
+        "drink": "Drink",
+        "activity": "Activity",
+        "sport": "Sport",
+        "location": "Location",
+        "transport": "Transportation",
+        "festival": "Festival"
       }
     }
   }

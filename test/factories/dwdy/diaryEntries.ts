@@ -19,11 +19,12 @@ export function genRandomDIndex(): DIndex {
 // Ref: https://github.com/dexie/Dexie.js/issues/647
 export function buildAttrs(givenAttrs: DiaryEntryParams = {}): DiaryEntryAttrs {
   return Object.assign(
+    {},
     {
-      essays: genRandomSize(() => faker.lorem.paragraphs()),
-      images: [], //genRandomBlobs(),
-      stickers: randomSample(Object.keys(stickerMap)),
-      illustrations: [], // genRandomBlobs(),
+      content: {
+        text: genRandomSize(() => faker.lorem.paragraphs()),
+        sticker: randomSample(Object.keys(stickerMap)),
+      },
     },
     givenAttrs
   );

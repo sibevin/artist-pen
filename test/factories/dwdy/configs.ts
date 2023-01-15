@@ -1,16 +1,18 @@
 import { faker } from "@faker-js/faker";
 import { randomPick, randomSample } from "../../support/randomUtils";
 import { prepareModelFactory } from "../factoryUtils";
-import { DiarySortedBy } from "~/models/dwdy/diarySortedBy";
+import {
+  DiarySortedBy,
+  WeekDay,
+  DiaryTimelineOrder,
+  DiaryFontFamily,
+  DiaryFontFormatSize,
+  WEEK_DAYS,
+} from "~/models/dwdy/configOption";
 import {
   DwdyConfigAttrs,
   DwdyConfigParams,
   DwdyConfig,
-  WeekDay,
-  DiaryTimelineOrder,
-  FontFamily,
-  FontFormatSize,
-  WEEK_DAYS,
 } from "~/models/dwdy/config";
 
 export function buildAttrs(givenAttrs: DwdyConfigParams = {}): DwdyConfigAttrs {
@@ -19,10 +21,10 @@ export function buildAttrs(givenAttrs: DwdyConfigParams = {}): DwdyConfigAttrs {
       diariesSortedBy: randomPick(Object.keys(DiarySortedBy)),
       isContentMenuShown: faker.datatype.boolean(),
       recentStickerCodes: faker.lorem.words(),
-      fontFamily: randomPick(Object.keys(FontFamily)),
-      fontSize: randomPick(Object.keys(FontFormatSize)),
-      fontLineHeight: randomPick(Object.keys(FontFormatSize)),
-      fontLetterSpacing: randomPick(Object.keys(FontFormatSize)),
+      fontFamily: randomPick(Object.keys(DiaryFontFamily)),
+      fontSize: randomPick(Object.keys(DiaryFontFormatSize)),
+      fontLineHeight: randomPick(Object.keys(DiaryFontFormatSize)),
+      fontLetterSpacing: randomPick(Object.keys(DiaryFontFormatSize)),
       highlightedWeekDays: randomSample(WEEK_DAYS as WeekDay[]),
       firstWeekDay: randomPick(WEEK_DAYS as WeekDay[]) as WeekDay,
       isWeekShown: faker.datatype.boolean(),

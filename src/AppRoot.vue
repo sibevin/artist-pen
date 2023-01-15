@@ -17,13 +17,16 @@ await initDwdyConfig();
 const appState = useAppState();
 const reloadKey = ref(1);
 
-function reloadPage() {
+function reloadPage(): void {
   reloadKey.value = reloadKey.value * -1;
 }
 </script>
 
 <template>
-  <div class="absolute inset-0" :data-theme="appState.config.value.doc.theme">
+  <div
+    class="relatvie top-0 bottom-0 w-full h-full"
+    :data-theme="appState.config.value.doc.theme"
+  >
     <RouterView
       v-slot="{ Component }"
       :key="reloadKey"

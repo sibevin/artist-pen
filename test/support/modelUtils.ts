@@ -91,7 +91,7 @@ export function checkUidBehavior<
   });
 }
 
-export function checkIsReadyToSaveBehavior<
+export function checkIsStoredBehavior<
   ModelKlass extends BaseModel<ModelKlass, ModelDoc, ModelParams>,
   ModelDoc,
   ModelParams
@@ -100,20 +100,20 @@ export function checkIsReadyToSaveBehavior<
   modelBuildProc: () => ModelKlass,
   modelCreateProc: () => Promise<ModelKlass>
 ) {
-  describe("#isReadyToSave", () => {
+  describe("#isStored", () => {
     afterAll(() => {
       dbClearProc();
     });
     describe("when the model instance is a new instance without saving", () => {
       it("returns false", () => {
         const modelInst = modelBuildProc();
-        expect(modelInst.isReadyToSave).toBeFalsy();
+        expect(modelInst.isStored).toBeFalsy();
       });
     });
     describe("when the model instance is saved", () => {
       it("returns true", async () => {
         const modelInst = await modelCreateProc();
-        expect(modelInst.isReadyToSave).toBeTruthy();
+        expect(modelInst.isStored).toBeTruthy();
       });
     });
   });

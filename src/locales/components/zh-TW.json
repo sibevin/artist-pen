@@ -1,0 +1,35 @@
+{
+  "dwdy": {
+    "diaryContent": {
+      "DeletionModal": {
+        "deletionHint_zero": "請選取您要刪除的資料。",
+        "deletionHint_one": "已選取 1 筆資料，確定要刪除它嗎？",
+        "deletionHint_other": "已選取 {{count}} 筆資料，確定要刪除這些資料嗎？"
+      }
+    },
+    "feature": {
+      "text": {
+        "ContentEditor": {
+          "writeSomethingHint": "寫點東西吧..."
+        }
+      },
+      "image": {
+        "ContentSlate": {
+          "imageSize": "圖片尺寸",
+          "fileSize": "檔案大小",
+          "fileType": "檔案類型",
+          "fileName": "檔案名稱"
+        },
+        "ContentEditor": {
+          "changeImage": "更換圖片",
+          "imageSize": "圖片尺寸",
+          "fileSize": "檔案大小",
+          "fileType": "檔案類型",
+          "fileName": "檔案名稱",
+          "comment": "備註",
+          "invalidFileNameHint": "無效的檔名，請嘗試移除特殊符號後再試一次。"
+        }
+      }
+    }
+  }
+}

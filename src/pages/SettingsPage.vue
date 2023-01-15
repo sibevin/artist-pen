@@ -23,7 +23,6 @@ import {
 import { THEMES } from "~/services/theme";
 import { PageNavigator, NavCellSpec } from "~/services/pageNavigator";
 import { useAppState } from "~/states/useAppState";
-import { AppConfig } from "~/models/app/config";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import ModalSelector from "~/components/ModalSelector.vue";
@@ -42,10 +41,6 @@ const appState = useAppState();
 const pageScope = "settings-page";
 const isLocaleSelectorModalOpen = ref(false);
 const mainLayout = ref();
-
-const appConfig = computed<AppConfig>(() => {
-  return appState.config.value;
-});
 
 const navCellSpecs: NavCellSpec[] = [];
 navCellSpecs.push({
@@ -89,7 +84,7 @@ navCellSpecs.push({
   callback: {
     trigger: () => {
       if (mainLayout.value) {
-        mainLayout.value.openWithBlock();
+        mainLayout.value.openMenu();
       }
     },
   },
@@ -124,12 +119,12 @@ appState.hk.value.setupHotKeys(pageScope, () => {
 });
 
 const localeDisplay = computed<string>(() => {
-  return LOCALE_DATA[appConfig.value.doc.locale];
+  return LOCALE_DATA[appState.config.value.doc.locale];
 });
 
 async function onSelectedLocaleChanged(locale: string) {
-  appConfig.value.assign({ locale });
-  await appConfig.value.save();
+  appState.config.value.assign({ locale });
+  await appState.config.value.save();
   await switchLocale(locale);
   isLocaleSelectorModalOpen.value = false;
   nextTick(() => {
@@ -137,8 +132,8 @@ async function onSelectedLocaleChanged(locale: string) {
   });
 }
 async function onThemeChanged(theme: string) {
-  appConfig.value.assign({ theme });
-  await appConfig.value.save();
+  appState.config.value.assign({ theme });
+  await appState.config.value.save();
 }
 </script>
 
@@ -213,7 +208,7 @@ async function onThemeChanged(theme: string) {
                 type="radio"
                 name="radio-1"
                 class="radio mr-3"
-                :checked="appConfig.doc.theme === theme"
+                :checked="appState.config.value.doc.theme === theme"
               />
               <div class="text-2xl text-primary mr-2">
                 {{ la.t(`.enum.theme.${theme}`) }}
@@ -309,7 +304,7 @@ async function onThemeChanged(theme: string) {
     </template>
     <template #layout-overlay-bottom-panel>
       <div
-        class="select-none w-full border-base-100 backdrop-blur-sm bg-base-100/80 flex justify-between items-center p-3"
+        class="w-full border-base-100 backdrop-blur-sm bg-base-100/60 flex justify-between items-center p-3"
       >
         <div class="indicator">
           <span
@@ -358,7 +353,7 @@ async function onThemeChanged(theme: string) {
       <ModalSelector
         v-model="isLocaleSelectorModalOpen"
         modal-id="locale-selector"
-        :current-value="appConfig.doc.locale"
+        :current-value="appState.config.value.doc.locale"
         :options="localeOptions()"
         @change="onSelectedLocaleChanged"
       >

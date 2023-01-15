@@ -19,7 +19,7 @@ import { useAppState } from "~/states/useAppState";
 import { useDwdyState } from "~/states/useDwdyState";
 import { DwdyConfig } from "~/models/dwdy/config";
 import { Diary, DUid } from "~/models/dwdy/diary";
-import { DiarySortedBy, diarySortedByOpts } from "~/models/dwdy/diarySortedBy";
+import { DiarySortedBy, diarySortedByOpts } from "~/models/dwdy/configOption";
 import { DiaryFeature, featureIconMap } from "~/models/dwdy/feature";
 import { Icon } from "~/models/app/types";
 import { dIndexToDtStr } from "~/models/dwdy/dateUtils";
@@ -126,7 +126,7 @@ function updatePnCellSpec(): void {
         trigger: () => {
           routeToDiaryPage(diary.uid as DUid);
         },
-        after: () => {
+        enter: () => {
           scrollDiaryList({ index });
         },
       },
@@ -142,7 +142,7 @@ function updatePnCellSpec(): void {
       trigger: () => {
         isDiaryCreationMoodalOn.value = true;
       },
-      after: () => {
+      enter: () => {
         scrollDiaryList({ toCreationBtn: true });
       },
     },
@@ -177,7 +177,7 @@ function updatePnCellSpec(): void {
     callback: {
       trigger: () => {
         if (mainLayout.value) {
-          mainLayout.value.openWithBlock();
+          mainLayout.value.openMenu();
         }
       },
     },
@@ -224,7 +224,6 @@ appState.hk.value.setupHotKeys(pageScope, () => {
     keys: ["/", "Enter"],
     scope: diaryQueryScope,
     callback: () => {
-      console.log("Entry");
       triggerDiarySearch();
     },
   });
@@ -309,7 +308,7 @@ async function onDiarySortingChanged(value: string): Promise<void> {
             </div>
             <div class="text-base-200 flex items-center">
               <SvgIcon
-                v-for="feature in diary.doc.enabledFeatures"
+                v-for="feature in diary.enabledFeatures"
                 :key="feature"
                 class="mr-3"
                 :icon-set="getFeatureIcon(feature).set"
@@ -374,7 +373,7 @@ async function onDiarySortingChanged(value: string): Promise<void> {
     </template>
     <template #layout-overlay-bottom-panel>
       <div
-        class="select-none w-full border-base-100 backdrop-blur-sm bg-base-100/80 flex justify-between items-center p-3"
+        class="w-full border-base-100 backdrop-blur-sm bg-base-100/60 flex justify-between items-center p-3"
       >
         <div class="indicator">
           <span

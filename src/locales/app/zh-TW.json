@@ -5,11 +5,14 @@
     "changeOrder": "變更順序",
     "close": "關閉",
     "confirm": "確認",
-    "create": "建立",
+    "create": "新增",
     "disable": "關閉",
     "delete": "刪除",
     "edit": "編輯",
     "enable": "啓動",
+    "export": "匯出",
+    "import": "匯入",
+    "list": "列表",
     "login": "登入",
     "next": "下一步",
     "moveForward": "往前移",
@@ -18,10 +21,16 @@
     "redo": "重做",
     "save": "儲存",
     "search": "搜尋",
+    "selectAll": "全選",
     "send": "送出",
     "undo": "復原",
     "update": "更新",
     "view": "檢視"
+  },
+  "state": {
+    "loading": "載入中",
+    "saved": "已儲存",
+    "saving": "儲存中"
   },
   "error": {
     "createFailed": "建立失敗，請稍後再試一次。",

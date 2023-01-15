@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, useSlots } from "vue";
 import { useRouter } from "vue-router";
 import {
   mdiClose,
@@ -23,15 +23,15 @@ const la = new LocaleActor("app");
 const router = useRouter();
 const appState = useAppState();
 const pageScope = "main-layout";
+const slots = useSlots();
 
 const isDrawerMenuOn = ref(false);
 
-function openWithBlock(): void {
-  appState.hk.value.block();
+function openMenu(): void {
   isDrawerMenuOn.value = true;
 }
 
-defineExpose({ openWithBlock });
+defineExpose({ openMenu });
 
 function triggerMenuBtn(): void {
   isDrawerMenuOn.value = !isDrawerMenuOn.value;
@@ -139,8 +139,8 @@ watch(
 );
 </script>
 <template>
-  <div>
-    <div class="drawer absolute inset-0">
+  <div class="relatvie top-0 bottom-0 w-full h-full">
+    <div class="drawer relatvie top-0 bottom-0 w-full h-full">
       <input
         id="whole-drawer"
         v-model="isDrawerMenuOn"
@@ -148,9 +148,10 @@ watch(
         class="drawer-toggle"
       />
       <div
-        class="drawer-content absolute inset-0 overflow-hidden flex flex-col justify-between items-stretch"
+        class="drawer-content relatvie top-0 bottom-0 w-full h-full overflow-hidden flex flex-col justify-between items-stretch"
       >
         <div
+          v-if="slots['header-title'] && slots['header-panel']"
           class="z-10 flex justify-between items-center shadow shadow-base-200/50 bg-base-100"
         >
           <RouterLink to="/" class="p-3">
@@ -177,7 +178,7 @@ watch(
               <slot name="layout-overlay-top-panel"></slot>
               <div
                 v-if="appState.hk.value.inHotkeyMode"
-                class="absolute top-0 right-0 p-3 backdrop-blur-sm bg-base-100/80 rounded"
+                class="absolute top-0 right-0 p-3 backdrop-blur-sm bg-base-100/60 rounded"
               >
                 <div
                   class="flex justify-center items-center text-lg font-bold mb-2 border-2 border-primary text-primary px-2 py-1"

@@ -10,6 +10,9 @@
     "disable": "Disable",
     "edit": "Edit",
     "enable": "Enable",
+    "export": "Export",
+    "import": "Import",
+    "list": "List",
     "login": "Login",
     "next": "Next",
     "moveForward": "Move forward",
@@ -18,10 +21,16 @@
     "redo": "Redo",
     "save": "Save",
     "search": "Search",
+    "selectAll": "Select all",
     "send": "Send",
     "undo": "Undo",
     "update": "Update",
     "view": "View"
+  },
+  "state": {
+    "loading": "Loading",
+    "saved": "Saved",
+    "saving": "Saving"
   },
   "error": {
     "createFailed": "Creation failed, please try again later.",

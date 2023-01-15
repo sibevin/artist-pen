@@ -9,6 +9,7 @@ import {
   getNeighborDt,
   getNeighborDIndex,
   isSameDt,
+  isDateDIndex,
 } from "~/models/dwdy/dateUtils";
 
 describe(".dIndexToDt", () => {
@@ -134,6 +135,19 @@ describe(".isSameDt", () => {
         const dt1 = new Date(2022, 1, 1);
         const dt2 = new Date(2023, 1, 1);
         expect(isSameDt(dt1, dt2, "year")).toBeFalsy();
+      });
+    });
+  });
+  describe(".isDateDIndex", () => {
+    it("checks the given d-index is a date index or not", () => {
+      const testCases = [
+        { dIndex: "20220102", result: true },
+        { dIndex: "test", result: false },
+        { dIndex: undefined, result: false },
+      ];
+      testCases.forEach((tc) => {
+        const result = isDateDIndex(tc.dIndex);
+        expect(result).toEqual(tc.result);
       });
     });
   });

@@ -28,15 +28,13 @@ export class HotkeyProvider {
   public activated: boolean;
   private currentScope: HotkeyScope;
   private prevScope: HotkeyScope;
-  private blocking: boolean;
   private specMap: HotkeySpecMap;
 
   constructor() {
     this.inHotkeyMode = false;
-    this.activated = true;
+    this.activated = false; // true;
     this.currentScope = GLOBAL_SCOPE;
     this.prevScope = GLOBAL_SCOPE;
-    this.blocking = false;
     this.specMap = {};
   }
 
@@ -44,13 +42,10 @@ export class HotkeyProvider {
     return this.currentScope;
   }
 
-  public setupHotKeys(
-    givenScope: HotkeyScope,
-    registerKeysProc?: () => void
-  ): void {
+  public setupHotKeys(scope: HotkeyScope, registerKeysProc?: () => void): void {
     this.cleanKeyEvents();
     registerKeysProc?.();
-    this.switchScope(givenScope);
+    this.switchScope(scope);
     this.bindKeyEvents();
   }
 
@@ -231,9 +226,5 @@ export class HotkeyProvider {
 
   public isMarkShown(givenScope: string): boolean {
     return this.checkScope(givenScope) && this.inHotkeyMode;
-  }
-
-  public block(): void {
-    this.blocking = true;
   }
 }

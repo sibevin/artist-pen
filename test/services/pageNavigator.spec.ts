@@ -7,6 +7,7 @@ import {
   NavCellID,
   NavCellSpec,
 } from "~/services/pageNavigator";
+import { faker } from "@faker-js/faker";
 
 // NOTE: The navi board for testing
 //
@@ -91,14 +92,35 @@ describe("PageNavigator", () => {
         }).toThrowError(/triggerCallback/);
       });
     });
-    describe("when after callback is defined", () => {
-      it("triggers the after callback", () => {
-        const cellSpecs = [
+    describe("when cell skip callback is defined", () => {
+      it("skips the cell on movement", () => {
+        const cellSpecs: NavCellSpec[] = [
+          { cell: { name: "A", start: [0, 0] } },
           {
-            cell: buildNavCell(),
+            cell: {
+              name: "Skipped",
+              start: [1, 0],
+              skip: () => {
+                return true;
+              },
+            },
+          },
+          { cell: { name: "B", start: [2, 0] } },
+        ];
+        const pn = new PageNavigator(cellSpecs);
+        pn.resetCurrent("A");
+        pn.move([1, 0]);
+        expect(pn.isCurrent("B")).toBeTruthy();
+      });
+    });
+    describe("when enter callback is defined", () => {
+      it("triggers the enter callback", () => {
+        const cellSpecs: NavCellSpec[] = [
+          {
+            cell: { name: faker.lorem.word(), start: [0, 0] },
             callback: {
-              after: () => {
-                throw "afterCallback";
+              enter: () => {
+                throw "enterCallback";
               },
             },
           },
@@ -106,7 +128,29 @@ describe("PageNavigator", () => {
         const pn = new PageNavigator(cellSpecs);
         expect(() => {
           pn.move([1, 0]);
-        }).toThrowError(/afterCallback/);
+        }).toThrowError(/enterCallback/);
+      });
+    });
+    describe("when leave callback is defined", () => {
+      it("triggers the leave callback", () => {
+        const cellSpecs: NavCellSpec[] = [
+          {
+            cell: { name: faker.lorem.word(), start: [0, 0] },
+            callback: {
+              leave: () => {
+                throw "leaveCallback";
+              },
+            },
+          },
+          {
+            cell: { name: faker.lorem.word(), start: [1, 0] },
+          },
+        ];
+        const pn = new PageNavigator(cellSpecs);
+        expect(() => {
+          pn.move([1, 0]);
+          pn.move([1, 0]);
+        }).toThrowError(/leaveCallback/);
       });
     });
   });
@@ -149,14 +193,35 @@ describe("PageNavigator", () => {
         }).toThrowError(/triggerCallback/);
       });
     });
-    describe("when after callback is defined", () => {
-      it("triggers the after callback", () => {
-        const cellSpecs = [
+    describe("when cell skip callback is defined", () => {
+      it("skips the cell on movement", () => {
+        const cellSpecs: NavCellSpec[] = [
+          { cell: { name: "A", start: [0, 0] } },
           {
-            cell: buildNavCell(),
+            cell: {
+              name: "Skipped",
+              start: [1, 0],
+              skip: () => {
+                return true;
+              },
+            },
+          },
+          { cell: { name: "B", start: [2, 0] } },
+        ];
+        const pn = new PageNavigator(cellSpecs);
+        pn.resetCurrent("A");
+        pn.moveNext();
+        expect(pn.isCurrent("B")).toBeTruthy();
+      });
+    });
+    describe("when enter callback is defined", () => {
+      it("triggers the enter callback", () => {
+        const cellSpecs: NavCellSpec[] = [
+          {
+            cell: { name: faker.lorem.word(), start: [0, 0] },
             callback: {
-              after: () => {
-                throw "afterCallback";
+              enter: () => {
+                throw "enterCallback";
               },
             },
           },
@@ -164,7 +229,29 @@ describe("PageNavigator", () => {
         const pn = new PageNavigator(cellSpecs);
         expect(() => {
           pn.moveNext();
-        }).toThrowError(/afterCallback/);
+        }).toThrowError(/enterCallback/);
+      });
+    });
+    describe("when leave callback is defined", () => {
+      it("triggers the leave callback", () => {
+        const cellSpecs: NavCellSpec[] = [
+          {
+            cell: { name: faker.lorem.word(), start: [0, 0] },
+            callback: {
+              leave: () => {
+                throw "leaveCallback";
+              },
+            },
+          },
+          {
+            cell: { name: faker.lorem.word(), start: [1, 0] },
+          },
+        ];
+        const pn = new PageNavigator(cellSpecs);
+        expect(() => {
+          pn.moveNext();
+          pn.moveNext();
+        }).toThrowError(/leaveCallback/);
       });
     });
   });
@@ -216,7 +303,7 @@ describe("PageNavigator", () => {
       });
     });
   });
-  describe("#resetCurrent, #isCurrent", () => {
+  describe("#resetCurrent", () => {
     describe("when a cell is given", () => {
       it("assigns the given cell to the current cell", () => {
         const pn = new PageNavigator(tcCellSpecs);
@@ -237,6 +324,25 @@ describe("PageNavigator", () => {
         pn.resetCurrent();
         expect(pn.isCurrent(cellId)).toBeFalsy();
         expect(pn.isCurrent(undefined)).toBeTruthy();
+      });
+    });
+    describe("when leave callback is defined", () => {
+      it("triggers the leave callback when leaving the current cell", () => {
+        const cellSpecs: NavCellSpec[] = [
+          {
+            cell: { name: faker.lorem.word(), start: [0, 0] },
+            callback: {
+              leave: () => {
+                throw "leaveCallback";
+              },
+            },
+          },
+        ];
+        const pn = new PageNavigator(cellSpecs);
+        expect(() => {
+          pn.move([1, 0]);
+          pn.resetCurrent();
+        }).toThrowError(/leaveCallback/);
       });
     });
   });

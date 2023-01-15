@@ -21,6 +21,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  closeBtnEnabled: {
+    type: Boolean,
+    default: true,
+  },
   currentSelectedBtn: {
     type: String,
     default: undefined,
@@ -84,16 +88,20 @@ function onHelpBtnClicked() {
       :checked="isModalOn"
       @change="onModalToggleChanged"
     />
-    <label class="modal modal-bottom sm:modal-middle" :for="outsideFor">
-      <div class="modal-box card p-0">
+    <label class="modal modal-bottom" :for="outsideFor">
+      <div class="max-w-full md:max-w-lg modal-box card p-0">
         <div
-          class="max-h-v90 card-body flex flex-col justify-between items-start overflow-hidden"
+          class="max-h-v90 card-body p-3 flex flex-col justify-between items-start overflow-hidden"
         >
-          <slot name="modal-title"></slot>
+          <div class="pt-2">
+            <slot name="modal-title"></slot>
+          </div>
+          <slot name="modal-fixed-top-panel"></slot>
           <div class="flex-1 w-full overflow-y-auto">
             <slot name="modal-content"></slot>
           </div>
-          <div class="absolute top-0 right-0 p-3 flex items-center">
+          <slot name="modal-fixed-bottom-panel"></slot>
+          <div class="absolute top-0 right-0 p-2 flex items-center">
             <div v-if="props.helpBtnEnabled" class="indicator">
               <span
                 v-if="props.showHotkeyHint"
@@ -115,7 +123,7 @@ function onHelpBtnClicked() {
                 ></SvgIcon>
               </button>
             </div>
-            <div class="indicator">
+            <div v-if="props.closeBtnEnabled" class="indicator">
               <span
                 v-if="props.showHotkeyHint"
                 class="indicator-item indicator-bottom indicator-start ml-2 mb-2 hotkey-mark"

@@ -5,6 +5,7 @@ import SettingsPage from "~/pages/SettingsPage.vue";
 import AccountPage from "~/pages/AccountPage.vue";
 import AboutPage from "~/pages/AboutPage.vue";
 import ErrorPage from "~/pages/ErrorPage.vue";
+import DevPage from "~/pages/DevPage.vue";
 
 export const routes = [
   {
@@ -41,6 +42,11 @@ export const routes = [
     path: "/error",
     name: "error",
     component: ErrorPage,
+  },
+  {
+    path: "/dev",
+    name: "dev",
+    component: DevPage,
   },
   {
     path: "/:pathMatch(.*)*",

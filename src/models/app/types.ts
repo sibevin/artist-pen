@@ -1,10 +1,11 @@
-export interface Icon {
+export type Icon = {
   set: string;
   path: string;
-}
+};
 
-export interface SelectionOption {
+export type SelectionOption = {
   label: string;
+  labelShort?: string;
   value: string;
   icon?: Icon;
-}
+};

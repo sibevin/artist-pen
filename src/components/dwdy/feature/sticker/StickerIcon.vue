@@ -10,11 +10,14 @@ const props = defineProps<Props>();
 
 const ICON_SIZE = 40;
 
-const sticker = computed<DiarySticker>(() => {
+const sticker = computed<DiarySticker | undefined>(() => {
   return stickerMap[props.code] as DiarySticker;
 });
 
 const stickerStyle = computed(() => {
+  if (!sticker.value) {
+    return {};
+  }
   const color = sticker.value.color;
   if (color) {
     if (sticker.value.bordered === false) {
@@ -28,6 +31,9 @@ const stickerStyle = computed(() => {
 });
 
 const stickerClass = computed(() => {
+  if (!sticker.value) {
+    return "";
+  }
   if (sticker.value.color) {
     return "";
   }
@@ -39,12 +45,16 @@ const stickerClass = computed(() => {
 });
 
 const iconSize = computed(() => {
+  if (!sticker.value) {
+    return ICON_SIZE;
+  }
   return sticker.value.size || ICON_SIZE;
 });
 </script>
 
 <template>
   <div
+    v-if="sticker"
     class="bg-base-100 rounded-full shadow-sm flex justify-center items-center"
     :class="stickerClass"
     :style="stickerStyle"

@@ -1,0 +1,35 @@
+{
+  "dwdy": {
+    "diaryContent": {
+      "DeletionModal": {
+        "deletionHint_zero": "Please select items to delete.",
+        "deletionHint_one": "An item is selected, are your sure to delete it?",
+        "deletionHint_other": "{{count}} items are selected, are your sure to delete them?"
+      }
+    },
+    "feature": {
+      "text": {
+        "ContentEditor": {
+          "writeSomethingHint": "Write something ..."
+        }
+      },
+      "image": {
+        "ContentSlate": {
+          "imageSize": "Image Size",
+          "fileSize": "File Size",
+          "fileType": "File Type",
+          "fileName": "File Name"
+        },
+        "ContentEditor": {
+          "changeImage": "Change image",
+          "imageSize": "Image Size",
+          "fileSize": "File Size",
+          "fileType": "File Type",
+          "fileName": "File Name",
+          "comment": "Comment",
+          "invalidFileNameHint": "Invalid file name, please remove special characters and try again."
+        }
+      }
+    }
+  }
+}

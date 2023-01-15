@@ -38,8 +38,12 @@ export class AppConfig
     return this.doc.acUid;
   }
 
-  get isReadyToSave(): boolean {
+  get isStored(): boolean {
     return this.uid !== undefined;
+  }
+
+  private get isReadyToSave(): boolean {
+    return this.isStored;
   }
 
   static async fetchCurrentConfig(): Promise<AppConfig | null> {

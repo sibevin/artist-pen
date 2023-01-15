@@ -1,28 +1,14 @@
 import { genUid } from "~/services/db";
 import { dbDwdy } from "~/services/db/dwdy";
 import { BaseModel } from "~/models/baseModel";
-import { DiarySortedBy } from "~/models/dwdy/diarySortedBy";
-
-export const WEEK_DAYS = [...Array(7).keys()] as const;
-export type WeekDay = typeof WEEK_DAYS[number];
-
-export enum DiaryTimelineOrder {
-  DIndexAsc = "d_index_asc",
-  DIndexDesc = "d_index_desc",
-}
-
-export enum FontFamily {
-  SansSerif = "sans_serif",
-  Serif = "serif",
-}
-
-export enum FontFormatSize {
-  XS = "xs",
-  S = "s",
-  M = "m",
-  L = "l",
-  XL = "xl",
-}
+import {
+  WeekDay,
+  DiarySortedBy,
+  DiaryTimelineOrder,
+  DiaryFontFamily,
+  DiaryFontFormatSize,
+} from "~/models/dwdy/configOption";
+import { TagValue } from "~/models/dwdy/feature/tag";
 
 export interface DiaryConfigAttrs {
   highlightedWeekDays: WeekDay[];
@@ -42,6 +28,7 @@ export interface DwdyConfigAttrs extends DiaryConfigAttrs {
   fontSize: string;
   fontLineHeight: string;
   fontLetterSpacing: string;
+  tagDistribution: Record<TagValue, number>;
 }
 
 export type DwdyConfigParams = Partial<DwdyConfigAttrs>;
@@ -60,10 +47,11 @@ export const DEFAULT_ATTRS: DwdyConfigAttrs = Object.assign(
     diariesSortedBy: DiarySortedBy.UpdateDesc,
     isContentMenuShown: true,
     recentStickerCodes: [],
-    fontFamily: FontFamily.SansSerif,
-    fontSize: FontFormatSize.M,
-    fontLineHeight: FontFormatSize.M,
-    fontLetterSpacing: FontFormatSize.M,
+    fontFamily: DiaryFontFamily.SansSerif,
+    fontSize: DiaryFontFormatSize.M,
+    fontLineHeight: DiaryFontFormatSize.M,
+    fontLetterSpacing: DiaryFontFormatSize.M,
+    tagDistribution: {},
   }
 );
 
@@ -89,8 +77,12 @@ export class DwdyConfig
     return this.doc.dcUid;
   }
 
-  get isReadyToSave(): boolean {
+  get isStored(): boolean {
     return this.uid !== undefined;
+  }
+
+  private get isReadyToSave(): boolean {
+    return this.isStored;
   }
 
   static async fetchCurrentConfig(): Promise<DwdyConfig | null> {
@@ -126,5 +118,9 @@ export class DwdyConfig
     );
     this.doc = docToSave;
     return { target: this, action };
+  }
+
+  public textFontStyle(): string {
+    return `font-fs-${this.doc.fontSize} font-ff-${this.doc.fontFamily} font-lh-${this.doc.fontLineHeight} font-ls-${this.doc.fontLetterSpacing}`;
   }
 }

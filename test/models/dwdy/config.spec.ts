@@ -9,7 +9,7 @@ import {
   checkFetchBehavior,
   checkConstructorBehavior,
   checkUidBehavior,
-  checkIsReadyToSaveBehavior,
+  checkIsStoredBehavior,
   checkAssignBehavior,
   checkSaveBehavior,
 } from "../../support/modelUtils";
@@ -52,7 +52,7 @@ describe("DwdyConfig", () => {
       return uid;
     }
   );
-  checkIsReadyToSaveBehavior(
+  checkIsStoredBehavior(
     () => {
       dbDwdy.configs.clear();
     },
