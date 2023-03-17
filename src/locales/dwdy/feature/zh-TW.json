@@ -1,0 +1,134 @@
+{
+  "text": {
+    "name": "文字",
+    "config": {
+      "display": {
+        "name": "顯示",
+        "options": {
+          "carousel": "輪播",
+          "list": "列表"
+        }
+      }
+    },
+    "stat": {
+      "count": "數量",
+      "fileSize": "檔案大小",
+      "words": "字數",
+      "letters": "字元數"
+    },
+    "components": {
+      "EditorMain": {
+        "writeSomethingHint": "寫點東西吧..."
+      },
+      "ContentEditor": {
+        "writeSomethingHint": "寫點東西吧..."
+      }
+    }
+  },
+  "image": {
+    "name": "圖像",
+    "config": {
+      "display": {
+        "name": "顯示",
+        "options": {
+          "carousel": "輪播",
+          "list": "列表"
+        }
+      }
+    },
+    "stat": {
+      "count": "數量",
+      "fileSize": "檔案大小"
+    },
+    "components": {
+      "EditorMain": {
+        "uploadImage": "上傳圖片",
+        "changeImage": "更換圖片",
+        "comment": "備註"
+      },
+      "ContentEditor": {
+        "uploadImage": "上傳圖片",
+        "changeImage": "更換圖片",
+        "comment": "備註"
+      }
+    }
+  },
+  "sound": {
+    "config": {
+      "repeat": {
+        "name": "重複",
+        "options": {
+          "none": "不重複",
+          "single": "單曲重複",
+          "all": "全部重複"
+        }
+      },
+      "isPlayingRandomly": { "name": "隨機播放" },
+      "volume": { "name": "音量" },
+      "isMuted": { "name": "靜音" },
+      "stereoPan": { "name": "左右聲道" }
+    },
+    "stat": {
+      "count": "數量",
+      "fileSize": "檔案大小",
+      "duration": "時長"
+    },
+    "name": "聲音",
+    "record": "開始錄音",
+    "recordAgain": "重新錄音",
+    "continue": "繼續錄音",
+    "pause": "暫停",
+    "stop": "停止錄音",
+    "saveAndStop": "儲存並停止錄音",
+    "saveAndRecord": "儲存並開始新錄音",
+    "comment": "備註",
+    "AudioRecorder": {
+      "error": {
+        "permission_denied": "無法取得裝置存取權限，請點擊「錄音」重新設定權限。",
+        "media_error": "裝置錯誤，無法儲存錄音，請點擊「錄音」重新錄製聲音。",
+        "media_not_supported": "您的裝置無法支援錄音功能。",
+        "unknown": "發生錯誤，請重新啓動應用程式。"
+      }
+    }
+  },
+  "sticker": {
+    "name": "貼紙",
+    "config": {
+      "recentRecords": {
+        "name": "近期"
+      }
+    },
+    "stat": {
+      "count": "數量",
+      "fileSize": "檔案大小",
+      "distribution": "數量分佈"
+    },
+    "category": {
+      "recent": "近期",
+      "customized": "個人",
+      "mood": "心情",
+      "weather": "天氣",
+      "food": "吃",
+      "dessert": "點心",
+      "drink": "飲料",
+      "activity": "活動",
+      "sport": "運動",
+      "location": "地點",
+      "transport": "交通",
+      "festival": "節日"
+    }
+  },
+  "tag": {
+    "name": "標籤",
+    "config": {
+      "recentRecords": {
+        "name": "近期"
+      }
+    },
+    "stat": {
+      "count": "數量",
+      "fileSize": "檔案大小",
+      "distribution": "數量分佈"
+    }
+  }
+}

@@ -56,12 +56,12 @@ defineExpose({ toggleMenu });
     <Transition name="menu-open">
       <div
         v-if="isMenuOpen"
-        class="w-full border-base-100 backdrop-blur-sm bg-base-100/60 flex flex-col items-stretch"
+        class="w-full border border-base-200/60 backdrop-blur-sm bg-base-100/60 flex flex-col items-stretch"
       >
-        <div class="flex justify-center items-center pt-3">
+        <div class="flex justify-center items-center pt-2">
           <slot name="sub-btn-list"></slot>
         </div>
-        <div class="flex justify-between items-center p-3 pt-0 pr-14">
+        <div class="flex justify-between items-center p-2 pt-0 pr-14">
           <div class="indicator">
             <span
               v-if="inHotkeyMode"
@@ -91,7 +91,7 @@ defineExpose({ toggleMenu });
     </Transition>
     <div
       v-if="props.isMenuHideBtnEnabled !== false"
-      class="absolute bottom-3 right-3 w-fit rounded-full"
+      class="absolute bottom-2 right-2 w-fit rounded-full"
       :class="isMenuShown ? '' : 'backdrop-blur-sm bg-base-100/60'"
     >
       <div class="indicator">
@@ -115,7 +115,7 @@ defineExpose({ toggleMenu });
         </button>
       </div>
     </div>
-    <div v-else class="absolute bottom-3 right-3 w-12 h-12"></div>
+    <div v-else class="absolute bottom-2 right-2 w-12 h-12"></div>
   </div>
 </template>
 

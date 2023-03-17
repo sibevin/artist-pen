@@ -7,8 +7,8 @@ import {
   DiaryTimelineOrder,
   DiaryFontFamily,
   DiaryFontFormatSize,
-} from "~/models/dwdy/configOption";
-import { TagValue } from "~/models/dwdy/feature/tag";
+} from "~/dwdy/services/configOption";
+import { TagValue } from "~/dwdy/feature/tag";
 
 export interface DiaryConfigAttrs {
   highlightedWeekDays: WeekDay[];

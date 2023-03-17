@@ -41,6 +41,10 @@ const ICON_SET_MAP: {
     // IonIcons https://icon-sets.iconify.design/ion/
     viewBox: "0 0 512 512",
   },
+  ss: {
+    // Svg Spinners https://icon-sets.iconify.design/svg-spinners/
+    viewBox: "0 0 24 24",
+  },
 };
 
 const props = defineProps({

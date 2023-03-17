@@ -10,8 +10,8 @@ import { LocaleActor } from "~/services/locale";
 import { useAppState } from "~/states/useAppState";
 import { useDwdyState } from "~/states/useDwdyState";
 import { DiaryDocParams } from "~/models/dwdy/diary";
-import { DiaryFeature } from "~/models/dwdy/feature";
-import { featureIcon, featureText } from "~/models/dwdy/featureDef";
+import { DiaryFeature } from "~/dwdy/feature/def";
+import { featureIcon, featureText } from "~/dwdy/feature/map";
 
 import SvgIcon from "~/components/SvgIcon.vue";
 import PercentageCircle from "~/components/PercentageCircle.vue";

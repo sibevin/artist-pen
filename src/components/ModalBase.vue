@@ -93,7 +93,7 @@ function onHelpBtnClicked() {
         <div
           class="max-h-v90 card-body p-3 flex flex-col justify-between items-start overflow-hidden"
         >
-          <div class="pt-2">
+          <div class="pl-2 pt-2">
             <slot name="modal-title"></slot>
           </div>
           <slot name="modal-fixed-top-panel"></slot>

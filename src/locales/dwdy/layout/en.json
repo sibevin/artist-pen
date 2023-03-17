@@ -1,0 +1,41 @@
+{
+  "config": {
+    "displayIcon": {
+      "name": "Calendar icon",
+      "options": {
+        "dot": "Dots",
+        "firstSticker": "Sticker",
+        "contentType": "Content type"
+      }
+    }
+  },
+  "calendar": {
+    "name": "Calendar",
+    "description": "Provide a calendar to quickly access contents for a particular date.",
+    "config": {
+      "calendarDisplay": {
+        "name": "Calendar display"
+      },
+      "firstWeekDay": {
+        "name": "Calendar started day"
+      }
+    }
+  },
+  "timeline": {
+    "name": "Timeline",
+    "description": "Display the whole-month contents in a timeline.",
+    "config": {
+      "timelineOrder": {
+        "name": "Timeline order (Top > Bottom)",
+        "options": {
+          "asc": "Early > Late",
+          "desc": "Late > Early"
+        }
+      }
+    }
+  },
+  "notebook": {
+    "name": "Notebook",
+    "description": "A notebook, you can give a title for each pages."
+  }
+}

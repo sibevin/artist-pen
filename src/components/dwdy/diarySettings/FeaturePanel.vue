@@ -16,20 +16,19 @@ import { LocaleActor } from "~/services/locale";
 import { useAppState } from "~/states/useAppState";
 import { useDwdyState } from "~/states/useDwdyState";
 import { DiaryTemplateAction } from "~/models/dwdy/diary";
-import { DiaryLayout } from "~/models/dwdy/layout";
+import { DiaryLayout } from "~/dwdy/layout/def";
+import { DiaryFeature } from "~/dwdy/feature/def";
 import {
-  DiaryFeature,
-  featureIconMap,
+  featureIcon,
+  featureText,
   AVAILABLE_FEATURES,
-} from "~/models/dwdy/feature";
-import { featureIcon, featureText } from "~/models/dwdy/featureDef";
-
-import SvgIcon from "~/components/SvgIcon.vue";
+} from "~/dwdy/feature/map";
 import {
   PageNavigator,
   NavCellSpec,
   NavCellID,
 } from "~/services/pageNavigator";
+import SvgIcon from "~/components/SvgIcon.vue";
 
 const emit = defineEmits<{
   (e: "triggerAction", action: string): void;

@@ -7,9 +7,9 @@ import { useAppState } from "~/states/useAppState";
 import { LocaleActor } from "~/services/locale";
 
 const props = defineProps({
-  currentDIndex: {
-    type: String,
-    required: true,
+  currentDt: {
+    type: Date,
+    default: new Date(),
   },
   modalId: {
     type: String,
@@ -23,25 +23,25 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
-  (e: "change", value: string): void;
+  (e: "change", value: Date): void;
 }>();
 
 const appState = useAppState();
 const la = new LocaleActor("pages.dwdy.DiaryPage");
 
-const currentDateStr = ref<string>(dIndexToDateStr(props.currentDIndex));
+const currentDateStr = ref<string>(dtToDateStr(props.currentDt));
 const isModalOn = ref(false);
 const dateSelectorModel = ref();
 
 onMounted(() => {
-  currentDateStr.value = dIndexToDateStr(props.currentDIndex);
+  currentDateStr.value = dtToDateStr(props.currentDt);
   isModalOn.value = props.modelValue;
 });
 
 watch(
-  () => props.currentDIndex,
+  () => props.currentDt,
   (newValue) => {
-    currentDateStr.value = dIndexToDateStr(newValue);
+    currentDateStr.value = dtToDateStr(newValue);
   }
 );
 
@@ -58,13 +58,15 @@ watch(
     triggerModelUpdate();
   }
 );
-
-function dIndexToDateStr(dIndex: string): string {
-  return `${dIndex.slice(0, 4)}-${dIndex.slice(4, 6)}-${dIndex.slice(6, 8)}`;
+function dtToDateStr(givenDt: Date): string {
+  return `${givenDt.getFullYear()}-${
+    givenDt.getMonth() + 1
+  }-${givenDt.getDate()}`;
 }
 
-function dateStrToDIndex(dateStr: string): string {
-  return dateStr.replaceAll("-", "");
+function dateStrToDt(dateStr: string): Date {
+  const [year, month, date] = dateStr.split("-");
+  return new Date(Number(year), Number(month) - 1, Number(date));
 }
 
 function closeModal() {
@@ -73,7 +75,7 @@ function closeModal() {
 
 function onDateUpdated() {
   closeModal();
-  emit("change", dateStrToDIndex(currentDateStr.value));
+  emit("change", dateStrToDt(currentDateStr.value));
 }
 
 function triggerModelUpdate() {

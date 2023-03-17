@@ -1,8 +1,8 @@
 import { describe, it, expect, afterAll } from "vitest";
 import "fake-indexeddb/auto";
 import { faker } from "@faker-js/faker";
-import { DiaryEntry, DiaryEntryIdentity } from "~/models/dwdy/diaryEntry";
-import { DiaryFeature } from "~/models/dwdy/feature";
+import { DiaryEntry } from "~/models/dwdy/diaryEntry";
+import { DiaryFeature } from "~/dwdy/feature/def";
 import { InvalidParamsError } from "~/models/app/error";
 import { dbDwdy } from "~/services/db/dwdy";
 import { genUid } from "~/services/db";
@@ -13,18 +13,19 @@ import {
   create,
 } from "../../factories/dwdy/diaryEntries";
 import { create as createDiary } from "../../factories/dwdy/diaries";
-import { dIndexToDt } from "~/models/dwdy/dateUtils";
+import { entryTsToDt } from "~/dwdy/services/dateUtils";
 import {
   checkConstructorBehavior,
   checkUidBehavior,
   checkIsStoredBehavior,
   checkAssignBehavior,
 } from "../../support/modelUtils";
-import { genRandomIndex } from "../../support/randomUtils";
+import { genRandomIndex, randomSample } from "../../support/randomUtils";
 
 const TEST_CONTENT_FREATURES: DiaryFeature[] = [
   DiaryFeature.Text,
   DiaryFeature.Sticker,
+  DiaryFeature.Tag,
 ];
 
 function checkIndexValidationBehavior(runTextProc: (index: number) => void) {
@@ -74,28 +75,20 @@ describe("DiaryEntry", () => {
         const entry = await create();
         const [dUid, dIndex] = (entry.uid as string).split("_");
         const fetchedEntry = await DiaryEntry.fetch({ dUid, dIndex });
-        expect(fetchedEntry.uid).toEqual(entry.uid);
-        expect(fetchedEntry.isSaved).toBeTruthy();
+        expect(fetchedEntry).not.toBeNull();
+        if (fetchedEntry) {
+          expect(fetchedEntry.uid).toEqual(entry.uid);
+          expect(fetchedEntry.doc.dUid).toEqual(entry.doc.dUid);
+          expect(fetchedEntry.isStored).toBeTruthy();
+        }
       });
     });
     describe("when no entry is found", () => {
-      it("returns a not-saved entry", async () => {
+      it("returns null", async () => {
         const entryIdy = { dUid: genUid(), dIndex: genRandomDIndex() };
         const fetchedEntry = await DiaryEntry.fetch(entryIdy);
-        expect(fetchedEntry.isSaved).toBeFalsy();
+        expect(fetchedEntry).toBeNull();
       });
-    });
-  });
-  describe("#isSaved", () => {
-    it("is assigned by constructor", () => {
-      const isSaved = faker.datatype.boolean();
-      const entry = new DiaryEntry({ isSaved });
-      expect(entry.isSaved).toEqual(isSaved);
-    });
-    it("should not be stored in doc", () => {
-      const isSaved = faker.datatype.boolean();
-      const entry = new DiaryEntry({ isSaved });
-      expect(entry.doc.isSaved).toBeUndefined();
     });
   });
   describe("#nextEntry, #prevEntry", () => {
@@ -105,51 +98,46 @@ describe("DiaryEntry", () => {
     });
     it("returns the prev/next diary entry ", async () => {
       const diary = await createDiary();
-      await diary.appendNewEntry("A");
-      await diary.appendNewEntry("B");
-      await diary.appendNewEntry("C");
-      const entryA = await diary.fetchEntry("A");
-      const entryB = await diary.fetchEntry("B");
-      const entryC = await diary.fetchEntry("C");
-
-      // With empty prev entry
-      expect((await entryA.prevEntry).doc.dUid).toEqual(diary.doc.dUid);
-      expect((await entryA.prevEntry).doc.dIndex).toBeUndefined();
-      expect((await entryA.prevEntry).isStored).toBeFalsy();
-
-      // With existing next entry
-      expect((await entryA.nextEntry).doc.dUid).toEqual(diary.doc.dUid);
-      expect((await entryA.nextEntry).doc.dIndex).toEqual("B");
-      expect((await entryA.nextEntry).isStored).toBeTruthy();
-
-      // With existing prev entry
-      expect((await entryB.prevEntry).doc.dUid).toEqual(diary.doc.dUid);
-      expect((await entryB.prevEntry).doc.dIndex).toEqual("A");
-      expect((await entryB.prevEntry).isStored).toBeTruthy();
-
-      expect((await entryB.nextEntry).doc.dIndex).toEqual("C");
-      expect((await entryC.prevEntry).doc.dIndex).toEqual("B");
-
-      // With empty next entry
-      expect((await entryC.nextEntry).doc.dUid).toEqual(diary.doc.dUid);
-      expect((await entryC.nextEntry).doc.dIndex).toBeUndefined();
-      expect((await entryC.nextEntry).isStored).toBeFalsy();
+      const dIndexA = (await diary.appendEntry()).doc.dIndex;
+      const dIndexB = (await diary.appendEntry()).doc.dIndex;
+      const dIndexC = (await diary.appendEntry()).doc.dIndex;
+      const entryA = await diary.fetchEntry({ dIndex: dIndexA });
+      const entryB = await diary.fetchEntry({ dIndex: dIndexB });
+      const entryC = await diary.fetchEntry({ dIndex: dIndexC });
+      if (!entryA || !entryB || !entryC) {
+        return;
+      }
+      expect(await entryA.prevEntry).toBeNull();
+      expect(await entryA.nextEntry).not.toBeNull();
+      expect(((await entryA.nextEntry) as DiaryEntry).doc.dIndex).toEqual(
+        dIndexB
+      );
+      expect(await entryB.prevEntry).not.toBeNull();
+      expect(((await entryB.prevEntry) as DiaryEntry).doc.dIndex).toEqual(
+        dIndexA
+      );
+      expect(await entryB.nextEntry).not.toBeNull();
+      expect(((await entryB.nextEntry) as DiaryEntry).doc.dIndex).toEqual(
+        dIndexC
+      );
+      expect(await entryC.prevEntry).not.toBeNull();
+      expect(((await entryC.prevEntry) as DiaryEntry).doc.dIndex).toEqual(
+        dIndexB
+      );
+      expect(await entryC.nextEntry).toBeNull();
     });
   });
   describe("#save", () => {
     afterAll(() => {
       dbDwdy.diaryEntries.clear();
     });
-    describe("when the instance has no dUid or dIndex", () => {
-      it("throws an invalid-params error with ['dUid', 'dIndex']:required reason", async () => {
+    describe("when the instance has no dUid", () => {
+      it("throws an invalid-params error with ['dUid']:required reason", async () => {
         const modelInst = build();
         try {
           await modelInst.save();
         } catch (err) {
-          expect((err as InvalidParamsError).params).toEqual([
-            "dUid",
-            "dIndex",
-          ]);
+          expect((err as InvalidParamsError).params).toEqual(["dUid"]);
           expect((err as InvalidParamsError).reason).toEqual("required");
         }
       });
@@ -157,24 +145,11 @@ describe("DiaryEntry", () => {
     describe("when the instance is a new instance", () => {
       it("stores the doc with the 'create' action", async () => {
         const diary = await createDiary();
-        const entryIdy: DiaryEntryIdentity = {
+        const entry = new DiaryEntry({
           dUid: diary.doc.dUid as string,
-          dIndex: genRandomDIndex(),
-        };
-        const entry = new DiaryEntry(entryIdy);
+        });
         const result = await entry.save();
         expect(result.action).toEqual("create");
-      });
-
-      it("changes isSaved to true", async () => {
-        const diary = await createDiary();
-        const entryIdy: DiaryEntryIdentity = {
-          dUid: diary.doc.dUid as string,
-          dIndex: genRandomDIndex(),
-        };
-        const entry = new DiaryEntry(entryIdy);
-        const result = await entry.save();
-        expect(result.target.isSaved).toBeTruthy();
       });
     });
     describe("when the instance is an existing instance", () => {
@@ -183,7 +158,6 @@ describe("DiaryEntry", () => {
         const result = await storedInst.save();
         expect(result.action).toEqual("update");
       });
-
       it("keeps uid not changed", async () => {
         const storedInst = await create();
         const oriUid = storedInst.uid;
@@ -192,20 +166,19 @@ describe("DiaryEntry", () => {
       });
     });
   });
-  describe("#dIndexDate", () => {
-    describe("when d-index is a date index", () => {
-      it("returns the data coverted from d-index", () => {
-        const dIndex = genRandomDIndex();
-        const dEntry = new DiaryEntry({ dIndex });
-        const result = dIndexToDt(dIndex);
-        expect(dEntry.dIndexDate).toEqual(result);
+  describe("#tsDate", () => {
+    describe("when timestamp exists", () => {
+      it("returns the data coverted from timestamp", () => {
+        const timestamp = Date.now();
+        const entry = new DiaryEntry({}, { timestamp });
+        const result = entryTsToDt(timestamp);
+        expect(entry.tsDate).toEqual(result);
       });
     });
-    describe("when d-index is not a date index", () => {
+    describe("when no timestamp stored in entry", () => {
       it("returns null", () => {
-        const dIndex = faker.lorem.word();
-        const dEntry = new DiaryEntry({ dIndex });
-        expect(dEntry.dIndexDate).toBeNull();
+        const entry = new DiaryEntry();
+        expect(entry.tsDate).toBeNull();
       });
     });
   });
@@ -318,6 +291,18 @@ describe("DiaryEntry", () => {
         const dEntry = build();
         dEntry.moveContent(feature, index, index);
       });
+    });
+  });
+  describe("#hasContentFeatures", () => {
+    it("returns features where the entry has contents", () => {
+      const dEntry = new DiaryEntry({});
+      const dEntryDoc = build();
+      const features = randomSample(TEST_CONTENT_FREATURES);
+      features.forEach((feature) => {
+        const contents = [...dEntryDoc.fetchContents(feature)];
+        dEntry.assignContents(feature, contents);
+      });
+      expect(dEntry.hasContentFeatures).toEqual(features);
     });
   });
 });

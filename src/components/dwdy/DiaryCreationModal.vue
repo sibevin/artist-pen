@@ -6,12 +6,10 @@ import { mdiPlus, mdiCheck, mdiClose, mdiArrowLeftBottom } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useAppState } from "~/states/useAppState";
 import { Diary, DiaryDocParams, DEFAULT_ATTRS } from "~/models/dwdy/diary";
-import {
-  DiaryFeature,
-  featureOpts,
-  AVAILABLE_FEATURES,
-} from "~/models/dwdy/feature";
-import { DiaryLayout, layoutOpts } from "~/models/dwdy/layout";
+import { DiaryFeature } from "~/dwdy/feature/def";
+import { featureOpts, AVAILABLE_FEATURES } from "~/dwdy/feature/map";
+import { DiaryLayout } from "~/dwdy/layout/def";
+import { layoutOpts } from "~/dwdy/layout/map";
 import SvgIcon from "~/components/SvgIcon.vue";
 import ModalBase from "~/components/ModalBase.vue";
 import { PageNavigator, NavCellSpec } from "~/services/pageNavigator";
@@ -377,7 +375,7 @@ async function onDiaryCreationSubmitted(): Promise<void> {
               v-if="newDiaryAttrs.layout === opt.value"
               class="p-5 pt-0 input-hint-block"
             >
-              {{ la.t(`models.dwdy.diary.hint.layout.${opt.value}`) }}
+              {{ la.t(`dwdy.layout.${opt.value}.description`) }}
             </div>
           </div>
         </div>
@@ -425,10 +423,10 @@ async function onDiaryCreationSubmitted(): Promise<void> {
                 <div>{{ opt.label }}</div>
               </label>
             </div>
+            <div class="input-hint-block mt-2">
+              {{ la.t("models.dwdy.diary.hint.enabledFeatures") }}
+            </div>
           </div>
-        </div>
-        <div class="input-hint-block">
-          {{ la.t(".creationHint") }}
         </div>
         <div class="card-actions my-3 items-center">
           <div class="grow flex items-center">

@@ -1,0 +1,28 @@
+{
+  "service": "Intimate Diary",
+  "slogan": "Record each treasured memory",
+  "week": "W",
+  "defaultConfig": "Default",
+  "weekDays": {
+    "short": ["SU", "MO", "TU", "WE", "TH", "FR", "SA"],
+    "long": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
+  },
+  "menu": {
+    "settings": "Settings",
+    "shelf": "Shelf"
+  },
+  "nav": {
+    "prevDay": "Previous day",
+    "nextDay": "Next day",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "today": "Today"
+  },
+  "ui": {
+    "newImage": "New Image",
+    "newEssay": "New Essay",
+    "newSticker": "New Sticker",
+    "browseImage": "Browse images",
+    "browseEssay": "Browse essays"
+  }
+}

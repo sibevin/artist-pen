@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { mdiChevronDoubleRight, mdiChevronDoubleLeft } from "@mdi/js";
-import SvgIcon from "~/components/SvgIcon.vue";
 import { useDwdyState } from "~/states/useDwdyState";
-import { NavInfo } from "~/models/dwdy/diaryEntry";
+import {
+  DiaryEntryMovementParams,
+  DiaryPageActionParams,
+} from "~/dwdy/types/core";
+import SvgIcon from "~/components/SvgIcon.vue";
 
 const props = defineProps({
   currentDate: {
@@ -14,24 +17,23 @@ const props = defineProps({
     type: String,
     default: undefined,
   },
-  showNav: {
-    type: Boolean,
-    default: true,
-  },
-  showHotkeyHint: {
+  enableSelector: {
     type: Boolean,
     default: false,
+  },
+  enableNav: {
+    type: Boolean,
+    default: true,
   },
 });
 
 const emit = defineEmits<{
-  (e: "moveNavPrevMonth"): void;
-  (e: "moveNavNextMonth"): void;
-  (e: "openDateSelector"): void;
+  (e: "moveToEntry", params: DiaryEntryMovementParams): void;
+  (e: "triggerAction", params: DiaryPageActionParams): void;
 }>();
 
 const dwdyState = useDwdyState();
-const navInfo = ref<NavInfo>(await dwdyState.entry.value.navInfo);
+const navInfo = ref(await dwdyState.entry.value.navInfo);
 
 watch(
   () => dwdyState.entry.value,
@@ -40,20 +42,24 @@ watch(
   }
 );
 
-function onPrevMonthClicked(): void {
-  emit("moveNavPrevMonth");
-}
-function onNextMonthClicked(): void {
-  emit("moveNavNextMonth");
-}
 function onDateSelectorOpen(): void {
-  emit("openDateSelector");
+  if (props.enableSelector) {
+    emit("triggerAction", { action: "select-date" });
+  }
+}
+
+function onPrevMonthClicked(): void {
+  emit("moveToEntry", { direction: "prev", unit: "month" });
+}
+
+function onNextMonthClicked(): void {
+  emit("moveToEntry", { direction: "next", unit: "month" });
 }
 </script>
 <template>
   <div class="flex items-center">
     <button
-      v-if="props.showNav"
+      v-if="props.enableNav"
       class="btn btn-circle btn-sm btn-ghost rounded-full mr-2"
       :class="props.currentSelectedBtn === 'prev-day-btn' ? 'bg-base-200' : ''"
       @click="onPrevMonthClicked"
@@ -61,7 +67,8 @@ function onDateSelectorOpen(): void {
       <SvgIcon icon-set="mdi" :path="mdiChevronDoubleLeft" :size="20"></SvgIcon>
     </button>
     <button
-      class="btn btn-ghost rounded-full flex items-end pb-1"
+      class="rounded-full flex items-end"
+      :class="props.enableSelector ? 'btn btn-ghost pb-1' : 'cursor-default'"
       @click="onDateSelectorOpen"
     >
       <div class="flex items-center text-lg pr-1 pb-1 text-primary">
@@ -72,7 +79,7 @@ function onDateSelectorOpen(): void {
       </div>
     </button>
     <button
-      v-if="props.showNav"
+      v-if="props.enableNav"
       class="btn btn-circle btn-sm btn-ghost rounded-full"
       :class="props.currentSelectedBtn === 'next-day-btn' ? 'bg-base-200' : ''"
       @click="onNextMonthClicked"

@@ -1,0 +1,32 @@
+{
+  "fontSize": { "name": "Size" },
+  "fontLineHeight": { "name": "Line Height" },
+  "fontLetterSpacing": { "name": "Letter Spacing" },
+  "diariesSortedBy": {
+    "name": "Diaries sorted by",
+    "options": {
+      "titleAsc": "By title",
+      "updateDesc": "By latest update"
+    }
+  },
+  "fontFamily": {
+    "name": "Family",
+    "options": {
+      "sansSerif": "Sans serif",
+      "sansSerifVariant": "",
+      "serif": "Serif",
+      "serifVariant": ""
+    }
+  },
+  "fontFormatSize": {
+    "options": {
+      "xs": "XS",
+      "s": "S",
+      "m": "M",
+      "l": "L",
+      "xl": "XL"
+    }
+  },
+  "isWeekShown": { "name": "Show weeks of the year" },
+  "dateDisplay": { "name": "Date display" }
+}

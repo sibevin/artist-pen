@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import {
   mdiCog,
@@ -9,32 +9,26 @@ import {
   mdiClose,
   mdiCalendarClock,
 } from "@mdi/js";
+import { LocaleActor } from "~/services/locale";
+import { useAppState } from "~/states/useAppState";
+import { useDwdyState } from "~/states/useDwdyState";
+import { PageNavigator, NavCellSpec } from "~/services/pageNavigator";
+import { layoutComponent } from "~/dwdy/layout/component";
+import {
+  DiaryContentFeatureIndex,
+  DiaryEntryMovementParams,
+  DiaryPageActionParams,
+} from "~/dwdy/types/core";
+import { dtToEntryTs } from "~/dwdy/services/dateUtils";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import ModalBase from "~/components/ModalBase.vue";
 import ModalDateSelector from "~/components/ModalDateSelector.vue";
 import ControlMenu from "~/components/dwdy/common/ControlMenu.vue";
-import CalendarNavMenu from "~/components/dwdy/diaryLayout/calendar/NavMenu.vue";
-import CalendarContentPanel from "~/components/dwdy/diaryLayout/calendar/ContentPanel.vue";
-import TimelineNavMenu from "~/components/dwdy/diaryLayout/timeline/NavMenu.vue";
-import YmNavPanel from "~/components/dwdy/common/YmNavPanel.vue";
-import NotebookNavMenu from "~/components/dwdy/diaryLayout/notebook/NavMenu.vue";
 import DiarySettingsModal from "~/components/dwdy/diarySettings/MainModal.vue";
-import DiaryContentEditorModal from "~/components/dwdy/diaryContent/EditorModal.vue";
 import DiaryContentFullViewerModal from "~/components/dwdy/diaryContent/FullViewerModal.vue";
-import DiaryContentEditorSelectorModal from "~/components/dwdy/diaryContent/EditorSelectorModal.vue";
-import { LocaleActor } from "~/services/locale";
-import { Diary, DIndex } from "~/models/dwdy/diary";
-import { useAppState } from "~/states/useAppState";
-import { useDwdyState } from "~/states/useDwdyState";
-import { PageNavigator, NavCellSpec } from "~/services/pageNavigator";
-import { DiaryLayout } from "~/models/dwdy/layout";
-import {
-  dIndexToDt,
-  dtToDIndex,
-  getNeighborDt,
-  isDateDIndex,
-} from "~/models/dwdy/dateUtils";
+import DiaryContentEditorSelectorModal from "~/components/dwdy/diaryEditor/FeatureSelectorModal.vue";
+import { initDwdyStateByRoute } from "~/dwdy/services/initDwdyStateByRoute";
 
 const route = useRoute();
 const router = useRouter();
@@ -43,41 +37,23 @@ const dwdyState = useDwdyState();
 const la = new LocaleActor("pages.dwdy.DiaryPage");
 const mainLayout = ref();
 const controlMenu = ref();
-const contentEditor = ref();
 const contentFullViewer = ref();
 const pageScope = "diary-page";
 const controlMenuSelectedBtn = ref<string>();
 const isDiarySettingsMoodalOn = ref(false);
 const isCurrentDateSelectorModalOn = ref(false);
-const isContentEditorModalOn = ref(false);
 const isContentFullViewerModalOn = ref(false);
 const isEditorSelectorModalOn = ref(false);
-const currentDate = ref<Date>(new Date());
-const currentDIndex = ref<DIndex>(dtToDIndex(currentDate.value));
 const isDiarySearchModalOn = ref(false);
+const layoutContentMain = ref();
 
-const fetchedDiary = await Diary.fetch(route.params.uid as string);
-if (fetchedDiary) {
-  dwdyState.diary.value = fetchedDiary;
-} else {
+const currentDate = computed(() => {
+  return dwdyState.entry.value.tsDate || new Date();
+});
+
+if (!(await initDwdyStateByRoute(dwdyState, route))) {
   router.push({ name: "diaries" });
 }
-await dwdyState.fetchEntry(currentDIndex.value);
-await dwdyState.fetchBunch(currentDIndex.value);
-
-watch(
-  () => currentDate.value,
-  async () => {
-    currentDIndex.value = dtToDIndex(currentDate.value);
-  }
-);
-
-watch(
-  () => currentDIndex.value,
-  async () => {
-    await dwdyState.fetchEntry(currentDIndex.value);
-  }
-);
 
 const navCellSpecs: NavCellSpec[] = [];
 navCellSpecs.push({
@@ -165,71 +141,52 @@ function onBackToShelfBtnClicked() {
 function onSearchBtnClicked() {
   isDiarySearchModalOn.value = true;
 }
-function moveNavPrevDay(): void {
-  console.log("viewer menu: prev day");
-  currentDate.value = getNeighborDt(currentDate.value, "prev", "day");
-}
-function moveNavNextDay(): void {
-  console.log("viewer menu: next day");
-  currentDate.value = getNeighborDt(currentDate.value, "next", "day");
-}
-function moveNavPrevMonth(): void {
-  console.log("viewer menu: prev month");
-  currentDate.value = getNeighborDt(currentDate.value, "prev", "month");
-}
-function moveNavNextMonth(): void {
-  console.log("viewer menu: next month");
-  currentDate.value = getNeighborDt(currentDate.value, "next", "month");
-}
-function moveNavPrevPage(): void {
-  console.log("viewer menu: prev page btn");
-  const prevDIndex = dwdyState.entry.value.doc.prevDIndex;
-  if (prevDIndex) {
-    if (isDateDIndex(prevDIndex)) {
-      currentDate.value = dIndexToDt(prevDIndex);
-    } else {
-      currentDIndex.value = prevDIndex;
-    }
-  }
-}
-function moveNavNextPage(): void {
-  console.log("viewer menu: next page btn");
-  const nextDIndex = dwdyState.entry.value.doc.nextDIndex;
-  if (nextDIndex) {
-    if (isDateDIndex(nextDIndex)) {
-      currentDate.value = dIndexToDt(nextDIndex);
-    } else {
-      currentDIndex.value = nextDIndex;
-    }
-  }
-}
-function moveNavToday(): void {
-  console.log("viewer menu: today btn");
-  currentDate.value = new Date();
-}
-function moveNavDate(givenDt: Date): void {
-  currentDate.value = givenDt;
-}
 function onSettingsBtnClicked() {
   isDiarySettingsMoodalOn.value = true;
 }
-function onDateSelectorOpen(): void {
-  isCurrentDateSelectorModalOn.value = true;
+function onCurrentDateSelectorChanged(givenDt: Date): void {
+  moveToEntry({ direction: "current", timestamp: dtToEntryTs(givenDt) });
 }
-function onCurrentDateSelectorChanged(givenDIndex: DIndex): void {
-  currentDate.value = dIndexToDt(givenDIndex);
+function onContentEditorOpen(cfi: DiaryContentFeatureIndex): void {
+  triggerAction({
+    action: "open-feature-editor",
+    cfi,
+    dIndex: dwdyState.entry.value.doc.dIndex,
+  });
 }
-function onEditorSelectorToggled(): void {
-  isEditorSelectorModalOn.value = true;
-}
-function onContentEditorOpen(action: string): void {
-  if (contentEditor.value) {
-    contentEditor.value.openModal(action);
+
+function moveToEntry(params: DiaryEntryMovementParams): void {
+  if (layoutContentMain.value) {
+    layoutContentMain.value.moveToEntry(params);
   }
 }
-function onFullViewerOpen(): void {
-  if (contentFullViewer.value) {
-    contentFullViewer.value.openModal();
+
+function triggerAction(params: DiaryPageActionParams): void {
+  if (params.action === "select-date") {
+    isCurrentDateSelectorModalOn.value = true;
+  } else if (params.action === "select-feature-editor") {
+    isEditorSelectorModalOn.value = true;
+  } else if (params.action === "open-feature-editor") {
+    const query = Object.assign(
+      {},
+      { f: params.cfi?.feature, ci: params.cfi?.index },
+      {
+        i: params.dIndex || dwdyState.entry.value.doc.dIndex,
+        ts: params.timestamp || dwdyState.entry.value.doc.timestamp,
+        ai: params.afterDIndex,
+      }
+    );
+    router.push({
+      name: "diaryEditor",
+      params: {
+        uid: dwdyState.diary.value.doc.dUid,
+      },
+      query: query,
+    });
+  } else if (params.action === "open-full-viewer") {
+    if (contentFullViewer.value) {
+      contentFullViewer.value.openModal(params.cfi);
+    }
   }
 }
 </script>
@@ -237,27 +194,12 @@ function onFullViewerOpen(): void {
 <template>
   <MainLayout ref="mainLayout">
     <div class="relatvie top-0 bottom-0 w-full h-full">
-      <CalendarContentPanel
-        v-if="dwdyState.diary.value.doc.layout === DiaryLayout.Calendar"
-        @move-nav-next-month="moveNavNextMonth"
-        @move-nav-prev-month="moveNavPrevMonth"
-        @move-nav-date="moveNavDate"
-        @open-date-selector="onDateSelectorOpen"
-        @open-content-editor="onContentEditorOpen"
-        @open-full-viewer="onFullViewerOpen"
-      ></CalendarContentPanel>
+      <component
+        :is="layoutComponent(dwdyState.diary.value.doc.layout, 'contentMain')"
+        ref="layoutContentMain"
+        @trigger-action="triggerAction"
+      ></component>
     </div>
-    <template #header-title> {{ dwdyState.diary.value.doc.title }} </template>
-    <template #layout-overlay-top-panel>
-      <YmNavPanel
-        v-if="dwdyState.diary.value.doc.layout === DiaryLayout.Timeline"
-        class="flex md:hidden justify-center backdrop-blur-sm bg-base-100/60 p-1"
-        :current-date="currentDate"
-        @move-nav-next-month="moveNavNextMonth"
-        @move-nav-prev-month="moveNavPrevMonth"
-        @open-date-selector="onDateSelectorOpen"
-      ></YmNavPanel>
-    </template>
     <template #layout-overlay-bottom-panel>
       <ControlMenu
         ref="controlMenu"
@@ -267,32 +209,17 @@ function onFullViewerOpen(): void {
       >
         <template #sub-btn-list>
           <div class="flex-none lg:hidden">
-            <CalendarNavMenu
-              v-if="dwdyState.diary.value.doc.layout === DiaryLayout.Calendar"
-              @move-nav-next-day="moveNavNextDay"
-              @move-nav-prev-day="moveNavPrevDay"
-              @move-nav-next-page="moveNavNextPage"
-              @move-nav-prev-page="moveNavPrevPage"
-              @move-nav-today="moveNavToday"
-              @edit="onEditorSelectorToggled"
-            ></CalendarNavMenu>
-            <TimelineNavMenu
-              v-if="dwdyState.diary.value.doc.layout === DiaryLayout.Timeline"
+            <component
+              :is="
+                layoutComponent(
+                  dwdyState.diary.value.doc.layout,
+                  'contentNavMenu'
+                )
+              "
               :current-date="currentDate"
-              @move-nav-next-day="moveNavNextDay"
-              @move-nav-prev-day="moveNavPrevDay"
-              @move-nav-next-month="moveNavNextMonth"
-              @move-nav-prev-month="moveNavPrevMonth"
-              @move-nav-next-page="moveNavNextPage"
-              @move-nav-prev-page="moveNavPrevPage"
-              @move-nav-today="moveNavToday"
-            ></TimelineNavMenu>
-            <NotebookNavMenu
-              v-if="dwdyState.diary.value.doc.layout === DiaryLayout.Notebook"
-              :current-d-index="currentDIndex"
-              @move-nav-next-page="moveNavNextPage"
-              @move-nav-prev-page="moveNavPrevPage"
-            ></NotebookNavMenu>
+              @move-to-entry="moveToEntry"
+              @trigger-action="triggerAction"
+            ></component>
           </div>
         </template>
         <template #main-btn-list>
@@ -309,7 +236,7 @@ function onFullViewerOpen(): void {
             >
               <SvgIcon icon-set="mdi" :path="mdiBookshelf" :size="24"></SvgIcon>
               <div class="hidden sm:block ml-2">
-                {{ la.t("dwdy.menu.shelf") }}
+                {{ la.t("dwdy.core.menu.shelf") }}
               </div>
             </button>
           </div>
@@ -348,32 +275,17 @@ function onFullViewerOpen(): void {
             </button>
           </div>
           <div class="hidden lg:flex ml-6">
-            <CalendarNavMenu
-              v-if="dwdyState.diary.value.doc.layout === DiaryLayout.Calendar"
-              @move-nav-next-day="moveNavNextDay"
-              @move-nav-prev-day="moveNavPrevDay"
-              @move-nav-next-page="moveNavNextPage"
-              @move-nav-prev-page="moveNavPrevPage"
-              @move-nav-today="moveNavToday"
-              @edit="onEditorSelectorToggled"
-            ></CalendarNavMenu>
-            <TimelineNavMenu
-              v-if="dwdyState.diary.value.doc.layout === DiaryLayout.Timeline"
+            <component
+              :is="
+                layoutComponent(
+                  dwdyState.diary.value.doc.layout,
+                  'contentNavMenu'
+                )
+              "
               :current-date="currentDate"
-              @move-nav-next-day="moveNavNextDay"
-              @move-nav-prev-day="moveNavPrevDay"
-              @move-nav-next-month="moveNavNextMonth"
-              @move-nav-prev-month="moveNavPrevMonth"
-              @move-nav-next-page="moveNavNextPage"
-              @move-nav-prev-page="moveNavPrevPage"
-              @move-nav-today="moveNavToday"
-            ></TimelineNavMenu>
-            <NotebookNavMenu
-              v-if="dwdyState.diary.value.doc.layout === DiaryLayout.Notebook"
-              :current-d-index="currentDIndex"
-              @move-nav-next-page="moveNavNextPage"
-              @move-nav-prev-page="moveNavPrevPage"
-            ></NotebookNavMenu>
+              @move-to-entry="moveToEntry"
+              @trigger-action="triggerAction"
+            ></component>
           </div>
         </template>
       </ControlMenu>
@@ -384,31 +296,22 @@ function onFullViewerOpen(): void {
         class="fixed z-10"
         :from-page-scope="pageScope"
       ></DiarySettingsModal>
-      <DiaryContentEditorModal
-        ref="contentEditor"
-        v-model="isContentEditorModalOn"
-        class="fixed z-10"
-        :feature="dwdyState.editingContent.value.feature"
-        :from-page-scope="pageScope"
-        @open-full-viewer="onFullViewerOpen"
-      ></DiaryContentEditorModal>
       <DiaryContentEditorSelectorModal
         ref="editorSelector"
         v-model="isEditorSelectorModalOn"
         class="fixed z-10"
-        @open-content-editor="onContentEditorOpen"
+        @select="onContentEditorOpen"
       ></DiaryContentEditorSelectorModal>
       <DiaryContentFullViewerModal
         ref="contentFullViewer"
         v-model="isContentFullViewerModalOn"
         class="fixed z-10"
-        :feature="dwdyState.editingContent.value.feature"
         @open-content-editor="onContentEditorOpen"
       ></DiaryContentFullViewerModal>
       <ModalDateSelector
         v-model="isCurrentDateSelectorModalOn"
         modal-id="current-date-selector"
-        :current-d-index="currentDIndex"
+        :current-date="currentDate"
         @change="onCurrentDateSelectorChanged"
       >
         <template #modal-title>

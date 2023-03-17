@@ -1,0 +1,32 @@
+{
+  "fontSize": { "name": "大小" },
+  "fontLineHeight": { "name": "行間距" },
+  "fontLetterSpacing": { "name": "字間距" },
+  "diariesSortedBy": {
+    "name": "顯示順序",
+    "options": {
+      "titleAsc": "日記名稱",
+      "updateDesc": "更新時間"
+    }
+  },
+  "fontFamily": {
+    "name": "字體",
+    "options": {
+      "sansSerif": "黑體",
+      "sansSerifVariant": "（無襯線體）",
+      "serif": "宋體",
+      "serifVariant": "（襯線體）"
+    }
+  },
+  "fontFormatSize": {
+    "options": {
+      "xs": "超小",
+      "s": "小",
+      "m": "中",
+      "l": "大",
+      "xl": "超大"
+    }
+  },
+  "isWeekShown": { "name": "顯示週數" },
+  "dateDisplay": { "name": "日期顯示" }
+}

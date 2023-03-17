@@ -1,9 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { prepareModelFactory } from "../factoryUtils";
 import { randomSample, genRandomSize } from "../../support/randomUtils";
-import { stickerMap } from "~/models/dwdy/sticker";
-import { DIndex } from "~/models/dwdy/diary";
-import { dtToDIndex } from "~/models/dwdy/dateUtils";
+import { stickerMap } from "~/dwdy/feature/sticker/data";
+import { DIndex } from "~/dwdy/types/core";
 import { genUid } from "~/services/db";
 import {
   DiaryEntryAttrs,
@@ -12,7 +11,7 @@ import {
 } from "~/models/dwdy/diaryEntry";
 
 export function genRandomDIndex(): DIndex {
-  return dtToDIndex(faker.datatype.datetime());
+  return genUid();
 }
 
 // NOTE: dexie cannot handle blob in test environment with fake-indexeddb
@@ -24,6 +23,7 @@ export function buildAttrs(givenAttrs: DiaryEntryParams = {}): DiaryEntryAttrs {
       content: {
         text: genRandomSize(() => faker.lorem.paragraphs()),
         sticker: randomSample(Object.keys(stickerMap)),
+        tag: genRandomSize(() => faker.lorem.word()),
       },
     },
     givenAttrs

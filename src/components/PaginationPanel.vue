@@ -20,7 +20,7 @@ const emit = defineEmits<{
 }>();
 
 const showCurrentPage = computed<boolean>(() => {
-  return props.totalPage > 0;
+  return props.totalPage > 0 && props.currentPage !== 0;
 });
 
 const showFirstPage = computed<boolean>(() => {
@@ -77,65 +77,68 @@ function onCurrentPageSelected(): void {
     >
       <SvgIcon icon-set="mdi" :path="mdiChevronLeft" :size="20"></SvgIcon>
     </button>
-    <div class="min-w-[18rem] btn-group justify-center">
-      <button
-        v-if="showFirstPage"
-        class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
-        @click="onPageSelected(1)"
-      >
-        1
-      </button>
-      <button
-        v-if="showFirstDots"
-        class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
-      >
-        <SvgIcon
-          class="text-base-300"
-          icon-set="mdi"
-          :path="mdiDotsHorizontal"
-          :size="16"
-        ></SvgIcon>
-      </button>
-      <button
-        v-if="showPreviousPage"
-        class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
-        @click="onPageSelected(props.currentPage - 1)"
-      >
-        {{ props.currentPage - 1 }}
-      </button>
-      <button
-        v-if="showCurrentPage"
-        class="btn btn-sm"
-        @click="onCurrentPageSelected"
-      >
-        {{ props.currentPage }}
-      </button>
-      <button
-        v-if="showNextPage"
-        class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
-        @click="onPageSelected(props.currentPage + 1)"
-      >
-        {{ props.currentPage + 1 }}
-      </button>
-      <button
-        v-if="showLastDots"
-        class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
-      >
-        <SvgIcon
-          class="text-base-300"
-          icon-set="mdi"
-          :path="mdiDotsHorizontal"
-          :size="16"
-        ></SvgIcon>
-      </button>
-      <button
-        v-if="showLastPage"
-        class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
-        @click="onPageSelected(props.totalPage)"
-      >
-        {{ props.totalPage }}
-      </button>
-      <slot name="right-appending"></slot>
+    <div class="w-full md:w-fit min-w-[22rem] flex justify-center items-center">
+      <div class="btn-group justify-center">
+        <button
+          v-if="showFirstPage"
+          class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
+          @click="onPageSelected(1)"
+        >
+          1
+        </button>
+        <button
+          v-if="showFirstDots"
+          class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
+        >
+          <SvgIcon
+            class="text-base-300"
+            icon-set="mdi"
+            :path="mdiDotsHorizontal"
+            :size="16"
+          ></SvgIcon>
+        </button>
+        <button
+          v-if="showPreviousPage"
+          class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
+          @click="onPageSelected(props.currentPage - 1)"
+        >
+          {{ props.currentPage - 1 }}
+        </button>
+        <button
+          v-if="showCurrentPage"
+          class="btn btn-sm"
+          @click="onCurrentPageSelected"
+        >
+          {{ props.currentPage }}
+        </button>
+        <button
+          v-if="showNextPage"
+          class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
+          @click="onPageSelected(props.currentPage + 1)"
+        >
+          {{ props.currentPage + 1 }}
+        </button>
+        <button
+          v-if="showLastDots"
+          class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
+        >
+          <SvgIcon
+            class="text-base-300"
+            icon-set="mdi"
+            :path="mdiDotsHorizontal"
+            :size="16"
+          ></SvgIcon>
+        </button>
+        <button
+          v-if="showLastPage"
+          class="btn btn-sm btn-outline hover:bg-base-100 hover:text-base-content"
+          @click="onPageSelected(props.totalPage)"
+        >
+          {{ props.totalPage }}
+        </button>
+        <slot name="right-appending"></slot>
+      </div>
+      <slot name="right-panel"></slot>
     </div>
     <button
       v-if="props.totalPage > 1"

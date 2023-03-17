@@ -1,87 +1,193 @@
 import { describe, expect, it } from "vitest";
-
 import {
-  MoveDirection,
-  MoveUnit,
-  dIndexToDt,
-  dIndexToDtStr,
-  dtToDIndex,
   getNeighborDt,
-  getNeighborDIndex,
   isSameDt,
-  isDateDIndex,
-} from "~/models/dwdy/dateUtils";
+  getBeginningOfDayTs,
+  dtToEntryTs,
+  entryTsToDt,
+  GetNeighborOption,
+} from "~/dwdy/services/dateUtils";
 
-describe(".dIndexToDt", () => {
-  it("returns the date by given dIndex", () => {
-    const givenDIndex = "20220101";
-    const expectedDt = new Date("2022-01-01").getTime();
-    expect(dIndexToDt(givenDIndex).getTime()).toEqual(expectedDt);
-  });
-});
-describe(".dIndexToDtStr", () => {
-  it("returns the date string by given dIndex", () => {
-    const givenDIndex = "20220101";
-    const expectedDtStr = "2022.01.01";
-    expect(dIndexToDtStr(givenDIndex)).toEqual(expectedDtStr);
-  });
-});
-describe(".dtToDIndex", () => {
-  it("returns the dIndex by given date", () => {
-    const givenDt = new Date("2022-01-01");
-    const expectedDIndex = "20220101";
-    expect(dtToDIndex(givenDt)).toEqual(expectedDIndex);
-  });
-});
-describe(".getNeighborDt", () => {
+describe.only(".getNeighborDt", () => {
   it("return the neighbor date", () => {
     const testCases = [
-      { params: ["prev", "month", 0], result: Date.parse("2022-02-01") },
-      { params: ["next", "month", 0], result: Date.parse("2022-02-28") },
-      { params: ["prev", "day", 0], result: Date.parse("2022-02-15") },
-      { params: ["next", "day", 0], result: Date.parse("2022-02-15") },
-      { params: ["prev", "month", 1], result: Date.parse("2022-01-01") },
-      { params: ["next", "month", 1], result: Date.parse("2022-03-31") },
-      { params: ["prev", "day", 1], result: Date.parse("2022-02-14") },
-      { params: ["next", "day", 1], result: Date.parse("2022-02-16") },
-      { params: ["prev", "month", 2], result: Date.parse("2021-12-01") },
-      { params: ["next", "month", 2], result: Date.parse("2022-04-30") },
-      { params: ["prev", "day", 2], result: Date.parse("2022-02-13") },
-      { params: ["next", "day", 2], result: Date.parse("2022-02-17") },
+      {
+        opts: {
+          direction: "current",
+        },
+        result: "2022-02-15 12:34:56",
+      },
+      {
+        opts: {
+          direction: "current",
+          alignment: "begin",
+        },
+        result: "2022-02-15 00:00:00",
+      },
+      {
+        opts: {
+          direction: "current",
+          alignment: "end",
+        },
+        result: "2022-02-15 23:59:59.999",
+      },
+      {
+        opts: {
+          direction: "current",
+          unit: "month",
+          alignment: "begin",
+        },
+        result: "2022-02-01 00:00:00",
+      },
+      {
+        opts: {
+          direction: "current",
+          unit: "month",
+          alignment: "end",
+        },
+        result: "2022-02-28 23:59:59.999",
+      },
+      {
+        opts: {
+          direction: "next",
+        },
+        result: "2022-02-16 12:34:56",
+      },
+      {
+        opts: {
+          direction: "next",
+          unit: "month",
+        },
+        result: "2022-03-15 12:34:56",
+      },
+      {
+        opts: {
+          direction: "next",
+          step: 2,
+        },
+        result: "2022-02-17 12:34:56",
+      },
+      {
+        opts: {
+          direction: "next",
+          unit: "month",
+          step: 2,
+        },
+        result: "2022-04-15 12:34:56",
+      },
+      {
+        opts: {
+          direction: "next",
+          step: 2,
+          alignment: "begin",
+        },
+        result: "2022-02-17 00:00:00",
+      },
+      {
+        opts: {
+          direction: "next",
+          step: 2,
+          alignment: "end",
+        },
+        result: "2022-02-17 23:59:59.999",
+      },
+      {
+        opts: {
+          direction: "next",
+          unit: "month",
+          step: 2,
+          alignment: "begin",
+        },
+        result: "2022-04-01 00:00:00",
+      },
+      {
+        opts: {
+          direction: "next",
+          unit: "month",
+          step: 2,
+          alignment: "end",
+        },
+        result: "2022-04-30 23:59:59.999",
+      },
+      {
+        opts: {
+          direction: "prev",
+        },
+        result: "2022-02-14 12:34:56",
+      },
+      {
+        opts: {
+          direction: "prev",
+          unit: "month",
+        },
+        result: "2022-01-15 12:34:56",
+      },
+      {
+        opts: {
+          direction: "prev",
+          step: 2,
+        },
+        result: "2022-02-13 12:34:56",
+      },
+      {
+        opts: {
+          direction: "prev",
+          unit: "month",
+          step: 2,
+        },
+        result: "2021-12-15 12:34:56",
+      },
+      {
+        opts: {
+          direction: "prev",
+          step: 2,
+          alignment: "begin",
+        },
+        result: "2022-02-13 00:00:00",
+      },
+      {
+        opts: {
+          direction: "prev",
+          step: 2,
+          alignment: "end",
+        },
+        result: "2022-02-13 23:59:59.999",
+      },
+      {
+        opts: {
+          direction: "prev",
+          unit: "month",
+          step: 2,
+          alignment: "begin",
+        },
+        result: "2021-12-01 00:00:00",
+      },
+      {
+        opts: {
+          direction: "prev",
+          unit: "month",
+          step: 2,
+          alignment: "end",
+        },
+        result: "2021-12-31 23:59:59.999",
+      },
     ];
-    const baseDt = new Date(Date.parse("2022-02-15"));
+    const baseDt = new Date("2022-02-15 12:34:56");
     testCases.forEach((tc) => {
-      const resultDt = getNeighborDt(
-        baseDt,
-        ...(tc.params as [MoveDirection, MoveUnit, number])
-      );
-      expect(resultDt.getTime()).toEqual(new Date(tc.result).getTime());
+      const resultDt = getNeighborDt(baseDt, tc["opts"] as GetNeighborOption);
+      const expectedDt = new Date(tc.result);
+      expect(resultDt.getTime()).toEqual(expectedDt.getTime());
     });
   });
-});
-describe(".getNeighborDIndex", () => {
-  it("return the neighbor date", () => {
-    const testCases = [
-      { params: ["prev", "month", 0], result: "20220201" },
-      { params: ["next", "month", 0], result: "20220228" },
-      { params: ["prev", "day", 0], result: "20220215" },
-      { params: ["next", "day", 0], result: "20220215" },
-      { params: ["prev", "month", 1], result: "20220101" },
-      { params: ["next", "month", 1], result: "20220331" },
-      { params: ["prev", "day", 1], result: "20220214" },
-      { params: ["next", "day", 1], result: "20220216" },
-      { params: ["prev", "month", 2], result: "20211201" },
-      { params: ["next", "month", 2], result: "20220430" },
-      { params: ["prev", "day", 2], result: "20220213" },
-      { params: ["next", "day", 2], result: "20220217" },
-    ];
-    const baseDIndex = "20220215";
-    testCases.forEach((tc) => {
-      const resultDIndex = getNeighborDIndex(
-        baseDIndex,
-        ...(tc.params as [MoveDirection, MoveUnit, number])
-      );
-      expect(resultDIndex).toEqual(tc.result);
+  describe("when the neighbor datetime is out of range", () => {
+    it("arranges to the end of the given unit", () => {
+      const baseDt = new Date("2022-01-31 12:34:56");
+      const resultDt = getNeighborDt(baseDt, {
+        direction: "next",
+        unit: "month",
+      });
+      const expectedDt = new Date("2022-02-28 12:34:56");
+      expect(resultDt.getTime()).toEqual(expectedDt.getTime());
     });
   });
 });
@@ -138,17 +244,38 @@ describe(".isSameDt", () => {
       });
     });
   });
-  describe(".isDateDIndex", () => {
-    it("checks the given d-index is a date index or not", () => {
-      const testCases = [
-        { dIndex: "20220102", result: true },
-        { dIndex: "test", result: false },
-        { dIndex: undefined, result: false },
-      ];
-      testCases.forEach((tc) => {
-        const result = isDateDIndex(tc.dIndex);
-        expect(result).toEqual(tc.result);
-      });
+  describe(".getBeginningOfDayTs", () => {
+    it("reranges the given timestamp to the beginning of the day", () => {
+      const ts = Date.now();
+      const result = getBeginningOfDayTs(ts);
+      const expectedDt = new Date(ts);
+      expectedDt.setUTCHours(0, 0, 0, 0);
+      expect(result).toEqual(expectedDt.getTime());
+    });
+  });
+  describe(".dtToEntryTs", () => {
+    it("returns the timestamp for entry by given datetime", () => {
+      const dt = new Date();
+      const ts = dtToEntryTs(dt);
+      const tsDt = new Date();
+      tsDt.setUTCFullYear(dt.getFullYear());
+      tsDt.setUTCMonth(dt.getMonth());
+      tsDt.setUTCDate(dt.getDate());
+      const expectedTs = getBeginningOfDayTs(tsDt.getTime());
+      expect(ts).toEqual(expectedTs);
+    });
+  });
+  describe(".entryTsToDt", () => {
+    it("returns the date from the entry timestamp", () => {
+      const ts = getBeginningOfDayTs(Date.now());
+      const dt = entryTsToDt(ts);
+      const tsDt = new Date(ts);
+      const expectedDt = new Date();
+      expectedDt.setFullYear(tsDt.getUTCFullYear());
+      expectedDt.setMonth(tsDt.getUTCMonth());
+      expectedDt.setDate(tsDt.getUTCDate());
+      expectedDt.setHours(0, 0, 0, 0);
+      expect(dt).toEqual(expectedDt);
     });
   });
 });

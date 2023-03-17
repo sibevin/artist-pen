@@ -1,0 +1,131 @@
+{
+  "text": {
+    "name": "Text",
+    "config": {
+      "display": {
+        "name": "Display",
+        "options": {
+          "carousel": "Carousel",
+          "list": "List"
+        }
+      }
+    },
+    "stat": {
+      "count": "Count",
+      "fileSize": "File size",
+      "words": "Words",
+      "letters": "Letters"
+    },
+    "components": {
+      "EditorMain": {
+        "writeSomethingHint": "Write something ..."
+      },
+      "ContentEditor": {
+        "writeSomethingHint": "Write something ..."
+      }
+    }
+  },
+  "image": {
+    "name": "Image",
+    "config": {
+      "display": {
+        "name": "Display",
+        "options": {
+          "carousel": "Carousel",
+          "list": "List"
+        }
+      }
+    },
+    "stat": {
+      "count": "Count",
+      "fileSize": "File size"
+    },
+    "components": {
+      "EditorMain": {
+        "uploadImage": "Upload image",
+        "changeImage": "Change image",
+        "comment": "Comment"
+      },
+      "ContentEditor": {
+        "uploadImage": "Upload image",
+        "changeImage": "Change image",
+        "comment": "Comment"
+      }
+    }
+  },
+  "sound": {
+    "name": "Sound",
+    "config": {
+      "repeat": {
+        "name": "Repeat",
+        "options": {
+          "none": "No repeat",
+          "single": "Single repeat",
+          "all": "All repeat"
+        }
+      },
+      "isPlayingRandomly": { "name": "Random" },
+      "volume": { "name": "Volume" },
+      "isMuted": { "name": "Muted" },
+      "stereoPan": { "name": "Stereo" }
+    },
+    "stat": {
+      "count": "Count",
+      "fileSize": "File size",
+      "duration": "Duration"
+    },
+    "record": "Record",
+    "recordAgain": "Record again",
+    "pause": "Pause",
+    "stop": "Stop",
+    "comment": "Comment",
+    "AudioRecorder": {
+      "error": {
+        "permission_denied": "Permission denied, please click \"Record\" to setup the device permission again.",
+        "media_error": "An device error occurred, the sound cannot be recorded. Please click \"Record\" to record again.",
+        "media_not_supported": "The sound recording is not supported on your device.",
+        "unknown": "An error occurred, please re-start the App."
+      }
+    }
+  },
+  "sticker": {
+    "name": "Sticker",
+    "config": {
+      "recentRecords": {
+        "name": "Recent"
+      }
+    },
+    "stat": {
+      "count": "Count",
+      "fileSize": "File size",
+      "distribution": "Distribution"
+    },
+    "category": {
+      "recent": "Recent",
+      "customized": "Customized",
+      "mood": "Mood",
+      "weather": "Weather",
+      "food": "Food",
+      "dessert": "Dessert",
+      "drink": "Drink",
+      "activity": "Activity",
+      "sport": "Sport",
+      "location": "Location",
+      "transport": "Transportation",
+      "festival": "Festival"
+    }
+  },
+  "tag": {
+    "name": "Tag",
+    "config": {
+      "recentRecords": {
+        "name": "Recent"
+      }
+    },
+    "stat": {
+      "count": "Count",
+      "fileSize": "File size",
+      "distribution": "Distribution"
+    }
+  }
+}

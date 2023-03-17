@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from "vue";
+import { ref, watch, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { useFocus } from "@vueuse/core";
 import { useMeta } from "vue-meta";
 import {
   mdiPlus,
   mdiMagnify,
-  mdiClockOutline,
   mdiMenu,
   mdiClose,
   mdiBookshelf,
@@ -17,19 +16,18 @@ import { elRdBook } from "~/services/iconSetPath";
 import { LocaleActor } from "~/services/locale";
 import { useAppState } from "~/states/useAppState";
 import { useDwdyState } from "~/states/useDwdyState";
-import { DwdyConfig } from "~/models/dwdy/config";
-import { Diary, DUid } from "~/models/dwdy/diary";
-import { DiarySortedBy, diarySortedByOpts } from "~/models/dwdy/configOption";
-import { DiaryFeature, featureIconMap } from "~/models/dwdy/feature";
-import { Icon } from "~/models/app/types";
-import { dIndexToDtStr } from "~/models/dwdy/dateUtils";
+import { DUid } from "~/dwdy/types/core";
+import { Diary } from "~/models/dwdy/diary";
+import { DiarySortedBy, diarySortedByOpts } from "~/dwdy/services/configOption";
+import { featureIcon } from "~/dwdy/feature/map";
+import { dispatchAuth } from "~/services/flow/auth";
+import { PageNavigator, NavCellSpec } from "~/services/pageNavigator";
+import { layoutComponent } from "~/dwdy/layout/component";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import ModalBase from "~/components/ModalBase.vue";
 import ModalSelector from "~/components/ModalSelector.vue";
 import DiaryCreationModal from "~/components/dwdy/DiaryCreationModal.vue";
-import { dispatchAuth } from "~/services/flow/auth";
-import { PageNavigator, NavCellSpec } from "~/services/pageNavigator";
 
 useMeta({
   title: "Diaries",
@@ -42,12 +40,8 @@ const appState = useAppState();
 const dwdyState = useDwdyState();
 const router = useRouter();
 
-const dwdyConfig = computed<DwdyConfig>(() => {
-  return dwdyState.config.value;
-});
-
 const diaries = ref<Diary[]>([]);
-const currentDiarySortedBy = ref(dwdyConfig.value.doc.diariesSortedBy);
+const currentDiarySortedBy = ref(dwdyState.config.value.doc.diariesSortedBy);
 const queryKeyword = ref("");
 const isDiaryCreationMoodalOn = ref(false);
 const isDiariesSortingMoodalOn = ref(false);
@@ -187,7 +181,7 @@ function updatePnCellSpec(): void {
 
 async function updateDiaries(): Promise<void> {
   diaries.value = await Diary.list({
-    sortedBy: dwdyConfig.value.doc.diariesSortedBy,
+    sortedBy: dwdyState.config.value.doc.diariesSortedBy,
     keyword: queryKeyword.value,
   });
   updatePnCellSpec();
@@ -240,14 +234,12 @@ watch([() => currentDiarySortedBy.value, () => queryKeyword.value], () =>
   updateDiaries()
 );
 
-function getFeatureIcon(feature: DiaryFeature): Icon {
-  return featureIconMap[feature];
-}
-
 async function onDiarySortingChanged(value: string): Promise<void> {
   currentDiarySortedBy.value = value as DiarySortedBy;
-  dwdyConfig.value.assign({ diariesSortedBy: currentDiarySortedBy.value });
-  await dwdyConfig.value.save();
+  dwdyState.config.value.assign({
+    diariesSortedBy: currentDiarySortedBy.value,
+  });
+  await dwdyState.config.value.save();
 }
 </script>
 
@@ -283,36 +275,17 @@ async function onDiarySortingChanged(value: string): Promise<void> {
             </div>
           </div>
           <div class="flex items-center">
-            <div class="text-base-600 flex items-center">
-              <SvgIcon
-                class="ml-1 mr-2"
-                icon-set="mdi"
-                :path="mdiClockOutline"
-                :size="24"
-              ></SvgIcon>
-              <div class="mr-6 text-xl">2022.11.28</div>
-            </div>
-            <div
-              v-if="diary.doc.lastDIndex"
-              class="text-base-600 flex items-center"
-            >
-              <SvgIcon
-                class="mr-2"
-                icon-set="mdi"
-                :path="mdiClockOutline"
-                :size="24"
-              ></SvgIcon>
-              <div class="mr-6 text-xl">
-                {{ dIndexToDtStr(diary.doc.lastDIndex) }}
-              </div>
-            </div>
+            <component
+              :is="layoutComponent(diary.doc.layout, 'lastContentPanel')"
+              :diary="diary"
+            ></component>
             <div class="text-base-200 flex items-center">
               <SvgIcon
                 v-for="feature in diary.enabledFeatures"
                 :key="feature"
                 class="mr-3"
-                :icon-set="getFeatureIcon(feature).set"
-                :path="getFeatureIcon(feature).path"
+                :icon-set="featureIcon(feature).set"
+                :path="featureIcon(feature).path"
                 :size="20"
               ></SvgIcon>
             </div>
@@ -367,7 +340,7 @@ async function onDiarySortingChanged(value: string): Promise<void> {
           :size="20"
         ></SvgIcon>
         <div class="text-xs">
-          {{ la.t("dwdy.menu.shelf") }}
+          {{ la.t("dwdy.core.menu.shelf") }}
         </div>
       </div>
     </template>

@@ -69,7 +69,7 @@ function changeScope(givenScope: string) {
               :path="mdiBookshelf"
               :size="24"
             ></SvgIcon>
-            {{ la.t("dwdy.menu.shelf") }}
+            {{ la.t("dwdy.core.menu.shelf") }}
           </RouterLink>
         </div>
       </div>

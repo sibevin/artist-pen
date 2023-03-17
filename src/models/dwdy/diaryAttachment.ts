@@ -1,15 +1,17 @@
-import { DUid, DIndex } from "~/models/dwdy/diary";
+import { DUid, DIndex } from "~/dwdy/types/core";
 import { DiaryEntryIdentity } from "~/models/dwdy/diaryEntry";
 import { InvalidParamsError } from "~/models/app/error";
 import { dbDwdy } from "~/services/db/dwdy";
 import { BaseModel } from "~/models/baseModel";
-import { genUid } from "~/services/db";
+import { genUid, normalizeObject } from "~/services/db";
 
 export type DiaryAttachmentFile = {
   fileName: string;
   fileType: string;
   size: number;
   data: string;
+  blob?: Blob;
+  buffer?: ArrayBuffer;
 };
 
 export interface DiaryAttachmentAttrs extends DiaryAttachmentFile {
@@ -131,7 +133,9 @@ export class DiaryAttachment
       });
     }
     await dbDwdy.diaryAttachments.put(
-      JSON.parse(JSON.stringify(this.doc)) as DiaryAttachmentExistingDoc
+      normalizeObject(this.doc, {
+        except: ["blob", "buffer"],
+      }) as DiaryAttachmentExistingDoc
     );
     if (this.isSaved) {
       return { target: this, action: "update" };

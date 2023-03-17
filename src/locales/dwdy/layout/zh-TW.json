@@ -1,0 +1,41 @@
+{
+  "config": {
+    "displayIcon": {
+      "name": "日曆圖示",
+      "options": {
+        "dot": "點點",
+        "firstSticker": "貼紙",
+        "contentType": "內容種類"
+      }
+    }
+  },
+  "calendar": {
+    "name": "日曆",
+    "description": "提供一個日曆可以快速瀏覽特定日期的內容。",
+    "config": {
+      "calendarDisplay": {
+        "name": "日曆顯示"
+      },
+      "firstWeekDay": {
+        "name": "開始星期"
+      }
+    }
+  },
+  "timeline": {
+    "name": "時間軸",
+    "description": "將一整個月的內容同時呈現在時間軸上。",
+    "config": {
+      "timelineOrder": {
+        "name": "時間順序（從上到下）",
+        "options": {
+          "asc": "早 > 晚",
+          "desc": "晚 > 早"
+        }
+      }
+    }
+  },
+  "notebook": {
+    "name": "筆記本",
+    "description": "單純的筆記本，可以為每個頁面給予標題。"
+  }
+}

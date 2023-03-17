@@ -26,6 +26,7 @@ import { useAppState } from "~/states/useAppState";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import ModalSelector from "~/components/ModalSelector.vue";
+import logoImage from "~/assets/images/app/logo_32x.svg";
 
 useMeta({
   title: "Settings",
@@ -287,7 +288,14 @@ async function onThemeChanged(theme: string) {
     </div>
 
     <template #header-title>
-      {{ la.t("app.serviceName") }}
+      <RouterLink to="/">
+        <div class="grow flex flex-row items-center">
+          <img class="h-10 mr-3" :src="logoImage" alt="" />
+          <div class="grow text-xl ml-0">
+            {{ la.t("app.serviceName") }}
+          </div>
+        </div>
+      </RouterLink>
     </template>
     <template #header-panel>
       <div class="page-mark">
@@ -343,7 +351,7 @@ async function onThemeChanged(theme: string) {
                 :path="mdiBookshelf"
                 :size="24"
               ></SvgIcon>
-              {{ la.t("dwdy.menu.shelf") }}
+              {{ la.t("dwdy.core.menu.shelf") }}
             </RouterLink>
           </div>
         </div>

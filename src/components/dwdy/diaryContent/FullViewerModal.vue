@@ -3,16 +3,13 @@ import { ref, watch, onMounted } from "vue";
 import { mdiFileEditOutline, mdiClose } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
-import { featureComponent } from "~/models/dwdy/featureDef";
-import YmdNavPanel from "~/components/dwdy/common/YmdNavPanel.vue";
+import { featureComponent } from "~/dwdy/feature/component";
+import { DiaryFeature } from "~/dwdy/feature/def";
+import { DiaryContentFeatureIndex } from "~/dwdy/types/core";
 import SvgIcon from "~/components/SvgIcon.vue";
 import ModalBase from "~/components/ModalBase.vue";
 
 const props = defineProps({
-  currentSelectedBtn: {
-    type: String,
-    default: undefined,
-  },
   modelValue: {
     type: Boolean,
     required: true,
@@ -21,8 +18,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
-  (e: "change", value: string): void;
-  (e: "openContentEditor", action: string): void;
+  (e: "openContentEditor", value: { feature: DiaryFeature }): void;
 }>();
 
 const la = new LocaleActor("app");
@@ -30,6 +26,9 @@ const dwdyState = useDwdyState();
 const isModalOn = ref(false);
 const diaryContentFullViewerModal = ref();
 const contentFullViewer = ref();
+const currentCfi = ref<DiaryContentFeatureIndex>({
+  feature: DiaryFeature.Text,
+});
 
 onMounted(() => {
   isModalOn.value = props.modelValue;
@@ -57,17 +56,17 @@ function triggerModelUpdate(): void {
 
 function onEditorOpened() {
   isModalOn.value = false;
-  emit("openContentEditor", "update");
+  emit("openContentEditor", currentCfi.value);
 }
 
-function openModal() {
-  if (dwdyState.editingContent.value.index < 0) {
-    dwdyState.editingContent.value.index = 0;
-  }
+function onContentSelected(index: number): void {
+  currentCfi.value.index = index;
+}
+
+function openModal(cfi: DiaryContentFeatureIndex) {
+  currentCfi.value = cfi;
   if (contentFullViewer.value && contentFullViewer.value.setCurrentIndex) {
-    contentFullViewer.value.setCurrentIndex(
-      dwdyState.editingContent.value.index
-    );
+    contentFullViewer.value.setCurrentIndex(cfi.index || 0);
   }
   isModalOn.value = true;
 }
@@ -86,10 +85,9 @@ defineExpose({ openModal });
       <div
         class="w-full pt-3 flex items-center backdrop-blur-sm bg-base-100/60"
       >
-        <YmdNavPanel
-          v-if="dwdyState.diary.value.isTimeBasedLayout"
-          :current-date="dwdyState.entry.value.dIndexDate || new Date()"
-        ></YmdNavPanel>
+        <component
+          :is="dwdyState.diary.value.layoutComponent('titlePanel')"
+        ></component>
         <div class="grow"></div>
         <button
           class="btn btn-ghost rounded-full flex items-center"
@@ -117,14 +115,10 @@ defineExpose({ openModal });
     <template #modal-content>
       <div class="absolute inset-6">
         <component
-          :is="
-            featureComponent(
-              dwdyState.editingContent.value.feature,
-              'fullViewer'
-            )
-          "
+          :is="featureComponent(currentCfi.feature, 'fullViewer')"
           ref="contentFullViewer"
-          :content-index="dwdyState.editingContent.value.index"
+          :content-index="currentCfi.index"
+          @select="onContentSelected"
         ></component>
       </div>
     </template>

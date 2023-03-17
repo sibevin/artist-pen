@@ -39,6 +39,11 @@
           "today": "Today"
         }
       }
+    },
+    "DiaryEditorPage": {
+      "menu": {
+        "backToDiary": "Back to diary"
+      }
     }
   }
 }

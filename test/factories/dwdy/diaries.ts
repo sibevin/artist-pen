@@ -13,13 +13,9 @@ import {
   DiaryTemplate,
   DEFAULT_TEMPLATE,
 } from "~/models/dwdy/diary";
-import { DiaryFeature, AVAILABLE_FEATURES } from "~/models/dwdy/feature";
-import { DiaryLayout } from "~/models/dwdy/layout";
-import {
-  WeekDay,
-  DiaryTimelineOrder,
-  WEEK_DAYS,
-} from "~/models/dwdy/configOption";
+import { DiaryFeature } from "~/dwdy/feature/def";
+import { AVAILABLE_FEATURES } from "~/dwdy/feature/map";
+import { DiaryLayout } from "~/dwdy/layout/def";
 
 export function buildAttrs(givenAttrs: DiaryParams = {}): DiaryAttrs {
   const enabledFeatures: DiaryFeature[] =
@@ -37,11 +33,13 @@ export function buildAttrs(givenAttrs: DiaryParams = {}): DiaryAttrs {
       title: faker.lorem.sentence(),
       entryCount: faker.datatype.number(),
       layout: randomPick(Object.keys(DiaryLayout)),
-      highlightedWeekDays: randomSample(WEEK_DAYS as WeekDay[]),
-      firstWeekDay: randomPick(WEEK_DAYS as WeekDay[]) as WeekDay,
-      isWeekShown: faker.datatype.boolean(),
-      timelineOrder: randomPick(Object.keys(DiaryTimelineOrder)),
       template,
+      stat: {},
+      config: {
+        diary: {},
+        content: {},
+        layout: {},
+      },
     },
     givenAttrs
   );

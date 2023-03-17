@@ -8,7 +8,7 @@ import {
   DiaryFontFamily,
   DiaryFontFormatSize,
   WEEK_DAYS,
-} from "~/models/dwdy/configOption";
+} from "~/dwdy/services/configOption";
 import {
   DwdyConfigAttrs,
   DwdyConfigParams,

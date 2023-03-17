@@ -1,3 +1,5 @@
+import { genUid } from "~/services/db";
+
 export type FileSizeDisplay = {
   unit: "gb" | "mb" | "kb";
   amount: string;
@@ -36,4 +38,9 @@ export function displayFileName(fileName: string): FileNameDisplay {
 
 export function getStringBytes(value: string): number {
   return new TextEncoder().encode(value).length;
+}
+
+export function genRandomFileName(ext?: string): string {
+  const extStr = ext ? `.${ext}` : "";
+  return `${genUid()}${extStr}`;
 }

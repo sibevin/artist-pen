@@ -1,18 +1,36 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { useMeta } from "vue-meta";
 import { mdiMenu, mdiBookshelf } from "@mdi/js";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import { LocaleActor } from "~/services/locale";
+import ContentGallery from "~/dwdy/feature/sound/components/ContentGallery.vue";
+import AudioPlayer from "~/dwdy/feature/sound/components/AudioPlayer.vue";
+import testMp3 from "~/assets/audio/test.mp3";
+import test2Mp3 from "~/assets/audio/test2.mp3";
 const la = new LocaleActor("app");
 useMeta({
   title: "Dev",
 });
+const audioSrc = ref<string | undefined>(testMp3);
+
+function switchAudioSrc(): void {
+  if (audioSrc.value === testMp3) {
+    audioSrc.value = undefined;
+  } else {
+    audioSrc.value = testMp3;
+  }
+}
 </script>
 
 <template>
   <MainLayout>
     <div>Dev</div>
+    <button class="btn" @click="switchAudioSrc">Switch audio</button>
+    <div class="m-2">
+      <AudioPlayer :audio-data="audioSrc" class="grow"></AudioPlayer>
+    </div>
     <template #header-title>
       {{ la.t("app.serviceName") }}
     </template>
@@ -39,7 +57,7 @@ useMeta({
               :path="mdiBookshelf"
               :size="24"
             ></SvgIcon>
-            {{ la.t("dwdy.menu.shelf") }}
+            {{ la.t("dwdy.core.menu.shelf") }}
           </RouterLink>
         </div>
       </div>

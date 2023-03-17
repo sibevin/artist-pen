@@ -1,7 +1,8 @@
 import { describe, it, expect, afterAll, afterEach } from "vitest";
 import { faker } from "@faker-js/faker";
 import "fake-indexeddb/auto";
-import { Diary, DIndex } from "~/models/dwdy/diary";
+import { DIndex } from "~/dwdy/types/core";
+import { Diary } from "~/models/dwdy/diary";
 import { AppError } from "~/models/app/error";
 import { dbDwdy } from "~/services/db/dwdy";
 import { genUid } from "~/services/db";
@@ -19,8 +20,6 @@ import {
   checkAssignBehavior,
   checkSaveBehavior,
 } from "../../support/modelUtils";
-import { randomPick } from "test/support/randomUtils";
-import { DiaryLayout, TIME_BASED_LAYOUTS } from "~/models/dwdy/layout";
 
 function checkEntryExisting(
   runProc: (diary: Diary, dIndex: DIndex) => Promise<void>
@@ -34,7 +33,7 @@ function checkEntryExisting(
         try {
           const diary = await create();
           const dIndex = faker.lorem.word();
-          await diary.appendNewEntry(dIndex);
+          await diary.appendEntry({}, dIndex);
           await runProc(diary, dIndex);
         } catch (error) {
           expect((error as AppError).code).toEqual("existing_diary_entry");
@@ -88,20 +87,6 @@ describe("Diary", () => {
     build,
     create
   );
-  describe("#isTimeBasedLayout", () => {
-    describe("when diary layout is a time-based layout", () => {
-      it("returns true", () => {
-        const diary = build({ layout: randomPick(TIME_BASED_LAYOUTS) });
-        expect(diary.isTimeBasedLayout).toBeTruthy();
-      });
-    });
-    describe("when diary layout is the 'Notebook' layout", () => {
-      it("returns false", () => {
-        const diary = build({ layout: DiaryLayout.Notebook });
-        expect(diary.isTimeBasedLayout).toBeFalsy();
-      });
-    });
-  });
   describe("#fetchEntry", () => {
     afterAll(() => {
       dbDwdy.diaries.clear();
@@ -109,71 +94,13 @@ describe("Diary", () => {
     });
     it("fetches the diary entry by given d-index", async () => {
       const diary = await create();
-      await diary.appendNewEntry("20220115");
-      const entry = await diary.fetchEntry("20220115");
-      expect(entry.doc.dIndex).toEqual("20220115");
+      const dIndex = genUid();
+      await diary.appendEntry({}, dIndex);
+      const entry = await diary.fetchEntry({ dIndex });
+      expect(entry && entry.doc.dIndex).toEqual(dIndex);
     });
   });
-  describe("#fetchMonthEntries", () => {
-    afterAll(() => {
-      dbDwdy.diaries.clear();
-      dbDwdy.diaryEntries.clear();
-    });
-    it("fetches month entries according to the given date", async () => {
-      const diary = await create();
-      await diary.appendNewEntry("20220115");
-      await diary.appendNewEntry("20220101");
-      await diary.appendNewEntry("20220131");
-      const givenDt = new Date("2022-01-07");
-      const result = await diary.fetchMonthEntries(givenDt);
-      expect(result.dIndexes).toEqual(["20220101", "20220115", "20220131"]);
-      expect(result.entryMap["20220101"].doc.dIndex).toEqual("20220101");
-      expect(result.entryMap["20220115"].doc.dIndex).toEqual("20220115");
-      expect(result.entryMap["20220131"].doc.dIndex).toEqual("20220131");
-      expect(result.entryMap["20220120"]).toBeUndefined();
-    });
-  });
-  describe("#insertNewEntryWithDIndexOrder", () => {
-    afterEach(() => {
-      dbDwdy.diaries.clear();
-      dbDwdy.diaryEntries.clear();
-    });
-    describe("when no entry in the diary", () => {
-      it("appends the entry with undefined prevDIndex and nextDIndex", async () => {
-        const diary = await create();
-        const dIndex = faker.lorem.word();
-        await diary.insertNewEntryWithDIndexOrder(dIndex);
-        const insertedEntry = await diary.lastEntry;
-        expect(insertedEntry.doc.dIndex).toEqual(dIndex);
-        expect(insertedEntry.doc.prevDIndex).toBeUndefined();
-        expect(insertedEntry.doc.nextDIndex).toBeUndefined();
-      });
-    });
-    describe("when the diary has some entries", () => {
-      it("inserts the entry to the position by given d-index", async () => {
-        const diary = await create();
-        await diary.appendNewEntry("20220110");
-        await diary.appendNewEntry("20220115");
-        const testCase = [
-          { dIndex: "20220113", prev: "20220110", next: "20220115" },
-          { dIndex: "20220101", prev: undefined, next: "20220110" },
-          { dIndex: "20220117", prev: "20220115", next: undefined },
-        ];
-        testCase.forEach(async (tc) => {
-          const insertedEntry = await diary.insertNewEntryWithDIndexOrder(
-            tc.dIndex
-          );
-          expect(insertedEntry.doc.dIndex).toEqual(tc.dIndex);
-          expect(insertedEntry.doc.prevDIndex).toEqual(tc.prev);
-          expect(insertedEntry.doc.nextDIndex).toEqual(tc.next);
-        });
-      });
-    });
-    checkEntryExisting(async (diary, dIndex) => {
-      await diary.insertNewEntryWithDIndexOrder(dIndex);
-    });
-  });
-  describe("#appendNewEntry", () => {
+  describe("#appendEntry", () => {
     afterAll(() => {
       dbDwdy.diaries.clear();
       dbDwdy.diaryEntries.clear();
@@ -181,29 +108,31 @@ describe("Diary", () => {
     describe("when no entry in the diary", () => {
       it("appends the entry with undefined prevDIndex and nextDIndex", async () => {
         const diary = await create();
-        const dIndex = faker.lorem.word();
-        await diary.appendNewEntry(dIndex);
+        const dIndex = genUid();
+        await diary.appendEntry({}, dIndex);
         const insertedEntry = await diary.lastEntry;
-        expect(insertedEntry.doc.dIndex).toEqual(dIndex);
-        expect(insertedEntry.doc.prevDIndex).toBeUndefined();
-        expect(insertedEntry.doc.nextDIndex).toBeUndefined();
+        expect(insertedEntry && insertedEntry.doc.dIndex).toEqual(dIndex);
+        expect(insertedEntry && insertedEntry.doc.prevDIndex).toBeUndefined();
+        expect(insertedEntry && insertedEntry.doc.nextDIndex).toBeUndefined();
       });
     });
     describe("when the diary has some entries", () => {
       it("append the entry to the last entry", async () => {
         const diary = await create();
-        const existingDIndex = faker.lorem.word();
-        await diary.appendNewEntry(existingDIndex);
-        const dIndex = faker.lorem.word();
-        await diary.appendNewEntry(dIndex);
+        const existingDIndex = genUid();
+        await diary.appendEntry({}, existingDIndex);
+        const dIndex = genUid();
+        await diary.appendEntry({}, dIndex);
         const insertedEntry = await diary.lastEntry;
-        expect(insertedEntry.doc.dIndex).toEqual(dIndex);
-        expect(insertedEntry.doc.prevDIndex).toEqual(existingDIndex);
-        expect(insertedEntry.doc.nextDIndex).toBeUndefined();
+        expect(insertedEntry && insertedEntry.doc.dIndex).toEqual(dIndex);
+        expect(insertedEntry && insertedEntry.doc.prevDIndex).toEqual(
+          existingDIndex
+        );
+        expect(insertedEntry && insertedEntry.doc.nextDIndex).toBeUndefined();
       });
     });
     checkEntryExisting(async (diary, dIndex) => {
-      await diary.appendNewEntry(dIndex);
+      await diary.appendEntry({}, dIndex);
     });
   });
   describe("#moveEntry", () => {
@@ -214,11 +143,11 @@ describe("Diary", () => {
     describe("when target d-index is given", () => {
       it("moves the entry to the position before the target entry.", async () => {
         const diary = await create();
-        await diary.appendNewEntry("A");
-        await diary.appendNewEntry("B");
-        await diary.appendNewEntry("C");
-        await diary.appendNewEntry("D");
-        await diary.appendNewEntry("E");
+        await diary.appendEntry({}, "A");
+        await diary.appendEntry({}, "B");
+        await diary.appendEntry({}, "C");
+        await diary.appendEntry({}, "D");
+        await diary.appendEntry({}, "E");
         await diary.moveEntry("B", "D");
         await diary.moveEntry("C", "A");
         const entryIndexes = (await diary.traverseEntries()).map(
@@ -234,9 +163,9 @@ describe("Diary", () => {
     describe("when no target d-index is given", () => {
       it("moves the entry to the last entry.", async () => {
         const diary = await create();
-        await diary.appendNewEntry("A");
-        await diary.appendNewEntry("B");
-        await diary.appendNewEntry("C");
+        await diary.appendEntry({}, "A");
+        await diary.appendEntry({}, "B");
+        await diary.appendEntry({}, "C");
         await diary.moveEntry("B");
         const entryIndexes = (await diary.traverseEntries()).map(
           (entry) => entry.doc.dIndex
@@ -256,9 +185,9 @@ describe("Diary", () => {
     });
     it("raverse diary entries with the given order", async () => {
       const diary = await create();
-      await diary.appendNewEntry("A");
-      await diary.appendNewEntry("B");
-      await diary.appendNewEntry("C");
+      await diary.appendEntry({}, "A");
+      await diary.appendEntry({}, "B");
+      await diary.appendEntry({}, "C");
       const entryIndexes = (await diary.traverseEntries()).map(
         (entry) => entry.doc.dIndex
       );

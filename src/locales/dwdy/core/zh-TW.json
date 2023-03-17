@@ -1,0 +1,28 @@
+{
+  "service": "私人日記",
+  "slogan": "記錄每一次珍貴回憶",
+  "week": "週",
+  "defaultConfig": "預設",
+  "weekDays": {
+    "short": ["日", "一", "二", "三", "四", "五", "六"],
+    "long": ["日", "一", "二", "三", "四", "五", "六"]
+  },
+  "menu": {
+    "settings": "設定",
+    "shelf": "書架"
+  },
+  "nav": {
+    "prevDay": "前一天",
+    "nextDay": "後一天",
+    "prevPage": "前一篇",
+    "nextPage": "後一篇",
+    "today": "今天"
+  },
+  "ui": {
+    "newImage": "新圖片",
+    "newEssay": "新文章",
+    "newSticker": "新貼紙",
+    "browseImage": "瀏覽圖片",
+    "browseEssay": "瀏覽文章"
+  }
+}

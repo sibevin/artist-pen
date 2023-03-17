@@ -1,6 +1,7 @@
 import EntryPage from "~/pages/EntryPage.vue";
 import DiariesPage from "~/pages/dwdy/DiariesPage.vue";
 import DiaryPage from "~/pages/dwdy/DiaryPage.vue";
+import DiaryEditorPage from "~/pages/dwdy/DiaryEditorPage.vue";
 import SettingsPage from "~/pages/SettingsPage.vue";
 import AccountPage from "~/pages/AccountPage.vue";
 import AboutPage from "~/pages/AboutPage.vue";
@@ -22,6 +23,11 @@ export const routes = [
     path: "/dwdy/diary/:uid",
     name: "diary",
     component: DiaryPage,
+  },
+  {
+    path: "/dwdy/diary/:uid/edit",
+    name: "diaryEditor",
+    component: DiaryEditorPage,
   },
   {
     path: "/settings",

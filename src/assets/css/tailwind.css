@@ -234,4 +234,125 @@
   }
 }
 
+.range {
+  &-process-bar {
+    @apply bg-transparent rounded-none overflow-hidden;
+    &::-webkit-slider-thumb {
+      background-color: hsl(var(--range-shdw));
+      @apply relative h-6 w-1 border-none rounded-none;
+      appearance: none;
+      -webkit-appearance: none;
+      top: 50%;
+      color: hsl(var(--range-shdw));
+      transform: translateY(-50%);
+      --filler-size: 100rem;
+      --filler-offset: 0rem;
+      box-shadow: 0 0 0 3px hsl(var(--range-shdw)) inset, var(--focus-shadow, 0 0), calc(var(--filler-size) * -1 - var(--filler-offset)) 0 0 var(--filler-size);
+    }
+    &::-moz-range-thumb {
+      background-color: hsl(var(--range-shdw));
+      @apply relative h-6 w-1 border-none rounded-none;
+      top: 50%;
+      color: hsl(var(--range-shdw));
+      --filler-size: 100rem;
+      --filler-offset: 0rem;
+      box-shadow: 0 0 0 3px hsl(var(--range-shdw)) inset, var(--focus-shadow, 0 0), calc(var(--filler-size) * -1 - var(--filler-offset)) 0 0 var(--filler-size);
+    }
+    &-primary {
+      --range-shdw: var(--p);
+    }
+    &-secondary {
+      --range-shdw: var(--s);
+    }
+    &-accent {
+      --range-shdw: var(--a);
+    }
+    &-success {
+      --range-shdw: var(--su);
+    }
+    &-warning {
+      --range-shdw: var(--wa);
+    }
+    &-info {
+      --range-shdw: var(--in);
+    }
+    &-error {
+      --range-shdw: var(--er);
+    }
+    &-base-200 {
+      --range-shdw: var(--b2);
+    }
+  }
+  &-tune-bar{
+    &::-webkit-slider-thumb {
+      background-color: hsl(var(--b1));
+      @apply relative h-6 w-6 border-none rounded-box;
+      appearance: none;
+      -webkit-appearance: none;
+      top: 50%;
+      color: transparent;
+      transform: translateY(-50%);
+      --filler-size: 100rem;
+      --filler-offset: 0.6rem;
+      box-shadow: 0 0 0 3px hsl(var(--range-shdw)) inset, var(--focus-shadow, 0 0), calc(var(--filler-size) * -1 - var(--filler-offset)) 0 0 var(--filler-size);
+    }
+    &::-moz-range-thumb {
+      background-color: hsl(var(--b1));
+      @apply relative h-6 w-6 border-none rounded-box;
+      top: 50%;
+      color: transparent;
+      --filler-size: 100rem;
+      --filler-offset: 0.5rem;
+      box-shadow: 0 0 0 3px hsl(var(--range-shdw)) inset, var(--focus-shadow, 0 0), calc(var(--filler-size) * -1 - var(--filler-offset)) 0 0 var(--filler-size);
+    }
+    &-primary {
+      --range-shdw: var(--p);
+    }
+    &-secondary {
+      --range-shdw: var(--s);
+    }
+    &-accent {
+      --range-shdw: var(--a);
+    }
+    &-success {
+      --range-shdw: var(--su);
+    }
+    &-warning {
+      --range-shdw: var(--wa);
+    }
+    &-info {
+      --range-shdw: var(--in);
+    }
+    &-error {
+      --range-shdw: var(--er);
+    }
+    &-base-200 {
+      --range-shdw: var(--b2);
+    }
+    &-disabled {
+      --range-shdw: var(--b3);
+      cursor: not-allowed;
+    }
+    &-xs {
+      @apply range-xs;
+    }
+    &-sm {
+      @apply range-sm;
+    }
+    &-md {
+      @apply range-md;
+    }
+    &-lg {
+      @apply range-lg;
+    }
+  }
+  &-base-200 {
+    --range-shdw: var(--b2);
+  }
+  &-disabled {
+    --range-shdw: var(--b3);
+    cursor: not-allowed;
+  }
+}
+
 @tailwind utilities;

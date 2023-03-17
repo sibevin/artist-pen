@@ -152,17 +152,12 @@ watch(
       >
         <div
           v-if="slots['header-title'] && slots['header-panel']"
-          class="z-10 flex justify-between items-center shadow shadow-base-200/50 bg-base-100"
+          class="z-10 p-3 flex justify-between items-center shadow shadow-base-200/50 bg-base-100"
         >
-          <RouterLink to="/" class="p-3">
-            <div class="grow flex flex-row items-center">
-              <img class="h-10 mr-3" :src="logoImage" alt="" />
-              <div class="grow text-xl ml-0">
-                <slot name="header-title"></slot>
-              </div>
-            </div>
-          </RouterLink>
-          <div class="m-3">
+          <div v-if="slots['header-title']" class="grow">
+            <slot name="header-title"></slot>
+          </div>
+          <div v-if="slots['header-panel']" class="ml-3">
             <slot name="header-panel"></slot>
           </div>
         </div>
@@ -328,7 +323,7 @@ watch(
                     :path="mdiBookshelf"
                     :size="20"
                   ></SvgIcon>
-                  {{ la.t("dwdy.menu.shelf") }}
+                  {{ la.t("dwdy.core.menu.shelf") }}
                 </RouterLink>
               </li>
             </ul>

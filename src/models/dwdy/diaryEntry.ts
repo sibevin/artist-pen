@@ -1,35 +1,35 @@
 import { mdiCheckboxMultipleBlank } from "@mdi/js";
-import { DUid, DIndex } from "~/models/dwdy/diary";
+import { DUid, DIndex } from "~/dwdy/types/core";
+import { DiaryEntryFetchParams } from "~/models/dwdy/diary";
 import { InvalidParamsError } from "~/models/app/error";
 import { dbDwdy } from "~/services/db/dwdy";
 import { Icon } from "~/models/app/types";
 import { BaseModel } from "~/models/baseModel";
-import { DiaryFeature } from "~/models/dwdy/feature";
+import { DiaryFeature } from "~/dwdy/feature/def";
 import { DiaryAttachment } from "~/models/dwdy/diaryAttachment";
 import {
   DiaryFeatureContentMap,
   DiaryFeatureMetaMap,
   featureIcon,
-} from "~/models/dwdy/featureDef";
-import {
-  dIndexToDt,
-  getNeighborDt,
-  isDateDIndex,
-  isToday,
-} from "~/models/dwdy/dateUtils";
+} from "~/dwdy/feature/map";
+import { getNeighborDt, isToday, entryTsToDt } from "~/dwdy/services/dateUtils";
+import { genUid } from "~/services/db";
+import { GeoRange } from "~/dwdy/types/core";
 
-export type NavInfo = {
-  available: boolean;
+type NavInfo = {
   nextDayDt?: Date;
   prevDayDt?: Date;
   nextMonthDt?: Date;
   prevMonthDt?: Date;
-  nextEntry?: DiaryEntry;
-  prevEntry?: DiaryEntry;
+  nextEntry?: DiaryEntry | null;
+  prevEntry?: DiaryEntry | null;
   isToday?: boolean;
 };
 
 export interface DiaryEntryAttrs {
+  timestamp?: number;
+  longitude?: number;
+  latitude?: number;
   prevDIndex?: DIndex;
   nextDIndex?: DIndex;
   content: Partial<DiaryFeatureContentMap>;
@@ -41,7 +41,6 @@ export type DiaryEntryParams = Partial<DiaryEntryAttrs>;
 export interface DiaryEntryIdentity {
   dUid: DUid;
   dIndex: DIndex;
-  isSaved?: boolean;
 }
 export type DiaryEntryIdentityParams = Partial<DiaryEntryIdentity>;
 
@@ -54,18 +53,21 @@ export interface DiaryEntryExistingDoc
   extends DiaryEntryAttrs,
     DiaryEntryIdentity {}
 
+const ENTRY_EXTRA_GEO_DEG = 0.01;
+
 export class DiaryEntry
   implements BaseModel<DiaryEntry, DiaryEntryDoc, DiaryEntryParams>
 {
   doc: DiaryEntryDoc;
-  public isSaved: boolean;
 
-  static async fetch(entryIdy: DiaryEntryIdentity): Promise<DiaryEntry> {
-    const deDoc = await dbDwdy.diaryEntries.where(entryIdy).first();
+  static async fetch(
+    params: DiaryEntryFetchParams & { dUid: DUid }
+  ): Promise<DiaryEntry | null> {
+    const deDoc = await dbDwdy.diaryEntries.get(params);
     if (deDoc) {
-      return new DiaryEntry(Object.assign(deDoc, { isSaved: true }));
+      return new DiaryEntry(deDoc);
     } else {
-      return new DiaryEntry(entryIdy);
+      return null;
     }
   }
 
@@ -75,12 +77,10 @@ export class DiaryEntry
   ) {
     const givenDoc = doc || entryIdy;
     this.doc = Object.assign({}, entryIdy, { content: {} }, givenDoc);
-    delete this.doc.isSaved;
-    this.isSaved = entryIdy.isSaved || false;
   }
 
   get uid(): string | undefined {
-    if (this.isReadyToSave) {
+    if (this.isStored) {
       return `${this.doc.dUid}_${this.doc.dIndex}`;
     } else {
       return undefined;
@@ -88,22 +88,31 @@ export class DiaryEntry
   }
 
   get isStored(): boolean {
-    return (
-      this.doc.dUid !== undefined &&
-      this.doc.dIndex !== undefined &&
-      this.isSaved
-    );
+    return this.doc.dUid !== undefined && this.doc.dIndex !== undefined;
   }
 
-  get dIndexDate(): Date | null {
-    if (this.doc.dIndex && isDateDIndex(this.doc.dIndex)) {
-      return dIndexToDt(this.doc.dIndex);
+  get tsDate(): Date | null {
+    if (this.doc.timestamp) {
+      return entryTsToDt(this.doc.timestamp);
     } else {
       return null;
     }
   }
 
-  get nextEntry(): Promise<DiaryEntry> {
+  get geoRange(): GeoRange | null {
+    if (this.doc.longitude && this.doc.latitude) {
+      return {
+        lngBegin: this.doc.longitude - ENTRY_EXTRA_GEO_DEG,
+        lngEnd: this.doc.longitude + ENTRY_EXTRA_GEO_DEG,
+        latBegin: this.doc.latitude - ENTRY_EXTRA_GEO_DEG,
+        latEnd: this.doc.latitude + ENTRY_EXTRA_GEO_DEG,
+      };
+    } else {
+      return null;
+    }
+  }
+
+  get nextEntry(): Promise<DiaryEntry | null> {
     return (async () => {
       if (this.doc.dUid && this.doc.nextDIndex) {
         return await DiaryEntry.fetch({
@@ -111,15 +120,12 @@ export class DiaryEntry
           dIndex: this.doc.nextDIndex,
         });
       } else {
-        return new DiaryEntry({
-          dUid: this.doc.dUid,
-          dIndex: this.doc.nextDIndex,
-        });
+        return null;
       }
     })();
   }
 
-  get prevEntry(): Promise<DiaryEntry> {
+  get prevEntry(): Promise<DiaryEntry | null> {
     return (async () => {
       if (this.doc.dUid && this.doc.prevDIndex) {
         return DiaryEntry.fetch({
@@ -127,10 +133,7 @@ export class DiaryEntry
           dIndex: this.doc.prevDIndex,
         });
       } else {
-        return new DiaryEntry({
-          dUid: this.doc.dUid,
-          dIndex: this.doc.prevDIndex,
-        });
+        return null;
       }
     })();
   }
@@ -145,27 +148,34 @@ export class DiaryEntry
 
   get navInfo(): Promise<NavInfo> {
     return (async () => {
-      if (this.dIndexDate) {
-        return {
-          available: true,
-          nextDayDt: getNeighborDt(this.dIndexDate, "next", "day"),
-          prevDayDt: getNeighborDt(this.dIndexDate, "prev", "day"),
-          nextMonthDt: getNeighborDt(this.dIndexDate, "next", "month"),
-          prevMonthDt: getNeighborDt(this.dIndexDate, "prev", "month"),
-          nextEntry: (await this.nextEntry).presence,
-          prevEntry: (await this.prevEntry).presence,
-          isToday: isToday(this.dIndexDate),
-        };
+      const ni = {
+        nextEntry: await this.nextEntry,
+        prevEntry: await this.prevEntry,
+      };
+      if (this.tsDate) {
+        return Object.assign(ni, {
+          nextDayDt: getNeighborDt(this.tsDate, {
+            direction: "next",
+            unit: "day",
+          }),
+          prevDayDt: getNeighborDt(this.tsDate, {
+            direction: "prev",
+            unit: "day",
+          }),
+          nextMonthDt: getNeighborDt(this.tsDate, {
+            direction: "next",
+            unit: "month",
+          }),
+          prevMonthDt: getNeighborDt(this.tsDate, {
+            direction: "prev",
+            unit: "month",
+          }),
+          isToday: isToday(this.tsDate),
+        });
       } else {
-        return {
-          available: false,
-        };
+        return ni;
       }
     })();
-  }
-
-  private get isReadyToSave(): boolean {
-    return this.doc.dUid !== undefined && this.doc.dIndex !== undefined;
   }
 
   public assign(params: DiaryEntryParams): DiaryEntry {
@@ -174,21 +184,22 @@ export class DiaryEntry
   }
 
   public async save(): Promise<{ target: DiaryEntry; action: string }> {
-    if (!this.isReadyToSave) {
+    if (this.doc.dUid === undefined) {
       throw new InvalidParamsError({
-        params: ["dUid", "dIndex"],
+        params: ["dUid"],
         reason: "required",
       });
     }
-    await dbDwdy.diaryEntries.put(
-      JSON.parse(JSON.stringify(this.doc)) as DiaryEntryExistingDoc
-    );
-    if (this.isSaved) {
-      return { target: this, action: "update" };
-    } else {
-      this.isSaved = true;
-      return { target: this, action: "create" };
+    let docToSave = this.doc;
+    let action = "update";
+    if (!this.doc.dIndex) {
+      docToSave = Object.assign({}, docToSave, { dIndex: genUid() });
+      action = "create";
     }
+    await dbDwdy.diaryEntries.put(
+      JSON.parse(JSON.stringify(docToSave)) as DiaryEntryExistingDoc
+    );
+    return { target: this, action };
   }
 
   public get hasContents(): boolean {
@@ -199,6 +210,18 @@ export class DiaryEntry
       }
     });
     return totalCount > 0;
+  }
+
+  public get hasContentFeatures(): DiaryFeature[] {
+    const features: DiaryFeature[] = [];
+    Object.keys(this.doc.content).forEach((key) => {
+      const contentValues =
+        this.doc.content[key as keyof DiaryFeatureContentMap];
+      if (contentValues && contentValues.length > 0) {
+        features.push(key as keyof DiaryFeatureContentMap as DiaryFeature);
+      }
+    });
+    return features;
   }
 
   public get contentIcon(): Icon | null {
