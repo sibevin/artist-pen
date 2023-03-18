@@ -1,3 +1,4 @@
+import { uniq } from "lodash";
 import { genUid } from "~/services/db";
 import { dbDwdy } from "~/services/db/dwdy";
 import { BaseModel } from "~/models/baseModel";
@@ -33,15 +34,6 @@ export interface DiaryTemplate {
     right: DiaryFeature[];
   };
 }
-export type DiaryTemplateAction =
-  | "up"
-  | "down"
-  | "right"
-  | "left"
-  | "enable"
-  | "enable-left"
-  | "enable-right"
-  | "disable";
 
 export interface DiaryAttrs {
   title: string;
@@ -225,11 +217,10 @@ export class Diary implements BaseModel<Diary, DiaryDoc, DiaryParams> {
   get enabledFeatures(): DiaryFeature[] {
     const features: DiaryFeature[] = ([] as DiaryFeature[]).concat(
       this.doc.template.desktop.left,
-      this.doc.template.desktop.right
+      this.doc.template.desktop.right,
+      this.doc.template.mobile
     );
-    return features.filter((feature) =>
-      this.doc.template.mobile.includes(feature)
-    );
+    return uniq(features);
   }
 
   get disabledFeatures(): DiaryFeature[] {
@@ -470,89 +461,35 @@ export class Diary implements BaseModel<Diary, DiaryDoc, DiaryParams> {
     return entries;
   }
 
-  private get getTemplateList(): DiaryFeature[][] {
-    return [
-      this.doc.template.desktop.left,
-      this.doc.template.desktop.right,
-      this.doc.template.mobile,
-    ];
-  }
-
-  private templateMoveFeatureOrder(
-    feature: DiaryFeature,
-    direction: "up" | "down"
+  public assignTemplate(
+    template: DiaryTemplate,
+    screen: "mobile" | "desktop"
   ): void {
-    this.getTemplateList.forEach((tList) => {
-      const foundIndex = tList.indexOf(feature);
-      if (direction === "up") {
-        if (foundIndex > 0) {
-          tList.splice(foundIndex - 1, 0, tList.splice(foundIndex, 1)[0]);
-        }
-      } else {
-        if (foundIndex >= 0 && foundIndex < tList.length - 1) {
-          tList.splice(foundIndex + 1, 0, tList.splice(foundIndex, 1)[0]);
-        }
-      }
-    });
-  }
-
-  private templateEnableFeature(
-    templateList: DiaryFeature[],
-    feature: DiaryFeature
-  ): void {
-    const foundIndex = templateList.indexOf(feature);
-    if (foundIndex < 0) {
-      templateList.push(feature);
+    const givenTemplate = this.buildTemplate({ template });
+    if (screen === "desktop") {
+      this.doc.template.desktop = givenTemplate.desktop;
+    } else if (screen === "mobile") {
+      this.doc.template.mobile = givenTemplate.mobile;
     }
   }
 
-  private templateDisableFeature(feature: DiaryFeature): void {
-    this.getTemplateList.forEach((tList) => {
-      const foundIndex = tList.indexOf(feature);
-      if (foundIndex >= 0) {
-        tList.splice(foundIndex, 1);
-      }
-    });
-  }
-
-  private templateMoveEnableFeature(
-    feature: DiaryFeature,
-    direction: "right" | "left"
-  ): void {
-    this.templateEnableFeature(this.doc.template.mobile, feature);
-    this.templateEnableFeature(this.doc.template.desktop[direction], feature);
-  }
-
-  public moveTemplateFeature(
-    feature: DiaryFeature,
-    action: DiaryTemplateAction
-  ): void {
-    switch (action) {
-      case "up":
-        this.templateMoveFeatureOrder(feature, "up");
-        break;
-      case "down":
-        this.templateMoveFeatureOrder(feature, "down");
-        break;
-      case "right":
-        this.templateDisableFeature(feature);
-        this.templateMoveEnableFeature(feature, "right");
-        break;
-      case "left":
-        this.templateDisableFeature(feature);
-        this.templateMoveEnableFeature(feature, "left");
-        break;
-      case "enable":
-      case "enable-right":
-        this.templateMoveEnableFeature(feature, "right");
-        break;
-      case "enable-left":
-        this.templateMoveEnableFeature(feature, "left");
-        break;
-      case "disable":
-        this.templateDisableFeature(feature);
-        break;
+  public fetchTemplateDisabledFeatures(
+    screen: "mobile" | "desktop"
+  ): DiaryFeature[] {
+    if (screen === "desktop") {
+      const desktopFeatures = ([] as DiaryFeature[]).concat(
+        this.doc.template.desktop.left,
+        this.doc.template.desktop.right
+      );
+      return AVAILABLE_FEATURES.filter(
+        (feature) => !desktopFeatures.includes(feature)
+      ) as DiaryFeature[];
+    } else if (screen === "mobile") {
+      return AVAILABLE_FEATURES.filter(
+        (feature) => !this.doc.template.mobile.includes(feature)
+      ) as DiaryFeature[];
     }
+    return this.disabledFeatures;
   }
 
   public fetchStat<T extends DiaryFeature>(

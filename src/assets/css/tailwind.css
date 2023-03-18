@@ -108,6 +108,17 @@
   }
 }
 
+.sep-block {
+  @apply border-t relative pt-2;
+  &.selected {
+    @apply border-t-4;
+  }
+}
+
+.sep-title {
+  @apply font-bold bg-base-100 w-fit px-2 absolute -top-3 left-2;
+}
+
 .cell-block {
   @apply border rounded-md relative pt-2;
   &.selected {
