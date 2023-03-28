@@ -47,4 +47,6 @@ export type DiaryFeatureComponent = {
   slate?: any;
   fullViewer?: any;
   listEntry?: any;
+  configPanel?: any;
+  fullViewerConfigPanel?: any;
 };

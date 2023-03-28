@@ -5,6 +5,7 @@ import ContentGallery from "~/dwdy/feature/text/components/ContentGallery.vue";
 import ContentSlate from "~/dwdy/feature/text/components/ContentSlate.vue";
 import ContentFullViewer from "~/dwdy/feature/text/components/ContentFullViewer.vue";
 import ContentListEntry from "~/dwdy/feature/text/components/ContentListEntry.vue";
+import ConfigPanel from "~/dwdy/feature/text/components/ConfigPanel.vue";
 
 export const FEATURE_COMPONENT: DiaryFeatureComponent = {
   editorMain: EditorMain,
@@ -13,4 +14,5 @@ export const FEATURE_COMPONENT: DiaryFeatureComponent = {
   slate: ContentSlate,
   fullViewer: ContentFullViewer,
   listEntry: ContentListEntry,
+  configPanel: ConfigPanel,
 };

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted, PropType } from "vue";
-import { mdiShuffleVariant } from "@mdi/js";
+import { mdiShuffle } from "@mdi/js";
 import SvgIcon from "~/components/SvgIcon.vue";
 import { useDwdyState } from "~/states/useDwdyState";
 import { LocaleActor } from "~/services/locale";
@@ -55,6 +55,7 @@ watch(
   () => props.modelValue,
   (newValue) => {
     isModalOn.value = newValue;
+    dwdyState.entry.value.reload();
   }
 );
 
@@ -98,7 +99,7 @@ async function onContentPositionChanged(newPos: string): Promise<void> {
         <SvgIcon
           class="mr-1"
           icon-set="mdi"
-          :path="mdiShuffleVariant"
+          :path="mdiShuffle"
           :size="24"
         ></SvgIcon>
         {{ la.t(".action.changeOrder") }}

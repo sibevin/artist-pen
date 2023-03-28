@@ -70,7 +70,7 @@ function onCurrentPageSelected(): void {
   <div class="flex justify-center items-center">
     <button
       v-if="props.totalPage > 1"
-      class="p-2"
+      class="hidden md:block p-2"
       :class="{ 'text-base-300': !enablePreviousArrow }"
       :disabled="!enablePreviousArrow"
       @click="onPageSelected(props.currentPage - 1)"
@@ -142,7 +142,7 @@ function onCurrentPageSelected(): void {
     </div>
     <button
       v-if="props.totalPage > 1"
-      class="p-2"
+      class="hidden md:block p-2"
       :class="{ 'text-base-300': !enableNextArrow }"
       :disabled="!enableNextArrow"
       @click="onPageSelected(props.currentPage + 1)"

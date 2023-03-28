@@ -41,6 +41,8 @@ module.exports = {
       maxWidth: {
         v50: "50vw",
         v60: "60vw",
+        v80: "80vw",
+        v90: "90vw",
       },
       animation: {
         "spin-slow": "spin 2s linear infinite",

@@ -2,7 +2,7 @@ import fixWebmDuration from "fix-webm-duration";
 
 const RECORD_TIME_SLICE = 100;
 
-type AudioRecord = { dataUrl: string; duration: number; blob: Blob };
+export type AudioRecord = { dataUrl: string; duration: number; blob: Blob };
 
 class RecordingTimer {
   private _duration = 0;
@@ -48,23 +48,21 @@ export class AudioRecorderProcessor {
   private _recordingTimer: RecordingTimer = new RecordingTimer();
 
   async setupRecorder(): Promise<void> {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      return navigator.mediaDevices
-        .getUserMedia({
-          audio: true,
-        })
-        .then((stream) => {
-          this.buildRecorder(stream);
-          this.setupAudioGraph(stream);
-          this._status = "ready";
-        })
-        .catch((err) => {
-          console.log("setup err", err);
-          this.setupErrorState(err as DOMException);
-        });
-    } else {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       this._status = "error";
       this._errorReason = "not_supported";
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      if (stream) {
+        this.buildRecorder(stream);
+        this.setupAudioGraph(stream);
+        this._status = "ready";
+      }
+    } catch (err) {
+      this.setupErrorState(err as DOMException);
     }
   }
 
@@ -101,7 +99,6 @@ export class AudioRecorderProcessor {
   }
 
   async start(): Promise<void> {
-    console.log(">>> start <<<");
     if (this._recorder && this._status === "ready") {
       this._duration = 0;
       this._recordingTimer.reset();
@@ -110,14 +107,12 @@ export class AudioRecorderProcessor {
         this._recorder.start(RECORD_TIME_SLICE);
         this._status = "recording";
       } catch (e) {
-        console.log("start error", e);
         this.setupErrorState(e as DOMException);
       }
     }
   }
 
   pause(): void {
-    console.log(">>> pause <<<");
     if (this._recorder && this._status === "recording") {
       this._recordingTimer.stop();
       this._recorder.pause();
@@ -125,8 +120,7 @@ export class AudioRecorderProcessor {
     }
   }
 
-  async stop(): Promise<void> {
-    console.log(">>> stop <<<");
+  stop(): void {
     if (this._recorder && this._status === "recording") {
       this._recorder.stop();
       this._recordingTimer.stop();
@@ -142,16 +136,27 @@ export class AudioRecorderProcessor {
     }
   }
 
+  private isChunkEmpty(): boolean {
+    if (this._audioChunks.length === 0) {
+      return true;
+    }
+    if (this._audioChunks[0] && this._audioChunks[0].size === 0) {
+      return true;
+    }
+    return false;
+  }
+
   private buildRecorder(stream: MediaStream): void {
     this._recorder = new MediaRecorder(stream);
     this._recorder.ondataavailable = (event) => {
-      console.log("==== dataavailable ====");
       this._audioChunks.push(event.data);
       this.buildVisualData();
       this._duration += RECORD_TIME_SLICE / 1000;
     };
     this._recorder.onstop = async () => {
-      console.log("==== stop ====");
+      if (this.isChunkEmpty()) {
+        return;
+      }
       const rawBlob = new Blob(this._audioChunks, {
         type: "audio/webm;codecs=opus",
       });

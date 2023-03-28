@@ -208,7 +208,7 @@ function triggerAction(params: DiaryPageActionParams): void {
         :current-selected-btn="controlMenuSelectedBtn"
       >
         <template #sub-btn-list>
-          <div class="flex-none lg:hidden">
+          <div class="flex-none md:hidden">
             <component
               :is="
                 layoutComponent(
@@ -274,7 +274,7 @@ function triggerAction(params: DiaryPageActionParams): void {
               </div>
             </button>
           </div>
-          <div class="hidden lg:flex ml-6">
+          <div class="hidden md:flex ml-6">
             <component
               :is="
                 layoutComponent(

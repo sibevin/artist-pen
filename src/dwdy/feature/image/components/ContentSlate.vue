@@ -1,72 +1,42 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { PropType } from "vue";
+import { useImage } from "@vueuse/core";
 import { mdiDotsCircle } from "@mdi/js";
 import { useDwdyState } from "~/states/useDwdyState";
-import { DiaryFeature } from "~/dwdy/feature/def";
 import { FeatureMeta } from "~/dwdy/feature/image/def";
 import SvgIcon from "~/components/SvgIcon.vue";
 
 const props = defineProps({
-  contentIndex: {
-    type: Number,
+  imageMeta: {
+    type: Object as PropType<FeatureMeta>,
+    required: true,
+  },
+  dataUrl: {
+    type: String,
     required: true,
   },
 });
 
 const dwdyState = useDwdyState();
-const imageDataUrl = ref<string>();
-const imageMeta = ref<FeatureMeta>();
-
-fetchImage();
-
-watch(
-  () => [props.contentIndex, dwdyState.entry.value],
-  async () => {
-    await fetchImage();
-  }
-);
-
-async function fetchImage(): Promise<void> {
-  if (props.contentIndex < 0) {
-    imageDataUrl.value = undefined;
-    imageMeta.value = undefined;
-    return;
-  }
-  imageMeta.value = dwdyState.entry.value.fetchContent<DiaryFeature.Image>(
-    DiaryFeature.Image,
-    props.contentIndex
-  );
-  if (!imageMeta.value || !imageMeta.value.daUid) {
-    return;
-  }
-  const da = await dwdyState.entry.value.fetchAttachment(imageMeta.value.daUid);
-  if (!da) {
-    return;
-  }
-  imageDataUrl.value = da.doc.data;
-}
+const { isLoading } = useImage({ src: props.dataUrl });
 </script>
 <template>
   <div class="relative w-full h-full flex flex-col justify-center items-center">
     <div class="min-h-0 w-full">
-      <img
-        v-if="imageDataUrl"
-        class="max-w-full max-h-full m-auto"
-        :src="imageDataUrl"
-      />
       <SvgIcon
-        v-else
+        v-if="isLoading"
         class="text-base-300 animate-spin-slow m-5"
         icon-set="mdi"
         :path="mdiDotsCircle"
         :size="20"
       ></SvgIcon>
+      <img v-else class="max-w-full max-h-full m-auto" :src="props.dataUrl" />
     </div>
     <div
-      v-if="imageMeta && imageMeta.comment"
-      class="flex-none self-stretch p-3 border text-left"
+      v-if="props.imageMeta && props.imageMeta.comment"
+      class="flex-none my-3 px-3 border-l-4 border-base-200 text-left"
       :class="dwdyState.config.value.textFontStyle()"
-      v-html="imageMeta.comment"
+      v-html="props.imageMeta.comment"
     ></div>
   </div>
 </template>

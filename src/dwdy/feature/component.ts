@@ -10,15 +10,9 @@ const DEFAULT_COMPONENT: DiaryFeatureComponent = {};
 const FEATURE_COMPONENT_MAP: Record<DiaryFeature, DiaryFeatureComponent> = {
   [DiaryFeature.Text]: TEXT_FEATURE_COMPONENT,
   [DiaryFeature.Image]: IMAGE_FEATURE_COMPONENT,
-  [DiaryFeature.Illustration]: DEFAULT_COMPONENT,
   [DiaryFeature.Sound]: SOUND_FEATURE_COMPONENT,
-  [DiaryFeature.Video]: DEFAULT_COMPONENT,
   [DiaryFeature.Sticker]: STICKER_FEATURE_COMPONENT,
   [DiaryFeature.Tag]: TAG_FEATURE_COMPONENT,
-  [DiaryFeature.Location]: DEFAULT_COMPONENT,
-  [DiaryFeature.TodoList]: DEFAULT_COMPONENT,
-  [DiaryFeature.DataList]: DEFAULT_COMPONENT,
-  [DiaryFeature.File]: DEFAULT_COMPONENT,
 };
 
 export function featureComponent(

@@ -44,8 +44,8 @@ const LAYOUT_ICON_MAP: Record<DiaryLayout, Icon> = {
 
 const DISPLAY_ICON_MAP: Record<DisplayIcon, Icon> = {
   ["dot"]: { set: "mdi", path: mdiChartBubble },
-  ["content_type"]: { set: "mdi", path: mdiCheckboxMultipleBlank },
-  ["first_sticker"]: { set: "bxs", path: bxsRdSticker },
+  ["content"]: { set: "mdi", path: mdiCheckboxMultipleBlank },
+  ["sticker"]: { set: "bxs", path: bxsRdSticker },
 };
 
 export function layoutText(layout: DiaryLayout, la: LocaleActor): string {

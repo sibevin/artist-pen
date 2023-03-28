@@ -9,6 +9,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  enableTextSelect: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const dwdyState = useDwdyState();
@@ -23,6 +27,14 @@ watch(
   }
 );
 
+function textStyle(): string {
+  let styleStr = dwdyState.config.value.textFontStyle();
+  if (props.enableTextSelect) {
+    styleStr = `${styleStr} select-text`;
+  }
+  return styleStr;
+}
+
 async function fetchText(): Promise<void> {
   textContent.value = dwdyState.entry.value.fetchContent<DiaryFeature.Text>(
     DiaryFeature.Text,
@@ -33,7 +45,7 @@ async function fetchText(): Promise<void> {
 <template>
   <p
     class="text-left"
-    :class="dwdyState.config.value.textFontStyle()"
+    :class="textStyle()"
     v-html="textContent && textContent.html"
   ></p>
 </template>

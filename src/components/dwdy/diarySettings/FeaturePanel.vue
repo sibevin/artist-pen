@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import Sortable from "sortablejs";
-import {
-  mdiCalendar,
-  mdiTimeline,
-  mdiCursorMove,
-  mdiToggleSwitch,
-  mdiToggleSwitchOffOutline,
-} from "@mdi/js";
+import { mdiCalendar, mdiTimeline, mdiCursorMove } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
 import { DiaryTemplate } from "~/models/dwdy/diary";
 import { DiaryLayout } from "~/dwdy/layout/def";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { featureIcon, featureText } from "~/dwdy/feature/map";
+import { featureComponent } from "~/dwdy/feature/component";
 import SvgIcon from "~/components/SvgIcon.vue";
 
 const la = new LocaleActor("pages.dwdy.DiaryPage.settingsModal");
@@ -23,9 +18,6 @@ const mobileRemovedList = ref();
 const desktopLeftFeatureList = ref();
 const desktopRightFeatureList = ref();
 const desktopRemovedList = ref();
-const currentFeatureTab = ref<DiaryFeature>(
-  dwdyState.diary.value.enabledFeatures[0]
-);
 
 const diaryTemplate = ref<DiaryTemplate>(
   Object.assign({}, dwdyState.diary.value.doc.template)
@@ -122,8 +114,8 @@ onMounted(() => {
           <SvgIcon icon-set="mdi" :path="mdiCursorMove" :size="20"></SvgIcon>
         </div>
       </div>
-      <div class="hidden md:flex p-3 justify-between">
-        <div class="flex-1 m-1 flex flex-col justify-stretch">
+      <div class="hidden md:flex p-3 justify-between gap-2">
+        <div class="flex-1 flex flex-col justify-stretch">
           <div
             v-if="dwdyState.diary.value.doc.layout === DiaryLayout.Calendar"
             class="w-full mb-2 flex justify-center items-center p-8 border border-base-200 border-dashed"
@@ -181,7 +173,7 @@ onMounted(() => {
         </div>
         <div
           ref="desktopRightFeatureList"
-          class="droparea flex-1 flex flex-col justify-stretch min-h-8 m-1 p-1 border border-base-200"
+          class="droparea flex-1 flex flex-col justify-stretch min-h-8 p-1 border border-base-200"
         >
           <div
             v-for="feature in diaryTemplate.desktop.right"
@@ -256,7 +248,36 @@ onMounted(() => {
         </div>
       </div>
     </div>
-    <div class="my-3"></div>
+    <div class="mt-4 mb-2">
+      <div class="grid grid-cols-4 gap-2">
+        <template
+          v-for="(feature, index) in dwdyState.diary.value.enabledFeatures"
+          :key="index"
+        >
+          <div v-if="featureComponent(feature, 'configPanel')">
+            <div
+              class="h-full flex justify-center items-center border rounded-lg"
+            >
+              <SvgIcon
+                class="mr-2"
+                :icon-set="featureIcon(feature).set"
+                :path="featureIcon(feature).path"
+                :size="24"
+              ></SvgIcon>
+              {{ featureText(feature, la) }}
+            </div>
+          </div>
+          <div
+            v-if="featureComponent(feature, 'configPanel')"
+            class="col-span-3 border-t-4 pt-6"
+          >
+            <component
+              :is="featureComponent(feature, 'configPanel')"
+            ></component>
+          </div>
+        </template>
+      </div>
+    </div>
   </div>
 </template>
 

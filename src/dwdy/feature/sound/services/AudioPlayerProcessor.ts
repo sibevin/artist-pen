@@ -1,5 +1,3 @@
-import { ref, Ref } from "vue";
-
 type AudioPlayerStatus = "init" | "stopped" | "playing" | "paused";
 
 export class AudioPlayerProcessor {
@@ -15,7 +13,9 @@ export class AudioPlayerProcessor {
   private _isLoading = false;
   private _currentTime = 0;
   private _visualDataSet: Uint8Array = new Uint8Array();
-  private _refreshKey = ref<number>(1);
+  private _refreshFn?: () => void = undefined;
+  private _startPlayingTime?: number;
+  private _endCallback?: () => void;
 
   constructor() {
     this.initAudioGraph();
@@ -23,6 +23,7 @@ export class AudioPlayerProcessor {
   }
 
   load(audioData: string): void {
+    this.stop();
     this._audioEle.src = audioData;
     this._audioEle.load();
   }
@@ -34,16 +35,18 @@ export class AudioPlayerProcessor {
     this._duration = 0;
     this._isLoading = false;
     this._currentTime = 0;
+    this._audioEle.loop = false;
     this.refresh();
   }
 
-  play(seekToTime: number | undefined = undefined): void {
+  play(seekToTime?: number): void {
     if (!this.isReady) {
       return;
     }
     if (seekToTime) {
       this._audioEle.currentTime = seekToTime;
     }
+    this._audioCtx.resume();
     this._audioEle.play();
   }
 
@@ -99,6 +102,10 @@ export class AudioPlayerProcessor {
     this._audioStereoPanner.pan.value = value;
   }
 
+  set endCallback(callbackFn: () => void) {
+    this._endCallback = callbackFn;
+  }
+
   get isReady(): boolean {
     return this._status !== "init";
   }
@@ -135,12 +142,18 @@ export class AudioPlayerProcessor {
     return this._visualDataSet;
   }
 
-  get refreshKey(): Ref<number> {
-    return this._refreshKey;
+  set refreshFn(givenFn: () => void) {
+    this._refreshFn = givenFn;
+  }
+
+  set startPlayingTime(givenTime: number) {
+    this._startPlayingTime = givenTime;
   }
 
   private refresh(): void {
-    this._refreshKey.value = this._refreshKey.value * -1;
+    if (this._refreshFn) {
+      this._refreshFn();
+    }
   }
 
   private setupAudioElement(): void {
@@ -149,6 +162,10 @@ export class AudioPlayerProcessor {
       this._status = "stopped";
       this._visualDataSet = new Uint8Array();
       this._currentTime = 0;
+      if (this._startPlayingTime !== undefined) {
+        this.play(this._startPlayingTime);
+        this._startPlayingTime = undefined;
+      }
       this.refresh();
     });
     this._audioEle.addEventListener("loadedmetadata", () => {
@@ -193,6 +210,9 @@ export class AudioPlayerProcessor {
       this._currentTime = 0;
       this._visualDataSet = new Uint8Array();
       this._status = "stopped";
+      if (this._endCallback) {
+        this._endCallback();
+      }
       this.refresh();
     });
   }

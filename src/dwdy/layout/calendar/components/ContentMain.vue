@@ -148,7 +148,7 @@ defineExpose({ moveToEntry });
           >
             <component
               :is="featureComponent(feature, 'gallery')"
-              class="p-2 pb-0"
+              class="p-2 pt-4 pb-0"
               :enable-click="true"
               @open-full-viewer="onOpenFullViewer"
             ></component>
@@ -198,14 +198,14 @@ defineExpose({ moveToEntry });
               v-if="calendarConfig.isCalendarShown"
               class="w-full flex justify-center items-center"
             >
-              <YmdNavPanel
+              <YmNavPanel
                 :current-date="currentDt"
                 :enable-selector="true"
                 :enable-nav="true"
                 @trigger-action="triggerAction"
                 @move-to-entry="moveToEntry"
-              ></YmdNavPanel>
-              <CalendarSwitchBtn class="mr-6"></CalendarSwitchBtn>
+              ></YmNavPanel>
+              <CalendarSwitchBtn></CalendarSwitchBtn>
             </div>
             <div v-else class="flex justify-center">
               <div class="flex justify-center">
@@ -236,7 +236,7 @@ defineExpose({ moveToEntry });
             >
               <component
                 :is="featureComponent(feature, 'gallery')"
-                class="p-2 pb-0"
+                class="p-2 pt-4 pb-0"
                 :enable-click="true"
                 @open-full-viewer="onOpenFullViewer"
               ></component>
@@ -282,7 +282,7 @@ defineExpose({ moveToEntry });
           >
             <component
               :is="featureComponent(feature, 'gallery')"
-              class="pt-2 pr-4 pb-0"
+              class="pt-4 pr-4 pb-0"
               :enable-click="true"
               @open-full-viewer="onOpenFullViewer"
             ></component>

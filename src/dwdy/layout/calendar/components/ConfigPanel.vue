@@ -70,7 +70,18 @@ async function onHighlightedWeekDaysUpdated(): Promise<void> {
         {{ la.t("dwdy.layout.calendar.config.calendarDisplay.name") }}
       </div>
       <div class="p-3 flex flex-col items-center">
-        <CalendarPanel class="pt-2"></CalendarPanel>
+        <div class="relative p-2 border-2 border-base-200">
+          <div class="absolute top-0 left-0 p-2 rounded-br-lg bg-base-200">
+            圖例
+          </div>
+          <div class="max-w-v80 overflow-hidden">
+            <YmdNavPanel :current-date="new Date()"></YmdNavPanel>
+            <CalendarPanel
+              class="pt-2"
+              :is-for-config-display="true"
+            ></CalendarPanel>
+          </div>
+        </div>
         <div
           class="self-stretch mt-8 flex flex-col md:flex-row justify-between gap-6 md:gap-3"
         >
@@ -143,15 +154,9 @@ async function onHighlightedWeekDaysUpdated(): Promise<void> {
           </div>
         </div>
       </div>
-    </div>
-    <div class="cell-block mt-5">
-      <div class="cell-title">
-        {{ la.t("dwdy.config.dateDisplay.name") }}
-      </div>
       <div class="p-3 flex flex-col items-center">
-        <YmdNavPanel :current-date="new Date()"></YmdNavPanel>
         <div
-          class="self-stretch mt-8 flex flex-col md:flex-row justify-between gap-6 md:gap-3"
+          class="self-stretch flex flex-col md:flex-row justify-between gap-6 md:gap-3"
         >
           <div class="flex-1 cell-block flex justify-center items-center">
             <div class="cell-title">

@@ -1,4 +1,13 @@
 {
+  "config": {
+    "display": {
+      "name": "顯示",
+      "options": {
+        "carousel": "輪播",
+        "list": "列表"
+      }
+    }
+  },
   "text": {
     "name": "文字",
     "config": {
@@ -63,10 +72,11 @@
           "all": "全部重複"
         }
       },
-      "isPlayingRandomly": { "name": "隨機播放" },
+      "isShuffleOn": { "name": "隨機播放" },
       "volume": { "name": "音量" },
       "isMuted": { "name": "靜音" },
-      "stereoPan": { "name": "左右聲道" }
+      "stereoPan": { "name": "左右聲道" },
+      "isAutoplayOn": { "name": "自動下一首" }
     },
     "stat": {
       "count": "數量",
@@ -75,12 +85,11 @@
     },
     "name": "聲音",
     "record": "開始錄音",
-    "recordAgain": "重新錄音",
     "continue": "繼續錄音",
     "pause": "暫停",
     "stop": "停止錄音",
-    "saveAndStop": "儲存並停止錄音",
     "saveAndRecord": "儲存並開始新錄音",
+    "import": "匯入音檔",
     "comment": "備註",
     "AudioRecorder": {
       "error": {

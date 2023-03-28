@@ -5,10 +5,16 @@ import { DiarySticker } from "~/dwdy/feature/sticker/def";
 import { stickerMap } from "~/dwdy/feature/sticker/data";
 import SvgIcon from "~/components/SvgIcon.vue";
 
-interface Props {
-  code: string;
-}
-const props = defineProps<Props>();
+const props = defineProps({
+  code: {
+    type: String,
+    required: true,
+  },
+  sizeMultiplier: {
+    type: Number,
+    default: 1,
+  },
+});
 
 const ICON_SIZE = 40;
 
@@ -47,10 +53,10 @@ const stickerClass = computed(() => {
 });
 
 const iconSize = computed(() => {
-  if (!sticker.value) {
-    return ICON_SIZE;
+  if (sticker.value?.size) {
+    return sticker.value.size * props.sizeMultiplier;
   }
-  return sticker.value.size || ICON_SIZE;
+  return ICON_SIZE * props.sizeMultiplier;
 });
 </script>
 
@@ -61,7 +67,7 @@ const iconSize = computed(() => {
     :class="stickerClass"
     :style="stickerStyle"
   >
-    <div class="w-12 h-12 mask mask-circle flex justify-center items-center">
+    <div class="mask mask-circle flex justify-center items-center">
       <div class="flex justify-center items-center">
         <SvgIcon
           v-if="sticker.icon && sticker.icon.path"

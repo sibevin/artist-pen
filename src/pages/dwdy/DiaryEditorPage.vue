@@ -54,9 +54,6 @@ async function initPage(): Promise<void> {
 watch(
   () => [dwdyState.entry.value, currentFeature.value],
   () => {
-    if (contentEditor.value && contentEditor.value.stopEditor) {
-      contentEditor.value.stopEditor();
-    }
     updateContentCount();
   }
 );
@@ -88,13 +85,16 @@ function onDeletionDone(index: number): void {
   onContentSelected(index);
 }
 
-function onCreationDone(index: number | undefined): void {
+function onCreationDone(moveToIndex: number | "last" | undefined): void {
   updateContentCount();
-  if (index) {
-    onContentSelected(index);
-  } else {
-    onContentSelected(currentContentCount.value - 1);
+  if (moveToIndex === undefined) {
+    return;
   }
+  if (moveToIndex === "last") {
+    onContentSelected(currentContentCount.value - 1);
+    return;
+  }
+  onContentSelected(moveToIndex);
 }
 </script>
 

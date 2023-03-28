@@ -1,14 +1,26 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch } from "vue";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
-import { Icon } from "~/models/app/types";
-import { dtToEntryTs, isSameDt } from "~/dwdy/services/dateUtils";
+import {
+  dtToEntryTs,
+  getNeighborDt,
+  isSameDt,
+} from "~/dwdy/services/dateUtils";
 import { DIndex } from "~/dwdy/types/core";
 import { WeekDay } from "~/dwdy/services/configOption";
+import { Diary } from "~/models/dwdy/diary";
 import { DiaryLayout } from "~/dwdy/layout/def";
-import { LayoutConfig } from "~/dwdy/layout/calendar/def";
-import SvgIcon from "~/components/SvgIcon.vue";
+import { LayoutConfig, DisplayIconFormat } from "~/dwdy/layout/calendar/def";
+import { buildDisplayIcons } from "~/dwdy/layout/calendar/action";
+import DisplayIconPanel from "~/dwdy/layout/calendar/components/DisplayIconPanel.vue";
+
+const props = defineProps({
+  isForConfigDisplay: {
+    type: Boolean,
+    default: false,
+  },
+});
 
 const emit = defineEmits<{
   (e: "moveNavDate", dt: Date): void;
@@ -25,14 +37,14 @@ const diaryConfig = computed(() => {
 const calendarConfig = computed<LayoutConfig>(() => {
   return dwdyState.diary.value.fetchLayoutConfig(DiaryLayout.Calendar);
 });
-const tsIconMap = computed<Record<DIndex, Icon | null>>(() => {
-  const iconMap: Record<DIndex, Icon | null> = {};
+const tsIconMap = computed<Record<DIndex, DisplayIconFormat[]>>(() => {
+  const iconMap: Record<DIndex, DisplayIconFormat[]> = {};
   if (dwdyState.bunch.value && dwdyState.bunch.value.tsDIndexMap) {
     for (let [ts, dIndex] of Object.entries(
       dwdyState.bunch.value.tsDIndexMap
     )) {
       const entry = dwdyState.bunch.value.entryMap[dIndex];
-      iconMap[ts] = entry.contentIcon;
+      iconMap[ts] = buildDisplayIcons(dwdyState.diary.value as Diary, entry);
     }
   }
   return iconMap;
@@ -44,6 +56,26 @@ watch(
     currentDt.value = dwdyState.entry.value.tsDate || new Date();
   }
 );
+
+function isNeighborRow(baseDate: Date = new Date(), row: Date[]): boolean {
+  const prev7dDt = getNeighborDt(baseDate, {
+    direction: "prev",
+    unit: "day",
+    step: 7,
+  });
+  const next7dDt = getNeighborDt(baseDate, {
+    direction: "next",
+    unit: "day",
+    step: 7,
+  });
+  for (let i = 0; i < 7; i++) {
+    const dt = row[i];
+    if (dt >= prev7dDt && dt <= next7dDt) {
+      return true;
+    }
+  }
+  return false;
+}
 
 function buildCalendarRows(
   baseDate: Date = new Date(),
@@ -59,23 +91,34 @@ function buildCalendarRows(
   //   Math.ceil((mLastDt.getDate() + offsetDays + 1) / 7.0) * 7 - offsetDays;
   const endDays = -offsetDays + 42;
   const rows = [];
+  let addToCalendar = true;
   let row = [];
   for (let i = -offsetDays; i < endDays; i++) {
     if ((i + offsetDays) % 7 === 0 && row.length === 7) {
-      rows.push(row);
+      if (props.isForConfigDisplay) {
+        addToCalendar = isNeighborRow(baseDate, row);
+      }
+      if (addToCalendar) {
+        rows.push(row);
+      }
       row = [];
     }
     row.push(new Date(currentY, currentM, i));
   }
   if (row.length > 0) {
-    rows.push(row);
+    if (props.isForConfigDisplay) {
+      addToCalendar = isNeighborRow(baseDate, row);
+    }
+    if (addToCalendar) {
+      rows.push(row);
+    }
   }
   return rows;
 }
 
-function dtDiaryIcon(givenDt: Date): Icon | null {
+function dtDisplayIcons(givenDt: Date): DisplayIconFormat[] {
   const ts = dtToEntryTs(givenDt);
-  return tsIconMap.value[ts];
+  return tsIconMap.value[ts] || [];
 }
 
 const calendar = computed(() => {
@@ -128,12 +171,15 @@ function dtHeaderBlockStyle(givenDt: Date): string {
 }
 
 function dtBlockStyle(givenDt: Date): string {
+  let cursorStyle = props.isForConfigDisplay
+    ? "cursor-default"
+    : "cursor-pointer";
   if (isSameDt(currentDt.value, givenDt)) {
-    return "bg-content-100 border-primary border-2";
+    return `${cursorStyle} bg-content-100 border-primary border-2`;
   } else if (isHighlightedWeekDay(givenDt)) {
-    return "bg-base-200/60";
+    return `${cursorStyle} bg-base-200/60`;
   } else {
-    return "";
+    return cursorStyle;
   }
 }
 
@@ -160,6 +206,9 @@ function dtIconStyle(givenDt: Date): string {
 }
 
 function moveToDate(givenDt: Date): void {
+  if (props.isForConfigDisplay) {
+    return;
+  }
   emit("moveNavDate", givenDt);
 }
 </script>
@@ -202,36 +251,17 @@ function moveToDate(givenDt: Date): void {
       <button
         v-for="dt in row"
         :key="dt.getTime()"
-        class="h-11 w-11 xl:h-20 xl:w-20 border flex items-start justify-between"
+        class="h-11 w-11 xl:h-20 xl:w-20 border flex flex-col items-start justify-between"
         :class="dtBlockStyle(dt)"
         @click="moveToDate(dt)"
       >
         <div class="text-xs p-0.5 xl:text-sm xl:p-2" :class="dtDateStyle(dt)">
           {{ dt.getDate() }}
         </div>
-        <div
-          v-for="(icon, index) in [dtDiaryIcon(dt)]"
-          :key="index"
-          class="self-end"
-        >
-          <div v-if="icon" class="m-2 hidden xl:block">
-            <SvgIcon
-              class="self-end"
-              :class="dtIconStyle(dt)"
-              :icon-set="icon.set"
-              :path="icon.path"
-              size="22"
-            ></SvgIcon>
-          </div>
-          <div v-if="icon" class="self-end m-1 xl:hidden">
-            <SvgIcon
-              class="self-end"
-              :class="dtIconStyle(dt)"
-              :icon-set="icon.set"
-              :path="icon.path"
-              size="14"
-            ></SvgIcon>
-          </div>
+        <div class="w-full flex justify-end" :class="dtIconStyle(dt)">
+          <DisplayIconPanel
+            :display-icons="dtDisplayIcons(dt)"
+          ></DisplayIconPanel>
         </div>
       </button>
     </template>

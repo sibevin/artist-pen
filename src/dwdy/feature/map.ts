@@ -157,7 +157,7 @@ export function displayOpts(la: LocaleActor): SelectionOption[] {
   return DISPLAY_MODES.map((key) => {
     const localeKey = camelCase(key);
     return {
-      label: la.t(`dwdy.feature.displayMode.${localeKey}`) as string,
+      label: la.t(`dwdy.feature.config.display.options.${localeKey}`) as string,
       value: key,
       icon: DISPLAY_MODE_ICON_MAP[key],
     };

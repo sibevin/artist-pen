@@ -4,8 +4,8 @@
       "name": "日曆圖示",
       "options": {
         "dot": "點點",
-        "firstSticker": "貼紙",
-        "contentType": "內容種類"
+        "sticker": "貼紙",
+        "content": "內容"
       }
     }
   },

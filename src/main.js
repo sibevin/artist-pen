@@ -4,10 +4,17 @@ import { createMetaManager } from "vue-meta";
 import "./assets/css/tailwind.css";
 import App from "./App.vue";
 import { routes } from "./configs/routes";
+import { useAudioState } from "~/dwdy/feature/sound/state/useAudioState";
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+router.beforeEach(() => {
+  const audioState = useAudioState();
+  audioState.recorder.value.stop();
+  audioState.player.stop();
+  audioState.player.endCallback = undefined;
 });
 
 const metaManager = createMetaManager();

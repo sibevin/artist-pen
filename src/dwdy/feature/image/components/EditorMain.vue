@@ -268,13 +268,15 @@ function onCurrentPageSelected(): void {
             </div>
           </div>
         </div>
-        <RichTextEditor
-          ref="imageCommentEditor"
-          class="flex-none pt-1 min-h-32 border-base-200 w-full"
-          :placeholder="(la.t('.comment') as string)"
-          @change="onCommentChanged"
-        >
-        </RichTextEditor>
+        <div class="border-l-4 border-base-200 mt-2 pl-2">
+          <RichTextEditor
+            ref="imageCommentEditor"
+            class="flex-none pt-1 min-h-32 max-h-64 border-base-200 w-full"
+            :placeholder="(la.t('.comment') as string)"
+            @change="onCommentChanged"
+          >
+          </RichTextEditor>
+        </div>
       </div>
     </div>
     <label

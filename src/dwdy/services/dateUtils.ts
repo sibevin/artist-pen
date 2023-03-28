@@ -133,3 +133,14 @@ export function entryTsToDt(ts: number): Date {
   const tsDt = new Date(ts);
   return new Date(tsDt.getUTCFullYear(), tsDt.getUTCMonth(), tsDt.getUTCDate());
 }
+
+export function buildDtString(givenDt: Date): string {
+  const dtY = new Intl.DateTimeFormat("en", { year: "numeric" }).format(
+    givenDt
+  );
+  const dtM = new Intl.DateTimeFormat("en", { month: "2-digit" }).format(
+    givenDt
+  );
+  const dtD = new Intl.DateTimeFormat("en", { day: "2-digit" }).format(givenDt);
+  return `${dtY}-${dtM}-${dtD}`;
+}

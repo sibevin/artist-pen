@@ -25,5 +25,6 @@ export function buildStat(): FeatureStat {
 export function buildConfig(): FeatureConfig {
   return {
     display: randomPick([...DISPLAY_MODES]),
+    desktopFullViewerW: faker.datatype.number({ min: 20, max: 100 }),
   };
 }

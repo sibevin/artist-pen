@@ -9,7 +9,7 @@ export type DiaryAttachmentFile = {
   fileName: string;
   fileType: string;
   size: number;
-  data: string;
+  data?: string;
   blob?: Blob;
   buffer?: ArrayBuffer;
 };
@@ -31,6 +31,8 @@ export interface DiaryAttachmentDoc
   extends DiaryAttachmentAttrs,
     DiaryAttachmentIdentityParams {}
 export type DiaryAttachmentDocParams = Partial<DiaryAttachmentDoc>;
+
+export type DiaryAttachmentDocMap = Record<DUid, DiaryAttachmentDoc>;
 
 export interface DiaryAttachmentExistingDoc
   extends DiaryAttachmentAttrs,

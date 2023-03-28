@@ -1,9 +1,12 @@
 import { dbDwdy } from "~/services/db/dwdy";
 import { useDwdyState } from "~/states/useDwdyState";
-import { DiaryAttachment } from "~/models/dwdy/diaryAttachment";
+import {
+  DiaryAttachment,
+  DiaryAttachmentDocMap,
+} from "~/models/dwdy/diaryAttachment";
 import { displayFileName, genRandomFileName } from "~/services/file";
 import { DiaryFeature } from "~/dwdy/feature/def";
-import { FeatureStat } from "~/dwdy/feature/image/def";
+import { FeatureMeta, FeatureStat, ImagePack } from "~/dwdy/feature/image/def";
 
 const THUMBNAIL_W = 120;
 
@@ -241,4 +244,25 @@ export async function replaceImage(
       return Promise<void>;
     }
   );
+}
+
+export function buildImagePacks(
+  contents: FeatureMeta[],
+  daMap: DiaryAttachmentDocMap
+): ImagePack[] {
+  const imagePacks: ImagePack[] = [];
+  for (let i = 0; i < contents.length; i++) {
+    const content = contents[i];
+    if (!content.daUid) {
+      continue;
+    }
+    const dataUrl = daMap[content.daUid].data;
+    if (!dataUrl) {
+      continue;
+    }
+    if (dataUrl) {
+      imagePacks.push(Object.assign({}, content, { dataUrl }));
+    }
+  }
+  return imagePacks;
 }

@@ -23,7 +23,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
-  (e: "creationDone"): void;
+  (e: "creationDone", value: "last" | number | undefined): void;
   (e: "toggleJump"): void;
   (e: "selectIndex", index: number): void;
 }>();
@@ -83,7 +83,7 @@ async function onTextChanged(text: FeatureMeta): Promise<void> {
 
 async function onAddText(): Promise<void> {
   await addText({ raw: "", html: "" });
-  emit("creationDone");
+  emit("creationDone", "last");
 }
 
 function onPageSelected(page: number): void {
@@ -102,6 +102,7 @@ function onCurrentPageSelected(): void {
         ref="textEditor"
         class="w-full h-full"
         :placeholder="(la.t('.writeSomethingHint') as string)"
+        :content="currentText.raw"
         @change="onTextChanged"
       >
       </RichTextEditor>

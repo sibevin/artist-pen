@@ -1,13 +1,24 @@
-import { mdiMicrophone, mdiMicrophonePlus } from "@mdi/js";
+import {
+  mdiMicrophone,
+  mdiMusic,
+  mdiVolumePlus,
+  mdiVolumeSource,
+} from "@mdi/js";
 import { DUid } from "~/dwdy/types/core";
 import { DiaryFeatureIcon } from "~/dwdy/feature/def";
+import { Icon } from "~/models/app/types";
 
 export const REPEAT_MODES = ["none", "single", "all"] as const;
 export type RepeatMode = typeof REPEAT_MODES[number];
 
+export type SoundFrom = "record" | "file";
+
 export type FeatureMeta = {
   fileSize: number;
   duration: number;
+  from?: SoundFrom;
+  fileType?: string;
+  fileExt?: string;
   comment?: string;
   daUid?: DUid;
 };
@@ -20,15 +31,15 @@ export type FeatureStat = {
 
 export type FeatureConfig = {
   repeat: RepeatMode;
-  isPlayingRandomly: boolean;
+  isShuffleOn: boolean;
   volume: number;
-  isMuted: boolean;
   stereoPan: number;
+  isAutoplayOn: boolean;
 };
 
 export type SoundSource = {
   meta: FeatureMeta;
-  data: string;
+  data: Blob;
 };
 
 export interface SoundTrack extends SoundSource {
@@ -36,9 +47,9 @@ export interface SoundTrack extends SoundSource {
 }
 
 export const FEATURE_ICON: DiaryFeatureIcon = {
-  main: { set: "mdi", path: mdiMicrophone },
-  create: { set: "mdi", path: mdiMicrophonePlus },
-  edit: { set: "mdi", path: mdiMicrophonePlus },
+  main: { set: "mdi", path: mdiVolumeSource },
+  create: { set: "mdi", path: mdiVolumePlus },
+  edit: { set: "mdi", path: mdiVolumePlus },
 };
 
 export const DEFAULT_FEATURE_STAT: FeatureStat = {
@@ -49,8 +60,13 @@ export const DEFAULT_FEATURE_STAT: FeatureStat = {
 
 export const DEFAULT_FEATURE_CONFIG: FeatureConfig = {
   repeat: "none",
-  isPlayingRandomly: false,
-  volume: 100,
-  isMuted: false,
+  isShuffleOn: false,
+  volume: 50,
   stereoPan: 0,
+  isAutoplayOn: true,
+};
+
+export const SOUND_FROM_ICON: Record<SoundFrom, Icon> = {
+  record: { set: "mdi", path: mdiMicrophone },
+  file: { set: "mdi", path: mdiMusic },
 };

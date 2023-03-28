@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { mdiShuffleVariant, mdiDeleteForever, mdiViewGallery } from "@mdi/js";
+import { mdiShuffle, mdiDeleteForever, mdiViewGallery } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import SvgIcon from "~/components/SvgIcon.vue";
 
@@ -24,7 +24,7 @@ const emit = defineEmits<{
       class="btn btn-ghost rounded-full items-center"
       @click="emit('togglePositionChange')"
     >
-      <SvgIcon icon-set="mdi" :path="mdiShuffleVariant" :size="24"></SvgIcon>
+      <SvgIcon icon-set="mdi" :path="mdiShuffle" :size="24"></SvgIcon>
       <div class="hidden md:block ml-2">
         {{ la.t(".action.changeOrder") }}
       </div>

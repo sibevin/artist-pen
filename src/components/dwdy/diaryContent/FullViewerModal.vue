@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
-import { mdiFileEditOutline, mdiClose } from "@mdi/js";
+import {
+  mdiFileEditOutline,
+  mdiClose,
+  mdiArrowExpandHorizontal,
+} from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
 import { featureComponent } from "~/dwdy/feature/component";
@@ -83,12 +87,16 @@ defineExpose({ openModal });
   >
     <template #modal-fixed-bottom-panel>
       <div
-        class="w-full pt-3 flex items-center backdrop-blur-sm bg-base-100/60"
+        class="z-10 w-full pt-3 flex items-center backdrop-blur-sm bg-base-100/60"
       >
         <component
           :is="dwdyState.diary.value.layoutComponent('titlePanel')"
         ></component>
-        <div class="grow"></div>
+        <div class="grow flex justify-center items-center">
+          <component
+            :is="featureComponent(currentCfi.feature, 'fullViewerConfigPanel')"
+          ></component>
+        </div>
         <button
           class="btn btn-ghost rounded-full flex items-center"
           @click="onEditorOpened"
@@ -113,7 +121,7 @@ defineExpose({ openModal });
       </div>
     </template>
     <template #modal-content>
-      <div class="absolute inset-6">
+      <div class="absolute inset-3">
         <component
           :is="featureComponent(currentCfi.feature, 'fullViewer')"
           ref="contentFullViewer"

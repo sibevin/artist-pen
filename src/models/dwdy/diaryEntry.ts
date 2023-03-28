@@ -1,16 +1,13 @@
-import { mdiCheckboxMultipleBlank } from "@mdi/js";
 import { DUid, DIndex } from "~/dwdy/types/core";
 import { DiaryEntryFetchParams } from "~/models/dwdy/diary";
 import { InvalidParamsError } from "~/models/app/error";
 import { dbDwdy } from "~/services/db/dwdy";
-import { Icon } from "~/models/app/types";
 import { BaseModel } from "~/models/baseModel";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { DiaryAttachment } from "~/models/dwdy/diaryAttachment";
 import {
   DiaryFeatureContentMap,
   DiaryFeatureMetaMap,
-  featureIcon,
 } from "~/dwdy/feature/map";
 import { getNeighborDt, isToday, entryTsToDt } from "~/dwdy/services/dateUtils";
 import { genUid } from "~/services/db";
@@ -202,6 +199,20 @@ export class DiaryEntry
     return { target: this, action };
   }
 
+  public async reload(): Promise<boolean> {
+    if (this.doc.dUid) {
+      const fetchedEntry = await DiaryEntry.fetch({
+        dUid: this.doc.dUid,
+        dIndex: this.doc.dIndex,
+      });
+      if (fetchedEntry) {
+        this.doc = fetchedEntry.doc;
+        return true;
+      }
+    }
+    return false;
+  }
+
   public get hasContents(): boolean {
     let totalCount = 0;
     Object.values(this.doc.content).forEach((contents) => {
@@ -222,33 +233,6 @@ export class DiaryEntry
       }
     });
     return features;
-  }
-
-  public get contentIcon(): Icon | null {
-    if (!this.hasContents) {
-      return null;
-    }
-    let contentCount = 0;
-    let feature: DiaryFeature | null = null;
-    Object.keys(this.doc.content).forEach((key) => {
-      const contentValues =
-        this.doc.content[key as keyof DiaryFeatureContentMap];
-      if (contentValues && contentValues.length > 0) {
-        contentCount++;
-        feature = key as keyof DiaryFeatureContentMap as DiaryFeature;
-      }
-    });
-    if (contentCount > 1) {
-      return {
-        set: "mdi",
-        path: mdiCheckboxMultipleBlank,
-      };
-    }
-    if (feature) {
-      return featureIcon(feature);
-    } else {
-      return null;
-    }
   }
 
   public fetchContents<T extends DiaryFeature>(

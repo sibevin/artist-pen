@@ -20,7 +20,10 @@ export type FeatureStat = {
 
 export type FeatureConfig = {
   display: DisplayMode;
+  desktopFullViewerW: number;
 };
+
+export type ImagePack = FeatureMeta & { dataUrl: string };
 
 export const FEATURE_ICON: DiaryFeatureIcon = {
   main: { set: "mdi", path: mdiRdImage },
@@ -35,4 +38,5 @@ export const DEFAULT_FEATURE_STAT: FeatureStat = {
 
 export const DEFAULT_FEATURE_CONFIG: FeatureConfig = {
   display: "carousel",
+  desktopFullViewerW: 60,
 };

@@ -1,4 +1,13 @@
 {
+  "config": {
+    "display": {
+      "name": "Display",
+      "options": {
+        "carousel": "Carousel",
+        "list": "List"
+      }
+    }
+  },
   "text": {
     "name": "Text",
     "config": {
@@ -57,17 +66,18 @@
     "name": "Sound",
     "config": {
       "repeat": {
-        "name": "Repeat",
+        "name": "Repeat Mode",
         "options": {
           "none": "No repeat",
-          "single": "Single repeat",
-          "all": "All repeat"
+          "single": "Repeat one",
+          "all": "Repeat all"
         }
       },
-      "isPlayingRandomly": { "name": "Random" },
+      "isShuffleOn": { "name": "Shuffle" },
       "volume": { "name": "Volume" },
       "isMuted": { "name": "Muted" },
-      "stereoPan": { "name": "Stereo" }
+      "stereoPan": { "name": "Stereo" },
+      "isAutoplayOn": { "name": "Autoplay Next" }
     },
     "stat": {
       "count": "Count",
@@ -75,9 +85,11 @@
       "duration": "Duration"
     },
     "record": "Record",
-    "recordAgain": "Record again",
     "pause": "Pause",
+    "continue": "Continue",
     "stop": "Stop",
+    "saveAndRecord": "Stop and start a new record",
+    "import": "Import files",
     "comment": "Comment",
     "AudioRecorder": {
       "error": {

@@ -6,7 +6,7 @@ import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import { LocaleActor } from "~/services/locale";
 import ContentGallery from "~/dwdy/feature/sound/components/ContentGallery.vue";
-import AudioPlayer from "~/dwdy/feature/sound/components/AudioPlayer.vue";
+import AudioPlayerUi from "~/dwdy/feature/sound/components/AudioPlayerUi.vue";
 import testMp3 from "~/assets/audio/test.mp3";
 import test2Mp3 from "~/assets/audio/test2.mp3";
 const la = new LocaleActor("app");
@@ -29,7 +29,7 @@ function switchAudioSrc(): void {
     <div>Dev</div>
     <button class="btn" @click="switchAudioSrc">Switch audio</button>
     <div class="m-2">
-      <AudioPlayer :audio-data="audioSrc" class="grow"></AudioPlayer>
+      <AudioPlayerUi :audio-data="audioSrc" class="grow"></AudioPlayerUi>
     </div>
     <template #header-title>
       {{ la.t("app.serviceName") }}

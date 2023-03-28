@@ -3,9 +3,9 @@
     "displayIcon": {
       "name": "Calendar icon",
       "options": {
-        "dot": "Dots",
-        "firstSticker": "Sticker",
-        "contentType": "Content type"
+        "dot": "Dot",
+        "sticker": "Sticker",
+        "content": "Content"
       }
     }
   },

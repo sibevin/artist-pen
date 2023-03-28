@@ -25,7 +25,7 @@ export function buildStat(): FeatureStat {
 export function buildConfig(): FeatureConfig {
   return {
     repeat: randomPick([...REPEAT_MODES]),
-    isPlayingRandomly: faker.datatype.boolean(),
+    isShuffleOn: faker.datatype.boolean(),
     volume: faker.datatype.number({ min: 0, max: 100 }),
     isMuted: faker.datatype.boolean(),
     stereoPan: faker.datatype.number({ min: -50, max: 50 }),
