@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { mdiShuffle, mdiDeleteForever, mdiViewGallery } from "@mdi/js";
+import { mdiShuffle, mdiDeleteForever } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import SvgIcon from "~/components/SvgIcon.vue";
 
@@ -36,15 +36,6 @@ const emit = defineEmits<{
       <SvgIcon icon-set="mdi" :path="mdiDeleteForever" :size="24"></SvgIcon>
       <div class="hidden md:block ml-2">
         {{ la.t(".action.delete") }}
-      </div>
-    </button>
-    <button
-      class="btn btn-ghost rounded-full items-center"
-      @click="emit('toggleFullViewer')"
-    >
-      <SvgIcon icon-set="mdi" :path="mdiViewGallery" :size="22"></SvgIcon>
-      <div class="hidden md:block ml-2">
-        {{ la.t(".action.list") }}
       </div>
     </button>
   </div>

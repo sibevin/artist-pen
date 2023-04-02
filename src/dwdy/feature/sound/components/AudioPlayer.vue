@@ -6,14 +6,13 @@ import {
   mdiPlay,
   mdiVolumeSource,
   mdiVolumeMedium,
-  mdiVolumeHigh,
-  mdiFormatHorizontalAlignCenter,
   mdiVolumeMute,
   mdiShuffleVariant,
   mdiTune,
   mdiAnimationPlay,
   mdiToggleSwitch,
   mdiToggleSwitchOffOutline,
+  mdiFileEditOutline,
 } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { getDurationString } from "~/services/duration";
@@ -47,6 +46,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: "updateConfig", value: Partial<FeatureConfig>): void;
+  (e: "triggerEditor"): void;
 }>();
 
 const la = new LocaleActor("dwdy.feature.sound");
@@ -151,16 +151,6 @@ const playerVolumeBinding = computed<number>({
   },
 });
 
-const playerStereoPanBinding = computed<number>({
-  get() {
-    audioState.refreshKey.value;
-    return playerConfig.value.stereoPan;
-  },
-  set(value: number) {
-    updatePlayerStereoPan(value);
-  },
-});
-
 watch(
   () => audioState.player.isReady,
   (newValue, oldValue) => {
@@ -233,49 +223,61 @@ function switchPlayerIsMuted(): void {
             ></AudioVisualizer>
             <div class="w-full flex justify-center items-center">
               <div class="grow flex flex-col justify-center items-center">
-                <div class="flex justify-center items-center p-4">
+                <div class="self-stretch flex justify-between items-center p-4">
+                  <div class="flex-1 flex justify-center items-center">
+                    <button
+                      v-if="audioState.player.status === 'playing'"
+                      class="btn btn-circle btn-ghost hover:bg-base-100"
+                      @click="audioState.player.pause()"
+                    >
+                      <SvgIcon
+                        class="text-base-content"
+                        icon-set="mdi"
+                        :path="mdiPause"
+                        :size="24"
+                      ></SvgIcon>
+                    </button>
+                    <button
+                      v-else
+                      class="btn btn-circle btn-ghost hover:bg-base-100"
+                      @click="audioState.player.play()"
+                    >
+                      <SvgIcon
+                        class="text-base-content"
+                        icon-set="mdi"
+                        :path="mdiPlay"
+                        :size="24"
+                      ></SvgIcon>
+                    </button>
+                    <button
+                      class="btn btn-circle btn-ghost hover:bg-base-100"
+                      @click="audioState.player.stop()"
+                    >
+                      <SvgIcon
+                        :class="
+                          audioState.player.status === 'stopped'
+                            ? 'text-base-300'
+                            : 'text-base-content'
+                        "
+                        icon-set="mdi"
+                        :path="mdiStop"
+                        :size="24"
+                      ></SvgIcon>
+                    </button>
+                  </div>
                   <button
-                    v-if="audioState.player.status === 'playing'"
-                    class="btn btn-circle btn-ghost hover:bg-base-100"
-                    @click="audioState.player.pause()"
+                    class="flex-none btn btn-circle btn-ghost hover:bg-base-100"
+                    @click="emit('triggerEditor')"
                   >
                     <SvgIcon
-                      class="text-base-content"
                       icon-set="mdi"
-                      :path="mdiPause"
-                      :size="24"
-                    ></SvgIcon>
-                  </button>
-                  <button
-                    v-else
-                    class="btn btn-circle btn-ghost hover:bg-base-100"
-                    @click="audioState.player.play()"
-                  >
-                    <SvgIcon
-                      class="text-base-content"
-                      icon-set="mdi"
-                      :path="mdiPlay"
-                      :size="24"
-                    ></SvgIcon>
-                  </button>
-                  <button
-                    class="btn btn-circle btn-ghost hover:bg-base-100"
-                    @click="audioState.player.stop()"
-                  >
-                    <SvgIcon
-                      :class="
-                        audioState.player.status === 'stopped'
-                          ? 'text-base-300'
-                          : 'text-base-content'
-                      "
-                      icon-set="mdi"
-                      :path="mdiStop"
+                      :path="mdiFileEditOutline"
                       :size="24"
                     ></SvgIcon>
                   </button>
                 </div>
                 <div
-                  class="self-stretch lg:self-center rounded bg-base-100/60 p-1 m-2 mt-0"
+                  class="self-stretch lg:self-center rounded bg-base-100/60 px-2 lg:px-1 py-1 m-2 mt-0"
                 >
                   <div class="flex">
                     <button
@@ -346,7 +348,7 @@ function switchPlayerIsMuted(): void {
                       />
                     </div>
                     <button
-                      class="btn btn-circle btn-ghost text-base-content"
+                      class="hidden lg:inline-flex btn btn-circle btn-ghost text-base-content"
                       :class="
                         isPlayerConfigShown
                           ? 'bg-base-200 hover:bg-base-200 '
@@ -361,28 +363,49 @@ function switchPlayerIsMuted(): void {
                       ></SvgIcon>
                     </button>
                   </div>
-                  <div class="lg:hidden flex items-center">
+                  <div
+                    class="lg:hidden border-t border-base-200 mt-1 pt-1 flex justify-between items-center"
+                  >
+                    <div class="flex-1 flex items-center">
+                      <button
+                        class="btn btn-circle btn-ghost hover:bg-base-100"
+                        @click="switchPlayerIsMuted()"
+                      >
+                        <SvgIcon
+                          icon-set="mdi"
+                          :path="
+                            playerConfig.isMuted
+                              ? mdiVolumeMute
+                              : mdiVolumeMedium
+                          "
+                          :size="24"
+                        ></SvgIcon>
+                      </button>
+                      <input
+                        v-model="playerVolumeBinding"
+                        type="range"
+                        min="0"
+                        :max="100"
+                        class="range range-xs range-base-200 mx-3"
+                        :class="{ 'range-disabled': playerConfig.isMuted }"
+                        :disabled="playerConfig.isMuted"
+                      />
+                    </div>
                     <button
-                      class="btn btn-circle btn-ghost hover:bg-base-100"
-                      @click="switchPlayerIsMuted()"
+                      class="flex-none btn btn-circle btn-ghost text-base-content"
+                      :class="
+                        isPlayerConfigShown
+                          ? 'bg-base-200 hover:bg-base-200 '
+                          : 'hover:bg-base-100'
+                      "
+                      @click="onConfigBtnClicked"
                     >
                       <SvgIcon
                         icon-set="mdi"
-                        :path="
-                          playerConfig.isMuted ? mdiVolumeMute : mdiVolumeMedium
-                        "
+                        :path="mdiTune"
                         :size="24"
                       ></SvgIcon>
                     </button>
-                    <input
-                      v-model="playerVolumeBinding"
-                      type="range"
-                      min="0"
-                      :max="100"
-                      class="range range-xs range-base-200 mx-3"
-                      :class="{ 'range-disabled': playerConfig.isMuted }"
-                      :disabled="playerConfig.isMuted"
-                    />
                   </div>
                 </div>
               </div>
@@ -390,34 +413,68 @@ function switchPlayerIsMuted(): void {
           </div>
         </div>
         <div v-if="isPlayerConfigShown" class="mt-2 flex flex-col gap-2">
-          <div
-            class="w-full p-3 border border-base-200 rounded flex justify-center"
-          >
-            <div class="grid grid-cols-3 gap-2">
-              <label
-                v-for="opt in repeatOpts(la)"
-                :key="opt.value"
-                class="p-3 rounded cursor-pointer flex flex-col justify-center items-center"
-                :class="{
-                  'bg-base-200': playerConfig.repeat === opt.value,
-                }"
+          <div class="flex flex-col lg:flex-row gap-2">
+            <div
+              class="flex-1 p-3 border border-base-200 rounded flex justify-center"
+            >
+              <div class="grid grid-cols-3 gap-2">
+                <label
+                  v-for="opt in repeatOpts(la)"
+                  :key="opt.value"
+                  class="p-3 rounded cursor-pointer flex flex-col justify-center items-center"
+                  :class="{
+                    'bg-base-200': playerConfig.repeat === opt.value,
+                  }"
+                >
+                  <input
+                    v-model="playerConfig.repeat"
+                    type="radio"
+                    name="layout"
+                    class="hidden"
+                    :value="opt.value"
+                  />
+                  <SvgIcon
+                    v-if="opt.icon"
+                    class="mb-2"
+                    :icon-set="opt.icon.set"
+                    :path="opt.icon.path"
+                    :size="28"
+                  ></SvgIcon>
+                  <div>{{ opt.label }}</div>
+                </label>
+              </div>
+            </div>
+            <div
+              class="flex-1 p-3 border border-base-200 rounded flex items-center"
+            >
+              <SvgIcon
+                class="flex-none ml-1"
+                icon-set="mdi"
+                :path="playerConfig.isMuted ? mdiVolumeMute : mdiVolumeMedium"
+                :size="20"
+              ></SvgIcon>
+              <input
+                v-model="playerVolumeBinding"
+                type="range"
+                min="0"
+                :max="100"
+                class="range range-xs range-base-200 mx-3"
+                :class="{ 'range-disabled': playerConfig.isMuted }"
+                :disabled="playerConfig.isMuted"
+              />
+              <div class="flex-none w-6 text-right mr-3">
+                {{ playerVolumeBinding }}
+              </div>
+              <button
+                class="btn btn-ghost border border-base-200 hover:bg-base-100 hover:border-base-200"
+                @click="switchPlayerIsMuted()"
               >
-                <input
-                  v-model="playerConfig.repeat"
-                  type="radio"
-                  name="layout"
-                  class="hidden"
-                  :value="opt.value"
-                />
                 <SvgIcon
-                  v-if="opt.icon"
-                  class="mb-2"
-                  :icon-set="opt.icon.set"
-                  :path="opt.icon.path"
-                  :size="28"
+                  icon-set="mdi"
+                  :path="playerConfig.isMuted ? mdiVolumeMedium : mdiVolumeMute"
+                  :size="24"
                 ></SvgIcon>
-                <div>{{ opt.label }}</div>
-              </label>
+              </button>
             </div>
           </div>
           <div class="flex flex-col lg:flex-row gap-2">
@@ -498,81 +555,6 @@ function switchPlayerIsMuted(): void {
                   {{ la.t("app.action.disable") }}
                 </div>
               </label>
-            </div>
-          </div>
-          <div class="flex flex-col lg:flex-row gap-2">
-            <div
-              class="flex-1 p-3 border border-base-200 rounded flex items-center"
-            >
-              <SvgIcon
-                class="flex-none ml-1"
-                icon-set="mdi"
-                :path="playerConfig.isMuted ? mdiVolumeMute : mdiVolumeMedium"
-                :size="20"
-              ></SvgIcon>
-              <input
-                v-model="playerVolumeBinding"
-                type="range"
-                min="0"
-                :max="100"
-                class="range range-xs range-base-200 mx-3"
-                :class="{ 'range-disabled': playerConfig.isMuted }"
-                :disabled="playerConfig.isMuted"
-              />
-              <div class="flex-none w-6 text-right mr-3">
-                {{ playerVolumeBinding }}
-              </div>
-              <button
-                class="btn btn-ghost border border-base-200 hover:bg-base-100 hover:border-base-200"
-                @click="switchPlayerIsMuted()"
-              >
-                <SvgIcon
-                  icon-set="mdi"
-                  :path="playerConfig.isMuted ? mdiVolumeMedium : mdiVolumeMute"
-                  :size="24"
-                ></SvgIcon>
-              </button>
-            </div>
-            <div
-              class="flex-1 p-3 border border-base-200 rounded flex items-center"
-            >
-              <div class="flex-none w-6 text-right mr-2">
-                {{ 50 - playerConfig.stereoPan }}
-              </div>
-              <SvgIcon
-                class="flex-none"
-                icon-set="mdi"
-                :path="mdiVolumeHigh"
-                :size="20"
-                flip="h"
-              ></SvgIcon>
-              <input
-                v-model.number="playerStereoPanBinding"
-                type="range"
-                min="-50"
-                :max="50"
-                class="range range-tune-bar range-tune-bar-base-200 range-tune-bar-xs mx-3"
-              />
-              <SvgIcon
-                class="flex-none"
-                icon-set="mdi"
-                :path="mdiVolumeHigh"
-                :size="20"
-              ></SvgIcon>
-              <div class="flex-none w-6 text-right ml-2 mr-3">
-                {{ 50 + playerConfig.stereoPan }}
-              </div>
-              <button
-                class="btn btn-ghost border border-base-200 hover:bg-base-100 hover:border-base-200"
-                :class="{ 'text-base-300': playerConfig.stereoPan === 0 }"
-                @click="updatePlayerStereoPan(0)"
-              >
-                <SvgIcon
-                  icon-set="mdi"
-                  :path="mdiFormatHorizontalAlignCenter"
-                  :size="24"
-                ></SvgIcon>
-              </button>
             </div>
           </div>
         </div>

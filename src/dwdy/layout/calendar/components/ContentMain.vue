@@ -57,6 +57,12 @@ function onOpenFullViewer(cfi: DiaryContentFeatureIndex): void {
   });
 }
 
+function onOpenFeatureEditor(cfi: DiaryContentFeatureIndex): void {
+  nextTick(() => {
+    emit("triggerAction", { action: "open-feature-editor", cfi });
+  });
+}
+
 async function updateStateEntryByTs(timestamp: number): Promise<void> {
   let entry = await dwdyState.diary.value.fetchEntry({ timestamp });
   if (!entry) {
@@ -151,6 +157,7 @@ defineExpose({ moveToEntry });
               class="p-2 pt-4 pb-0"
               :enable-click="true"
               @open-full-viewer="onOpenFullViewer"
+              @open-feature-editor="onOpenFeatureEditor"
             ></component>
           </div>
         </div>
@@ -239,6 +246,7 @@ defineExpose({ moveToEntry });
                 class="p-2 pt-4 pb-0"
                 :enable-click="true"
                 @open-full-viewer="onOpenFullViewer"
+                @open-feature-editor="onOpenFeatureEditor"
               ></component>
             </div>
           </div>
@@ -285,6 +293,7 @@ defineExpose({ moveToEntry });
               class="pt-4 pr-4 pb-0"
               :enable-click="true"
               @open-full-viewer="onOpenFullViewer"
+              @open-feature-editor="onOpenFeatureEditor"
             ></component>
           </div>
         </div>

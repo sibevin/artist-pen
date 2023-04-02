@@ -6,11 +6,7 @@ import {
   mdiPlay,
   mdiVolumeMedium,
   mdiSpeaker,
-  mdiVolumeHigh,
-  mdiFormatHorizontalAlignCenter,
-  mdiDownload,
   mdiVolumeMute,
-  mdiTune,
 } from "@mdi/js";
 import { getDurationString } from "~/services/duration";
 import { useAudioState } from "~/dwdy/feature/sound/state/useAudioState";
@@ -41,7 +37,6 @@ const emit = defineEmits<{
 }>();
 
 const audioState = useAudioState();
-const isPlayerVolumeShown = ref<boolean>(false);
 const playerVolume = ref<number>(props.config.volume);
 const playerStereoPan = ref<number>(props.config.stereoPan);
 const playerIsMuted = ref<boolean>(false);
@@ -68,16 +63,6 @@ const playerVolumeBinding = computed<number>({
   },
   set(value: number) {
     updatePlayerVolume(value);
-  },
-});
-
-const playerStereoPanBinding = computed<number>({
-  get() {
-    audioState.refreshKey.value;
-    return playerStereoPan.value;
-  },
-  set(value: number) {
-    updatePlayerStereoPan(value);
   },
 });
 
@@ -125,10 +110,6 @@ function updatePlayerStereoPan(value: number): void {
 function onPlayBtnClicked(): void {
   audioState.player.play();
   playerIsMuted.value = false;
-}
-
-function onVolumeBtnClicked(): void {
-  isPlayerVolumeShown.value = !isPlayerVolumeShown.value;
 }
 
 function switchPlayerIsMuted(): void {
@@ -225,20 +206,7 @@ function switchPlayerIsMuted(): void {
                 :size="24"
               ></SvgIcon>
             </button>
-            <a
-              class="btn btn-circle btn-ghost hover:bg-base-100"
-              :href="props.audioDataUrl"
-              :download="props.fileName"
-              target="_blank"
-            >
-              <SvgIcon
-                class="text-base-content"
-                icon-set="mdi"
-                :path="mdiDownload"
-                :size="24"
-              ></SvgIcon>
-            </a>
-            <div class="hidden md:flex items-center">
+            <div class="flex items-center">
               <button
                 class="btn btn-circle btn-ghost hover:bg-base-100"
                 @click="switchPlayerIsMuted()"
@@ -259,89 +227,6 @@ function switchPlayerIsMuted(): void {
                 :disabled="playerIsMuted"
               />
             </div>
-          </div>
-          <button
-            class="btn btn-circle btn-ghost text-base-content"
-            :class="
-              isPlayerVolumeShown
-                ? 'bg-base-200 hover:bg-base-200 '
-                : 'hover:bg-base-100'
-            "
-            @click="onVolumeBtnClicked"
-          >
-            <SvgIcon icon-set="mdi" :path="mdiTune" :size="24"></SvgIcon>
-          </button>
-        </div>
-        <div
-          v-if="isPlayerVolumeShown"
-          class="m-2 flex flex-col md:flex-row gap-2"
-        >
-          <div
-            class="flex-1 p-3 border border-base-200 rounded flex items-center"
-          >
-            <SvgIcon
-              class="ml-2"
-              icon-set="mdi"
-              :path="playerIsMuted ? mdiVolumeMute : mdiVolumeMedium"
-              :size="28"
-            ></SvgIcon>
-            <input
-              v-model="playerVolumeBinding"
-              type="range"
-              min="0"
-              :max="100"
-              class="range range-xs range-base-200 mx-3"
-              :class="{ 'range-disabled': playerIsMuted }"
-              :disabled="playerIsMuted"
-            />
-            <div class="flex-none w-6 text-right mr-2">
-              {{ playerVolumeBinding }}
-            </div>
-            <button
-              class="btn btn-ghost border border-base-200 hover:bg-base-100 hover:border-base-200"
-              @click="switchPlayerIsMuted()"
-            >
-              <SvgIcon
-                icon-set="mdi"
-                :path="playerIsMuted ? mdiVolumeMedium : mdiVolumeMute"
-                :size="24"
-              ></SvgIcon>
-            </button>
-          </div>
-          <div
-            class="flex-1 p-3 border border-base-200 rounded flex items-center"
-          >
-            <div class="flex-none w-6 text-right mx-2">
-              {{ 50 - playerStereoPan }}
-            </div>
-            <SvgIcon
-              icon-set="mdi"
-              :path="mdiVolumeHigh"
-              :size="28"
-              flip="h"
-            ></SvgIcon>
-            <input
-              v-model.number="playerStereoPanBinding"
-              type="range"
-              min="-50"
-              :max="50"
-              class="range range-tune-bar range-tune-bar-base-200 range-tune-bar-xs mx-3"
-            />
-            <SvgIcon icon-set="mdi" :path="mdiVolumeHigh" :size="28"></SvgIcon>
-            <div class="flex-none w-6 text-right mx-2">
-              {{ 50 + playerStereoPan }}
-            </div>
-            <button
-              class="btn btn-ghost border border-base-200 hover:bg-base-100 hover:border-base-200"
-              :class="{ 'text-base-300': playerStereoPan === 0 }"
-              @click="updatePlayerStereoPan(0)"
-            >
-              <SvgIcon
-                icon-set="mdi"
-                :path="mdiFormatHorizontalAlignCenter"
-                :size="24"
-              ></SvgIcon>
-            </button>
           </div>
         </div>
       </div>

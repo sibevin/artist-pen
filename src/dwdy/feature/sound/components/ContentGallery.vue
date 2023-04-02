@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, nextTick } from "vue";
+import { DiaryContentFeatureIndex } from "~/dwdy/types/core";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import {
   FeatureConfig,
@@ -11,6 +12,10 @@ import { useDwdyState } from "~/states/useDwdyState";
 import { useWorkerState } from "~/states/useWorkerState";
 import AudioPlayer from "~/dwdy/feature/sound/components/AudioPlayer.vue";
 import { DUid } from "~/dwdy/types/core";
+
+const emit = defineEmits<{
+  (e: "openFeatureEditor", params: DiaryContentFeatureIndex): void;
+}>();
 
 const dwdyState = useDwdyState();
 const workerState = useWorkerState();
@@ -55,6 +60,12 @@ async function onConfigUpdated(
   dwdyState.diary.value.patchFeatureConfig(DiaryFeature.Sound, givenConfig);
   await dwdyState.diary.value.save();
 }
+
+function onEditorTriggered(): void {
+  nextTick(() => {
+    emit("openFeatureEditor", { feature: DiaryFeature.Sound });
+  });
+}
 </script>
 <template>
   <AudioPlayer
@@ -62,5 +73,6 @@ async function onConfigUpdated(
     :sound-sources="soundSources"
     :config="soundConfig"
     @update-config="onConfigUpdated"
+    @trigger-editor="onEditorTriggered"
   ></AudioPlayer>
 </template>

@@ -13,13 +13,13 @@ const props = defineProps({
 });
 
 function calculateIconSize(di: DisplayIconFormat): number {
-  const baseSize = ["sm", "md", "lg"].includes(getCurrentBreakpoint())
+  const baseSize = ["xs", "sm", "md", "lg"].includes(getCurrentBreakpoint())
     ? 16
     : 28;
   return baseSize * (di.size || 1);
 }
 function calculateStickerSizeMultiplier(): number {
-  if (["sm", "md", "lg"].includes(getCurrentBreakpoint())) {
+  if (["xs", "sm", "md", "lg"].includes(getCurrentBreakpoint())) {
     return 0.45;
   } else {
     return 0.8;
