@@ -28,6 +28,7 @@ import {
 import { repeatOpts, REPEAT_ICON_MAP } from "~/dwdy/feature/sound/map";
 import { chooseNextTrackIndex } from "~/dwdy/feature/sound/action";
 import { useAudioState } from "~/dwdy/feature/sound/state/useAudioState";
+import { nextEntry } from "~/services/loopArray";
 import AudioVisualizer from "~/dwdy/feature/sound/components/AudioVisualizer.vue";
 import SvgIcon from "~/components/SvgIcon.vue";
 
@@ -72,7 +73,6 @@ audioState.player.endCallback = () => {
     soundTracks.value.length,
     randomPlayedIndexes
   );
-  // console.log("endCallback", nextIndex);
   if (nextIndex !== null) {
     if (playerConfig.value.isShuffleOn) {
       if (randomPlayedIndexes.length === soundTracks.value.length) {
@@ -178,8 +178,10 @@ function onConfigBtnClicked(): void {
 }
 
 function onSwitchRepeatBtnClicked(): void {
-  const rmIndex = REPEAT_MODES.indexOf(playerConfig.value.repeat);
-  playerConfig.value.repeat = REPEAT_MODES[(rmIndex + 1) % REPEAT_MODES.length];
+  playerConfig.value.repeat = nextEntry(
+    REPEAT_MODES,
+    playerConfig.value.repeat
+  );
   emit("updateConfig", { repeat: playerConfig.value.repeat });
 }
 
@@ -206,12 +208,12 @@ function switchPlayerIsMuted(): void {
     <div class="flex-none">
       <div class="p-2 mb-3 border border-base-200 rounded-md shadow-md">
         <div class="w-full flex items-center">
-          <div class="ml-2 mr-3 my-4">
+          <div class="ml-2 mr-3">
             <SvgIcon
               class="text-primary"
               icon-set="mdi"
               :path="mdiVolumeSource"
-              :size="40"
+              :size="32"
             ></SvgIcon>
           </div>
           <div

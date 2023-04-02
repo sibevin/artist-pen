@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import { mdiCircle, mdiDotsCircle } from "@mdi/js";
+import { ref, computed, watch, nextTick } from "vue";
+import { mdiCircle, mdiDotsCircle, mdiFileEditOutline } from "@mdi/js";
 import { ChangedEvent } from "@egjs/flicking";
 import Flicking from "@egjs/vue3-flicking";
 import { useDwdyState } from "~/states/useDwdyState";
@@ -17,7 +17,7 @@ import ContentSlate from "~/dwdy/feature/image/components/ContentSlate.vue";
 
 import "@egjs/vue3-flicking/dist/flicking.css";
 
-const MAX_IMAGE_DOTS = 8;
+const MAX_CAROUSEL_DOTS = 5;
 
 const props = defineProps({
   enableClick: {
@@ -28,6 +28,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: "openFullViewer", value: DiaryContentFeatureIndex): void;
+  (e: "openFeatureEditor", params: DiaryContentFeatureIndex): void;
 }>();
 
 const dwdyState = useDwdyState();
@@ -75,7 +76,7 @@ async function fetchImages(): Promise<void> {
         dIndex: dwdyState.entry.value.doc.dIndex,
         daUid: content.daUid,
       });
-      if (daDoc) {
+      if (daDoc && daDoc.data) {
         imagePacks.value[index] = Object.assign(
           {
             dataUrl: daDoc.data,
@@ -98,20 +99,90 @@ function isCurrentImage(index: number): boolean {
 function onFlickerChanged(event: ChangedEvent): void {
   imageFlickerIndex.value = event.index;
 }
+
 function onGalleryClicked(): void {
   if (props.enableClick) {
-    emit("openFullViewer", {
-      feature: DiaryFeature.Image,
-      index: imageFlickerIndex.value,
-    });
+    const index =
+      featureConfig.value.display === "carousel" ? imageFlickerIndex.value : 0;
+    emit("openFullViewer", { feature: DiaryFeature.Image, index });
   }
+}
+
+function onEditBtnClicked(): void {
+  nextTick(() => {
+    const index =
+      featureConfig.value.display === "carousel" ? imageFlickerIndex.value : 0;
+    emit("openFeatureEditor", { feature: DiaryFeature.Image, index });
+  });
 }
 </script>
 <template>
   <div v-if="currentImageCount > 0">
+    <div class="border border-base-200 rounded-md shadow-md">
+      <div class="w-full flex items-center">
+        <SvgIcon
+          class="flex-none text-primary ml-3.5"
+          :icon-set="FEATURE_ICON.main.set"
+          :path="FEATURE_ICON.main.path"
+          :size="32"
+        ></SvgIcon>
+        <div class="flex-1">
+          <div v-if="featureConfig.display === 'carousel'">
+            <div
+              v-if="currentImageCount > MAX_CAROUSEL_DOTS"
+              class="flex justify-center items-center"
+            >
+              <button
+                class="text-sm flex items-center"
+                @click="
+                  moveImageFlicker((imageFlickerIndex + 1) % currentImageCount)
+                "
+              >
+                <div class="font-bold">
+                  {{ imageFlickerIndex + 1 }}
+                </div>
+                <div class="mx-2">⁄</div>
+                <div>
+                  {{ currentImageCount }}
+                </div>
+              </button>
+            </div>
+            <div
+              v-else-if="currentImageCount > 1"
+              class="flex justify-center items-center"
+            >
+              <button
+                v-for="index in [...Array(currentImageCount).keys()]"
+                :key="index"
+                class="p-2"
+                @click="moveImageFlicker(index)"
+              >
+                <SvgIcon
+                  icon-set="mdi"
+                  :path="mdiCircle"
+                  :size="isCurrentImage(index) ? 8 : 5"
+                ></SvgIcon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="m-2 flex gap-2">
+          <button
+            class="flex-none btn btn-circle btn-ghost"
+            @click="onEditBtnClicked"
+          >
+            <SvgIcon
+              icon-set="mdi"
+              :path="mdiFileEditOutline"
+              :size="24"
+            ></SvgIcon>
+          </button>
+        </div>
+      </div>
+    </div>
     <button
       v-if="featureConfig.display === 'list'"
-      class="pt-2 border-t-4 border-base-200 flex flex-col"
+      class="mt-3 mx-2 flex flex-col"
       :class="props.enableClick ? 'cursor-pointer' : 'cursor-default'"
       @click="onGalleryClicked"
     >
@@ -143,93 +214,43 @@ function onGalleryClicked(): void {
         </div>
       </div>
     </button>
-    <div
+    <button
       v-else
-      class="flex flex-col items-start"
+      class="mt-4 px-2 w-full"
       :class="props.enableClick ? 'cursor-pointer' : 'cursor-default'"
+      @click="onGalleryClicked"
     >
-      <div
-        class="self-stretch flex-1 pt-2 mb-2 border-t-4 border-base-200 flex items-center"
+      <Flicking
+        ref="imageFlicker"
+        :options="{
+          align: 'center',
+          circular: true,
+        }"
+        class="max-h-full max-w-full"
+        @changed="onFlickerChanged"
       >
-        <SvgIcon
-          :icon-set="FEATURE_ICON.main.set"
-          :path="FEATURE_ICON.main.path"
-          :size="20"
-        ></SvgIcon>
         <div
-          v-if="currentImageCount > MAX_IMAGE_DOTS"
-          class="grow flex justify-center items-center"
+          v-for="(pack, index) in imagePacks"
+          :id="'slide_image_' + index"
+          :key="index"
+          class="panel w-full max-h-v60 flex flex-col items-center"
         >
-          <button
-            class="text-sm flex items-center"
-            @click="
-              moveImageFlicker((imageFlickerIndex + 1) % currentImageCount)
-            "
+          <ContentSlate
+            v-if="pack && pack.dataUrl"
+            :image-meta="pack"
+            :data-url="pack.dataUrl"
+            onmousedown="if (event.preventDefault) event.preventDefault()"
           >
-            <div class="font-bold">
-              {{ imageFlickerIndex + 1 }}
-            </div>
-            <div class="mx-2">⁄</div>
-            <div>
-              {{ currentImageCount }}
-            </div>
-          </button>
+          </ContentSlate>
+          <SvgIcon
+            v-else
+            class="text-base-300 animate-spin-slow m-5"
+            icon-set="mdi"
+            :path="mdiDotsCircle"
+            :size="20"
+          ></SvgIcon>
         </div>
-        <div
-          v-else-if="currentImageCount > 1"
-          class="grow flex justify-center items-center"
-        >
-          <button
-            v-for="index in [...Array(currentImageCount).keys()]"
-            :key="index"
-            class="p-2"
-            @click="moveImageFlicker(index)"
-          >
-            <SvgIcon
-              icon-set="mdi"
-              :path="mdiCircle"
-              :size="isCurrentImage(index) ? 8 : 5"
-            ></SvgIcon>
-          </button>
-        </div>
-      </div>
-      <button
-        class="min-w-0 grow"
-        :class="props.enableClick ? 'cursor-pointer' : 'cursor-default'"
-        @click="onGalleryClicked"
-      >
-        <Flicking
-          ref="imageFlicker"
-          :options="{
-            align: 'center',
-            circular: true,
-          }"
-          class="max-h-full max-w-full"
-          @changed="onFlickerChanged"
-        >
-          <div
-            v-for="(pack, index) in imagePacks"
-            :id="'slide_image_' + index"
-            :key="index"
-            class="panel w-full max-h-v60 flex flex-col items-center"
-          >
-            <ContentSlate
-              v-if="pack && pack.dataUrl"
-              :image-meta="pack"
-              :data-url="pack.dataUrl"
-              onmousedown="if (event.preventDefault) event.preventDefault()"
-            >
-            </ContentSlate>
-            <SvgIcon
-              v-else
-              class="text-base-300 animate-spin-slow m-5"
-              icon-set="mdi"
-              :path="mdiDotsCircle"
-              :size="20"
-            ></SvgIcon>
-          </div>
-        </Flicking>
-      </button>
-    </div>
+      </Flicking>
+    </button>
   </div>
 </template>

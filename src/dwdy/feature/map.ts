@@ -2,8 +2,8 @@ import {
   mdiFileDocumentOutline,
   mdiFileDocumentPlusOutline,
   mdiFileDocumentEditOutline,
-  mdiViewGallery,
-  mdiViewSequential,
+  mdiViewSequentialOutline,
+  mdiViewGalleryOutline,
 } from "@mdi/js";
 import camelCase from "lodash-es/camelCase";
 import { LocaleActor } from "~/services/locale";
@@ -101,8 +101,8 @@ const FEATURE_ICON_MAP: Record<DiaryFeature, DiaryFeatureIcon> = {
 };
 
 const DISPLAY_MODE_ICON_MAP: Record<DisplayMode, Icon> = {
-  ["carousel"]: { set: "mdi", path: mdiViewGallery },
-  ["list"]: { set: "mdi", path: mdiViewSequential },
+  ["carousel"]: { set: "mdi", path: mdiViewGalleryOutline },
+  ["list"]: { set: "mdi", path: mdiViewSequentialOutline },
 };
 
 const DEFAULT_FEATURE_STAT_MAP: DiaryFeatureStatMap = {
