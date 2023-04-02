@@ -34,6 +34,7 @@ const isPositionChangeModalOn = ref(false);
 const isDeletionModalOn = ref(false);
 const isJumpModalOn = ref(false);
 const contentEditor = ref();
+const menuEntries = ref<string[]>([]);
 
 await initPage();
 
@@ -96,6 +97,10 @@ function onCreationDone(moveToIndex: number | "last" | undefined): void {
   }
   onContentSelected(moveToIndex);
 }
+
+function onMenuEntriesChanged(entries: string[] = []) {
+  menuEntries.value = entries;
+}
 </script>
 
 <template>
@@ -109,6 +114,7 @@ function onCreationDone(moveToIndex: number | "last" | undefined): void {
         @toggle-jump="isJumpModalOn = true"
         @select-index="onContentSelected"
         @creation-done="onCreationDone"
+        @change-menu-entries="onMenuEntriesChanged"
       ></component>
     </div>
     <template #header-title>
@@ -139,6 +145,7 @@ function onCreationDone(moveToIndex: number | "last" | undefined): void {
           <component
             :is="featureComponent(currentFeature, 'editorMenu')"
             :content-count="currentContentCount"
+            :menu-entries="menuEntries"
             @toggle-deletion="isDeletionModalOn = true"
             @toggle-position-change="isPositionChangeModalOn = true"
           ></component>

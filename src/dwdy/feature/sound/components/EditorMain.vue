@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from "vue";
+import { ref, watch, computed, onMounted, nextTick } from "vue";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
 import { DiaryFeature } from "~/dwdy/feature/def";
@@ -33,6 +33,7 @@ const emit = defineEmits<{
   (e: "creationDone", moveToIndex: "last" | undefined): void;
   (e: "toggleJump"): void;
   (e: "selectIndex", index: number): void;
+  (e: "changeMenuEntries", entries: string[]): void;
 }>();
 
 const la = new LocaleActor("dwdy.feature.image.components.EditorMain");
@@ -103,12 +104,16 @@ watch(
   async () => {
     if (!isRecorderShown.value) {
       audioState.stopAllAudioDevices();
+      emit("changeMenuEntries", ["change-order", "delete"]);
+    } else {
+      emit("changeMenuEntries", []);
     }
   }
 );
 
 onMounted(() => {
   initSoundEditor();
+  emit("changeMenuEntries", ["change-order", "delete"]);
 });
 
 async function fetchSound(): Promise<void> {

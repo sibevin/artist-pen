@@ -9,6 +9,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  menuEntries: {
+    type: Array,
+    required: true,
+  },
 });
 
 const emit = defineEmits<{
@@ -16,11 +20,15 @@ const emit = defineEmits<{
   (e: "toggleDeletion"): void;
   (e: "toggleFullViewer"): void;
 }>();
+
+function isEntryShown(entry: string): boolean {
+  return props.menuEntries.includes(entry);
+}
 </script>
 <template>
   <div v-if="props.contentCount > 0" class="flex justify-center items-center">
     <button
-      v-if="props.contentCount > 1"
+      v-if="isEntryShown('change-order') && props.contentCount > 1"
       class="btn btn-ghost rounded-full items-center"
       @click="emit('togglePositionChange')"
     >
@@ -30,6 +38,7 @@ const emit = defineEmits<{
       </div>
     </button>
     <button
+      v-if="isEntryShown('delete')"
       class="btn btn-ghost text-error rounded-full items-center"
       @click="emit('toggleDeletion')"
     >
