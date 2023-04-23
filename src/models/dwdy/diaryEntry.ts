@@ -11,7 +11,11 @@ import {
 } from "~/dwdy/feature/map";
 import { getNeighborDt, isToday, entryTsToDt } from "~/dwdy/services/dateUtils";
 import { genUid } from "~/services/db";
-import { GeoRange } from "~/dwdy/types/core";
+import {
+  DiaryEntryIdentity,
+  DiaryEntryIdentityParams,
+  GeoRange,
+} from "~/dwdy/types/core";
 
 type NavInfo = {
   nextDayDt?: Date;
@@ -34,12 +38,6 @@ export interface DiaryEntryAttrs {
 }
 
 export type DiaryEntryParams = Partial<DiaryEntryAttrs>;
-
-export interface DiaryEntryIdentity {
-  dUid: DUid;
-  dIndex: DIndex;
-}
-export type DiaryEntryIdentityParams = Partial<DiaryEntryIdentity>;
 
 export interface DiaryEntryDoc
   extends DiaryEntryAttrs,
@@ -82,6 +80,10 @@ export class DiaryEntry
     } else {
       return undefined;
     }
+  }
+
+  get identity(): DiaryEntryIdentityParams {
+    return { dUid: this.doc.dUid, dIndex: this.doc.dIndex };
   }
 
   get isStored(): boolean {

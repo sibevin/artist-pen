@@ -3,6 +3,12 @@ import { DiaryFeature } from "~/dwdy/feature/def";
 export type DUid = string;
 export type DIndex = string;
 
+export type DiaryEntryIdentity = {
+  dUid: DUid;
+  dIndex: DIndex;
+};
+export type DiaryEntryIdentityParams = Partial<DiaryEntryIdentity>;
+
 export type DiaryContentFeatureIndex = {
   feature: DiaryFeature;
   index?: number;
@@ -55,7 +61,12 @@ export type DiaryPageActionParams = {
     | "select-date"
     | "select-feature-editor"
     | "open-feature-editor"
-    | "open-full-viewer";
+    | "open-full-viewer"
+    | "open-search-main-modal"
+    | "open-search-time-range-modal"
+    | "open-search-feature-modal"
+    | "open-search-sort-modal"
+    | "apply-search";
   cfi?: DiaryContentFeatureIndex;
   timestamp?: number;
   afterDIndex?: DIndex;

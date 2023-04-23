@@ -18,6 +18,18 @@
       },
       "firstWeekDay": {
         "name": "開始星期"
+      },
+      "searchSort": {
+        "name": "搜尋排序",
+        "options": {
+          "timestampDesc": "日期順序：晚 > 早",
+          "timestampAsc": "日期順序：早 > 晚"
+        }
+      }
+    },
+    "components": {
+      "SearchMain": {
+        "timeRange": "時間"
       }
     }
   },

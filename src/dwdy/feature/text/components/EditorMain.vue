@@ -75,14 +75,16 @@ function initTextEditor(): void {
 
 async function onTextChanged(text: FeatureMeta): Promise<void> {
   currentText.value = text;
-  await updateText(text, props.contentIndex);
+  await updateText(dwdyState.entry.value.identity, text, props.contentIndex);
+  await dwdyState.reloadEntry();
   if (textEditor.value) {
     textEditor.value.updateStatus("saved");
   }
 }
 
 async function onAddText(): Promise<void> {
-  await addText({ raw: "", html: "" });
+  await addText(dwdyState.entry.value.identity, { raw: "", html: "" });
+  await dwdyState.reloadEntry();
   emit("creationDone", "last");
 }
 

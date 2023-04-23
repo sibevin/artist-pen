@@ -1,6 +1,7 @@
 {
   "serviceName": "Artist's Pen",
   "action": {
+    "apply": "Apply",
     "cancel": "Cancel",
     "changeOrder": "Change order",
     "confirm": "Confirm",

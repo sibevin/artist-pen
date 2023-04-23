@@ -35,6 +35,11 @@ export const useDwdyState = createGlobalState(() => {
     await fetchBunch(givenEntry);
   }
 
+  async function reloadEntry(): Promise<void> {
+    await entry.value.reload();
+    await updateEntry(entry.value.doc);
+  }
+
   async function fetchBunch(entry: DiaryEntry): Promise<void> {
     const currentDiary = new Diary(diary.value.doc);
     const flow = layoutFlow(currentDiary);
@@ -48,5 +53,6 @@ export const useDwdyState = createGlobalState(() => {
     bunch,
     fetchEntry,
     updateEntry,
+    reloadEntry,
   };
 });

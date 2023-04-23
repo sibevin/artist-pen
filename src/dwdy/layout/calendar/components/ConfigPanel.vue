@@ -75,7 +75,9 @@ async function onHighlightedWeekDaysUpdated(): Promise<void> {
             圖例
           </div>
           <div class="max-w-v80 overflow-hidden">
-            <YmdNavPanel :current-date="new Date()"></YmdNavPanel>
+            <YmdNavPanel
+              :current-date="dwdyState.entry.value.tsDate || new Date()"
+            ></YmdNavPanel>
             <CalendarPanel
               class="pt-2"
               :is-for-config-display="true"

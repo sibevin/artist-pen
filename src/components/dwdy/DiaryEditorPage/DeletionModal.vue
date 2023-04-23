@@ -135,14 +135,14 @@ async function onDeletionConfirmed(): Promise<void> {
     return b - a;
   });
   for (let index of indexToDelete) {
-    if (flow.deletion.delete) {
-      await flow.deletion.delete(index);
+    if (flow.deleteContent) {
+      await flow.deleteContent(dwdyState.entry.value.identity, index);
     } else {
       dwdyState.entry.value.deleteContent(props.feature, index);
       await dwdyState.entry.value.save();
-      dwdyState.updateEntry(dwdyState.entry.value.doc);
     }
   }
+  await dwdyState.reloadEntry();
   isInDeleting.value = false;
   isModalOn.value = false;
   triggerDone();

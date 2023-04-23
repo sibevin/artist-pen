@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
-import {
-  mdiFileEditOutline,
-  mdiClose,
-  mdiArrowExpandHorizontal,
-} from "@mdi/js";
+import { mdiFileEditOutline, mdiClose } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
 import { featureComponent } from "~/dwdy/feature/component";
+import { layoutComponent } from "~/dwdy/layout/component";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { DiaryContentFeatureIndex } from "~/dwdy/types/core";
 import SvgIcon from "~/components/SvgIcon.vue";
@@ -90,7 +87,7 @@ defineExpose({ openModal });
         class="z-10 w-full pt-3 flex items-center backdrop-blur-sm bg-base-100/60"
       >
         <component
-          :is="dwdyState.diary.value.layoutComponent('titlePanel')"
+          :is="layoutComponent(dwdyState.diary.value.doc.layout, 'titlePanel')"
         ></component>
         <div class="grow flex justify-center items-center">
           <component

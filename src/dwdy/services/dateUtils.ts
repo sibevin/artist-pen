@@ -103,6 +103,14 @@ export function getNeighborTs(
   return dtToEntryTs(getNeighborDt(baseDt, options));
 }
 
+export function getNeighborDs(
+  ds: string,
+  options: GetNeighborOption = {}
+): string {
+  const baseDt = dsToDt(ds);
+  return dtToDs(getNeighborDt(baseDt, options));
+}
+
 export function isSameDt(
   dt1: Date,
   dt2: Date,
@@ -134,7 +142,7 @@ export function entryTsToDt(ts: number): Date {
   return new Date(tsDt.getUTCFullYear(), tsDt.getUTCMonth(), tsDt.getUTCDate());
 }
 
-export function buildDtString(givenDt: Date): string {
+export function dtToDs(givenDt: Date): string {
   const dtY = new Intl.DateTimeFormat("en", { year: "numeric" }).format(
     givenDt
   );
@@ -143,4 +151,54 @@ export function buildDtString(givenDt: Date): string {
   );
   const dtD = new Intl.DateTimeFormat("en", { day: "2-digit" }).format(givenDt);
   return `${dtY}-${dtM}-${dtD}`;
+}
+
+export function dsToDt(dateStr: string): Date {
+  const [year, month, date] = dateStr.split("-");
+  return new Date(Number(year), Number(month) - 1, Number(date));
+}
+
+export function getWeekOfYear(givenDt: Date): number {
+  const yFirstDt = new Date(givenDt.getFullYear(), 0, 1);
+  return Math.ceil(
+    ((givenDt.getTime() - yFirstDt.getTime()) / 86400000 +
+      yFirstDt.getDay() +
+      1) /
+      7
+  );
+}
+
+export function getWeekOfYearFirstDt(baseDt: Date, week: number): Date {
+  const yFirstDt = new Date(baseDt.getFullYear(), 0, 1);
+  const days = (week - 1) * 7 - yFirstDt.getDay() + 1;
+  return new Date(baseDt.getFullYear(), 0, days);
+}
+
+export function isWeekOfYearFirstDt(givenDt: Date): boolean {
+  const yFirstDt = new Date(givenDt.getFullYear(), 0, 1);
+  return (
+    ((givenDt.getTime() - yFirstDt.getTime()) / 86400000 +
+      yFirstDt.getDay() +
+      1) %
+      7 ===
+    1
+  );
+}
+
+export function getQuarter(givenDt: Date): number {
+  return Math.floor((givenDt.getMonth() + 1) / 4) + 1;
+}
+
+export function getQuarterFirstDt(baseDt: Date, quarter: number): Date {
+  const month = (quarter - 1) * 3;
+  return new Date(baseDt.getFullYear(), Number(month), 1);
+}
+
+export function getHalfYear(givenDt: Date): number {
+  return Math.floor((givenDt.getMonth() + 1) / 6) + 1;
+}
+
+export function getHalfYearFirstDt(baseDt: Date, halfYear: number): Date {
+  const month = (halfYear - 1) * 6;
+  return new Date(baseDt.getFullYear(), Number(month), 1);
 }

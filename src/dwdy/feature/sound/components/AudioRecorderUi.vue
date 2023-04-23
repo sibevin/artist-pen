@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch } from "vue";
+import { computed } from "vue";
 import {
   mdiStop,
   mdiCircle,
@@ -9,6 +9,7 @@ import {
   mdiFolderMusic,
 } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
+import { useDwdyState } from "~/states/useDwdyState";
 import { useAudioState } from "~/dwdy/feature/sound/state/useAudioState";
 import { getDurationString } from "~/services/duration";
 import { importAudio } from "~/dwdy/feature/sound/action";
@@ -27,34 +28,40 @@ const ACCEPT_FORMATS = [
   "audio/webm",
 ] as const;
 
-const emit = defineEmits<{
-  (e: "store"): void;
-}>();
-
 const la = new LocaleActor("dwdy.feature.sound");
+const dwdyState = useDwdyState();
 const audioState = useAudioState();
 
-watch(
-  () => [audioState.recorder.value.storedRecords],
-  () => {
-    emit("store");
-  }
-);
+const recorderVisualDataSet = computed<Uint8Array>(() => {
+  audioState.tickKey.value;
+  console.log("vd", audioState.recorder.visualDataSet);
+  return audioState.recorder.visualDataSet;
+});
+
+const recorderDuration = computed<number>(() => {
+  audioState.tickKey.value;
+  return audioState.recorder.duration;
+});
+
+const recorderStatus = computed<string>(() => {
+  audioState.tickKey.value;
+  return audioState.recorder.status;
+});
 
 async function onRecordBtnClicked(): Promise<void> {
-  audioState.recorder.value.start();
+  audioState.recorder.start();
 }
 
 async function onRestartRecordingBtnClicked(): Promise<void> {
-  audioState.recorder.value.resume();
+  audioState.recorder.resume();
 }
 
 async function onSaveAndStopBtnClicked(): Promise<void> {
-  audioState.recorder.value.stop();
+  audioState.recorder.stop();
 }
 
 async function onSaveAndRecordBtnClicked(): Promise<void> {
-  audioState.recorder.value.stopAndStart();
+  audioState.recorder.stopAndStart();
 }
 
 async function onImportFileSelected(event: Event): Promise<void> {
@@ -67,7 +74,8 @@ async function onImportFileSelected(event: Event): Promise<void> {
     fr.onload = async () => {
       const result = fr.result as ArrayBuffer;
       if (result) {
-        await importAudio(file, result);
+        await importAudio(dwdyState.entry.value.identity, file, result);
+        await dwdyState.reloadEntry();
       }
     };
     fr.readAsArrayBuffer(file);
@@ -95,17 +103,16 @@ async function onImportFileSelected(event: Event): Promise<void> {
           <div class="grow relative h-16 border border-base-300 rounded-md">
             <AudioVisualizer
               class="absolute inset-0 h-full w-full text-base-200"
-              :data-set="audioState.recorder.value.visualDataSet"
+              :data-set="recorderVisualDataSet"
             ></AudioVisualizer>
           </div>
           <div class="px-5 font-bold text-primary">
             <div
               v-if="
-                audioState.recorder.value.status === 'recording' ||
-                audioState.recorder.value.status === 'paused'
+                recorderStatus === 'recording' || recorderStatus === 'paused'
               "
             >
-              {{ getDurationString(audioState.recorder.value.duration) }}
+              {{ getDurationString(recorderDuration) }}
             </div>
             <div v-else>
               {{ getDurationString(0) }}
@@ -114,10 +121,7 @@ async function onImportFileSelected(event: Event): Promise<void> {
         </div>
         <div class="w-full mt-4 flex md:hidden justify-center items-center">
           <label
-            v-if="
-              audioState.recorder.value.status === 'init' ||
-              audioState.recorder.value.status === 'stopped'
-            "
+            v-if="recorderStatus === 'init' || recorderStatus === 'stopped'"
             class="btn btn-ghost hover:bg-base-100"
           >
             <SvgIcon
@@ -136,7 +140,7 @@ async function onImportFileSelected(event: Event): Promise<void> {
             />
           </label>
           <button
-            v-if="audioState.recorder.value.isInRecording"
+            v-if="audioState.recorder.isInRecording"
             class="btn btn-ghost hover:bg-base-100"
             @click="onSaveAndRecordBtnClicked"
           >
@@ -151,10 +155,7 @@ async function onImportFileSelected(event: Event): Promise<void> {
         </div>
         <div class="w-full mb-2 flex justify-center items-center">
           <button
-            v-if="
-              audioState.recorder.value.status === 'init' ||
-              audioState.recorder.value.status === 'stopped'
-            "
+            v-if="recorderStatus === 'init' || recorderStatus === 'stopped'"
             class="btn btn-ghost hover:bg-base-100"
             @click="onRecordBtnClicked"
           >
@@ -167,9 +168,9 @@ async function onImportFileSelected(event: Event): Promise<void> {
             {{ la.t(".record") }}
           </button>
           <button
-            v-if="audioState.recorder.value.status === 'recording'"
+            v-if="recorderStatus === 'recording'"
             class="btn btn-ghost hover:bg-base-100"
-            @click="audioState.recorder.value.pause()"
+            @click="audioState.recorder.pause()"
           >
             <SvgIcon
               class="text-base-content mr-2"
@@ -180,7 +181,7 @@ async function onImportFileSelected(event: Event): Promise<void> {
             {{ la.t(".pause") }}
           </button>
           <button
-            v-if="audioState.recorder.value.status === 'paused'"
+            v-if="recorderStatus === 'paused'"
             class="btn btn-ghost hover:bg-base-100"
             @click="onRestartRecordingBtnClicked"
           >
@@ -195,7 +196,7 @@ async function onImportFileSelected(event: Event): Promise<void> {
           <button
             class="btn btn-ghost hover:bg-base-100"
             :class="
-              audioState.recorder.value.isInRecording
+              audioState.recorder.isInRecording
                 ? 'text-base-content'
                 : 'text-base-300'
             "
@@ -210,7 +211,7 @@ async function onImportFileSelected(event: Event): Promise<void> {
             {{ la.t(".stop") }}
           </button>
           <button
-            v-if="audioState.recorder.value.isInRecording"
+            v-if="audioState.recorder.isInRecording"
             class="hidden md:inline-flex btn btn-ghost hover:bg-base-100"
             @click="onSaveAndRecordBtnClicked"
           >
@@ -223,10 +224,7 @@ async function onImportFileSelected(event: Event): Promise<void> {
             {{ la.t(".saveAndRecord") }}
           </button>
           <label
-            v-if="
-              audioState.recorder.value.status === 'init' ||
-              audioState.recorder.value.status === 'stopped'
-            "
+            v-if="recorderStatus === 'init' || recorderStatus === 'stopped'"
             class="hidden md:inline-flex btn btn-ghost hover:bg-base-100"
           >
             <SvgIcon

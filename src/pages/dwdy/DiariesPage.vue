@@ -27,7 +27,7 @@ import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import ModalBase from "~/components/ModalBase.vue";
 import ModalSelector from "~/components/ModalSelector.vue";
-import DiaryCreationModal from "~/components/dwdy/DiaryCreationModal.vue";
+import DiaryCreationModal from "~/components/dwdy/DiariesPage/DiaryCreationModal.vue";
 
 useMeta({
   title: "Diaries",

@@ -18,6 +18,18 @@
       },
       "firstWeekDay": {
         "name": "Calendar started day"
+      },
+      "searchSort": {
+        "name": "Sorted by",
+        "options": {
+          "timestampDesc": "Date: Late> Early",
+          "timestampAsc": "Date: Early > Late"
+        }
+      }
+    },
+    "components": {
+      "SearchMain": {
+        "timeRange": "Date"
       }
     }
   },

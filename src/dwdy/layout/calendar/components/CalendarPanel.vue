@@ -5,7 +5,9 @@ import { useDwdyState } from "~/states/useDwdyState";
 import {
   dtToEntryTs,
   getNeighborDt,
+  getWeekOfYear,
   isSameDt,
+  isWeekOfYearFirstDt,
 } from "~/dwdy/services/dateUtils";
 import { DIndex } from "~/dwdy/types/core";
 import { WeekDay } from "~/dwdy/services/configOption";
@@ -140,20 +142,8 @@ const calendar = computed(() => {
   return { weekDayRow, rows };
 });
 
-function getRowWeekOfYear(rowIndex: number): number {
-  const mFirstDt = new Date(
-    currentDt.value.getFullYear(),
-    currentDt.value.getMonth(),
-    1
-  );
-  const yFirstDt = new Date(currentDt.value.getFullYear(), 0, 1);
-  const mFirstWeek = Math.ceil(
-    ((mFirstDt.getTime() - yFirstDt.getTime()) / 86400000 +
-      yFirstDt.getDay() +
-      1) /
-      7
-  );
-  return mFirstWeek + rowIndex;
+function getRowWeekOfYear(row: Date[]): string {
+  return String(getWeekOfYear(row[0]));
 }
 
 function isHighlightedWeekDay(givenDt: Date): boolean {
@@ -244,21 +234,36 @@ function moveToDate(givenDt: Date): void {
       <div
         v-if="diaryConfig.isWeekShown"
         :key="rowIndex"
-        class="h-11 w-11 xl:h-20 text-sm text-base-600 border flex items-center justify-center"
+        class="h-14 w-11 xl:h-20 text-sm text-base-600 border flex items-center justify-center"
       >
-        {{ getRowWeekOfYear(rowIndex) }}
+        {{ getRowWeekOfYear(row) }}
       </div>
       <button
-        v-for="dt in row"
+        v-for="(dt, colIndex) of row"
         :key="dt.getTime()"
-        class="h-11 w-11 xl:h-20 xl:w-20 border flex flex-col items-start justify-between"
+        class="h-14 w-11 xl:h-20 xl:w-20 border flex flex-col items-stretch justify-between"
         :class="dtBlockStyle(dt)"
         @click="moveToDate(dt)"
       >
-        <div class="text-xs p-0.5 xl:text-sm xl:p-2" :class="dtDateStyle(dt)">
-          {{ dt.getDate() }}
+        <div class="flex justify-between">
+          <div
+            class="text-xs p-0.5 rounded-br xl:text-sm xl:p-2 xl:rounded-br-lg"
+            :class="dtDateStyle(dt)"
+          >
+            {{ dt.getDate() }}
+          </div>
+          <div
+            v-if="
+              diaryConfig.isWeekShown &&
+              colIndex !== 0 &&
+              isWeekOfYearFirstDt(dt)
+            "
+            class="text-xs p-0.5 xl:text-sm xl:p-1 xl:m-1 text-base-100 bg-base-300"
+          >
+            {{ getWeekOfYear(dt) }}
+          </div>
         </div>
-        <div class="w-full flex justify-end" :class="dtIconStyle(dt)">
+        <div class="flex justify-end" :class="dtIconStyle(dt)">
           <DisplayIconPanel
             :display-icons="dtDisplayIcons(dt)"
           ></DisplayIconPanel>

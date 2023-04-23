@@ -8,7 +8,7 @@ import {
   DiaryFontFamily,
   DiaryFontFormatSize,
 } from "~/dwdy/services/configOption";
-import { TagValue } from "~/dwdy/feature/tag";
+import { TagValue } from "~/dwdy/feature/tag/def";
 
 export interface DiaryConfigAttrs {
   highlightedWeekDays: WeekDay[];

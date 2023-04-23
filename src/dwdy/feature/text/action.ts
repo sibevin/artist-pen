@@ -1,26 +1,22 @@
 import { dbDwdy } from "~/services/db/dwdy";
-import { useDwdyState } from "~/states/useDwdyState";
+import { DiaryEntryIdentityParams } from "~/dwdy/types/core";
+import { Diary } from "~/models/dwdy/diary";
 import { getStringBytes } from "~/services/file";
 import { DiaryFeature } from "~/dwdy/feature/def";
-import { FeatureMeta, FeatureStat } from "~/dwdy/feature/text/def";
-
-const DEFAULT_STAT = {
-  count: 0,
-  fileSize: 0,
-  words: 0,
-  letters: 0,
-};
+import {
+  FeatureMeta,
+  FeatureStat,
+  DEFAULT_FEATURE_STAT,
+} from "~/dwdy/feature/text/def";
 
 async function updateDiaryTextStat(
+  diary: Diary,
   statDelta: Partial<FeatureStat>
 ): Promise<void> {
-  const dwdyState = useDwdyState();
-  let stat = dwdyState.diary.value.fetchStat<DiaryFeature.Text>(
-    DiaryFeature.Text
-  );
+  let stat = diary.fetchStat<DiaryFeature.Text>(DiaryFeature.Text);
   if (!stat) {
     if (statDelta.count && statDelta.count > 0) {
-      stat = Object.assign({}, DEFAULT_STAT);
+      stat = Object.assign({}, DEFAULT_FEATURE_STAT);
     } else {
       return;
     }
@@ -29,8 +25,8 @@ async function updateDiaryTextStat(
   stat["fileSize"] += statDelta.fileSize || 0;
   stat["words"] += statDelta.words || 0;
   stat["letters"] += statDelta.letters || 0;
-  dwdyState.diary.value.assignStat<DiaryFeature.Text>(DiaryFeature.Text, stat);
-  await dwdyState.diary.value.save();
+  diary.assignStat<DiaryFeature.Text>(DiaryFeature.Text, stat);
+  await diary.save();
 }
 
 function getTextBytes(text: FeatureMeta): number {
@@ -45,57 +41,67 @@ function getTextLetters(text: FeatureMeta): number {
   return text.raw.replace(/\s/g, "").length;
 }
 
-export async function addText(text: FeatureMeta): Promise<void> {
+export async function addText(
+  dei: DiaryEntryIdentityParams,
+  text: FeatureMeta
+): Promise<void> {
   await dbDwdy.transaction(
     "rw",
     dbDwdy.diaryEntries,
     dbDwdy.diaries,
     async () => {
-      const dwdyState = useDwdyState();
-      dwdyState.entry.value.appendContent<DiaryFeature.Text>(
-        DiaryFeature.Text,
-        text
-      );
-      await dwdyState.entry.value.save();
-      await updateDiaryTextStat({
+      const fetchedResult = await Diary.fetchDiaryAndEntry(dei);
+      if (!fetchedResult) {
+        return Promise<void>;
+      }
+      const { diary, entry } = fetchedResult;
+      entry.appendContent<DiaryFeature.Text>(DiaryFeature.Text, text);
+      await entry.save();
+      await updateDiaryTextStat(diary, {
         count: 1,
         fileSize: getTextBytes(text),
         words: getTextWords(text),
         letters: getTextLetters(text),
       });
-      dwdyState.updateEntry(dwdyState.entry.value.doc);
     }
   );
 }
 
-export async function deleteText(index: number): Promise<void> {
+export async function deleteText(
+  dei: DiaryEntryIdentityParams,
+  index: number
+): Promise<void> {
   await dbDwdy.transaction(
     "rw",
     dbDwdy.diaryEntries,
     dbDwdy.diaries,
     async () => {
-      const dwdyState = useDwdyState();
-      const oriText = dwdyState.entry.value.fetchContent<DiaryFeature.Text>(
+      const fetchedResult = await Diary.fetchDiaryAndEntry(dei);
+      if (!fetchedResult) {
+        return Promise<void>;
+      }
+      const { diary, entry } = fetchedResult;
+      const oriText = entry.fetchContent<DiaryFeature.Text>(
         DiaryFeature.Text,
         index
       );
       if (!oriText) {
         return;
       }
-      dwdyState.entry.value.deleteContent(DiaryFeature.Text, index);
-      await dwdyState.entry.value.save();
-      await updateDiaryTextStat({
+      entry.deleteContent(DiaryFeature.Text, index);
+      await entry.save();
+      await updateDiaryTextStat(diary, {
         count: -1,
         fileSize: -getTextBytes(oriText),
         words: -getTextWords(oriText),
         letters: -getTextLetters(oriText),
       });
-      dwdyState.updateEntry(dwdyState.entry.value.doc);
     }
   );
 }
 
 export async function updateText(
+  dei: DiaryEntryIdentityParams,
   text: FeatureMeta,
   index: number
 ): Promise<void> {
@@ -104,22 +110,25 @@ export async function updateText(
     dbDwdy.diaryEntries,
     dbDwdy.diaries,
     async () => {
-      const dwdyState = useDwdyState();
-      let oriText = dwdyState.entry.value.fetchContent<DiaryFeature.Text>(
+      const fetchedResult = await Diary.fetchDiaryAndEntry(dei);
+      if (!fetchedResult) {
+        return Promise<void>;
+      }
+      const { diary, entry } = fetchedResult;
+      let oriText = entry.fetchContent<DiaryFeature.Text>(
         DiaryFeature.Text,
         index
       );
       if (!oriText) {
         oriText = { raw: "", html: "" };
       }
-      dwdyState.entry.value.assignContent(DiaryFeature.Text, index, text);
-      await dwdyState.entry.value.save();
-      await updateDiaryTextStat({
+      entry.assignContent(DiaryFeature.Text, index, text);
+      await entry.save();
+      await updateDiaryTextStat(diary, {
         fileSize: getTextBytes(text) - getTextBytes(oriText),
         words: getTextWords(text) - getTextWords(oriText),
         letters: getTextLetters(text) - getTextLetters(oriText),
       });
-      dwdyState.updateEntry(dwdyState.entry.value.doc);
     }
   );
 }

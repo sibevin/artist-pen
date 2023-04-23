@@ -12,8 +12,8 @@ const router = createRouter({
 });
 router.beforeEach(() => {
   const audioState = useAudioState();
-  audioState.recorder.value.stop();
-  audioState.player.stop();
+  audioState.stopAllAudioDevices();
+  audioState.recorder.stopCallback = undefined;
   audioState.player.endCallback = undefined;
 });
 

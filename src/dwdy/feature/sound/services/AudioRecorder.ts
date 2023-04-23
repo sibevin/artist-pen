@@ -1,10 +1,13 @@
 import { genUid } from "~/services/db";
-import { AudioRecorderProcessor, AudioRecord } from "./AudioRecorderProcessor";
+import { AudioRecord } from "~/dwdy/feature/sound/def";
+import { AudioRecorderProcessor } from "./AudioRecorderProcessor";
 
 export class AudioRecorder {
   private _currentProcessor?: AudioRecorderProcessor;
   private _currentPUid?: string;
   private _storedProcessorMap: Record<string, AudioRecorderProcessor> = {};
+  private _tickFn?: () => void = undefined;
+  private _stopCallback?: (record: AudioRecord) => void = undefined;
 
   get status(): string {
     if (this._currentProcessor) {
@@ -53,9 +56,23 @@ export class AudioRecorder {
     return recordMap;
   }
 
+  set tickFn(givenFn: () => void) {
+    this._tickFn = givenFn;
+  }
+
+  set stopCallback(givenFn: ((record: AudioRecord) => void) | undefined) {
+    this._stopCallback = givenFn;
+  }
+
   public async start(): Promise<string | undefined> {
     if (!this._currentProcessor) {
       this._currentProcessor = new AudioRecorderProcessor();
+      if (this._tickFn) {
+        this._currentProcessor.tickFn = this._tickFn;
+      }
+      if (this._stopCallback) {
+        this._currentProcessor.stopCallback = this._stopCallback;
+      }
       await this._currentProcessor.setupRecorder();
       this._currentPUid = genUid();
     }

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 import { mdiCheck, mdiClose } from "@mdi/js";
-import ModalBase from "~/components/ModalBase.vue";
-import SvgIcon from "~/components/SvgIcon.vue";
 import { useAppState } from "~/states/useAppState";
 import { LocaleActor } from "~/services/locale";
+import ModalBase from "~/components/ModalBase.vue";
+import SvgIcon from "~/components/SvgIcon.vue";
 
 const props = defineProps({
   currentDt: {

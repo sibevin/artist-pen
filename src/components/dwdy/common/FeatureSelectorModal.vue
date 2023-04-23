@@ -87,20 +87,20 @@ function onContentEditorOpen(feature: DiaryFeature): void {
             @click="onContentEditorOpen(feature)"
           >
             <SvgIcon
-              class="mr-2 text-base-200"
+              class="mr-3 text-base-200"
               :icon-set="featureIcon(feature).set"
               :path="featureIcon(feature).path"
-              :size="54"
+              :size="32"
             ></SvgIcon>
             <div class="indicator">
-              <div class="text-lg flex items-center text-primary">
+              <div class="flex items-center text-primary">
                 {{ featureText(feature, la) }}
                 <SvgIcon
                   v-if="!dwdyState.entry.value.hasContent(feature)"
                   class="ml-2"
                   icon-set="mdi"
                   :path="mdiPlus"
-                  :size="24"
+                  :size="16"
                 ></SvgIcon>
               </div>
             </div>

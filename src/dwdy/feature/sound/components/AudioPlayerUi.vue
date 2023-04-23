@@ -42,13 +42,13 @@ const playerStereoPan = ref<number>(props.config.stereoPan);
 const playerIsMuted = ref<boolean>(false);
 
 const playerStatus = computed<string>(() => {
-  audioState.refreshKey.value;
+  audioState.tickKey.value;
   return audioState.player.status;
 });
 
 const playerCurrentTimeBinding = computed<number>({
   get() {
-    audioState.refreshKey.value;
+    audioState.tickKey.value;
     return audioState.player.currentTime;
   },
   set(value: number) {
@@ -58,7 +58,7 @@ const playerCurrentTimeBinding = computed<number>({
 
 const playerVolumeBinding = computed<number>({
   get() {
-    audioState.refreshKey.value;
+    audioState.tickKey.value;
     return playerVolume.value;
   },
   set(value: number) {

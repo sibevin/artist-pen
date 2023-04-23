@@ -32,7 +32,7 @@ export function buildDisplayIcons(
         });
         i++;
       }
-      if (icons.length > 1) {
+      if (icons.length > 0) {
         break;
       }
     }
@@ -58,6 +58,7 @@ export function buildDisplayIcons(
       .map((code) => {
         return { stickerCode: code };
       });
+    icons = (icons[0] && [icons[0]]) || [];
   }
   return icons;
 }

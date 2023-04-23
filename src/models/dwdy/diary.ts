@@ -2,7 +2,7 @@ import { uniq } from "lodash";
 import { genUid } from "~/services/db";
 import { dbDwdy } from "~/services/db/dwdy";
 import { BaseModel } from "~/models/baseModel";
-import { DIndex } from "~/dwdy/types/core";
+import { DIndex, DiaryEntryIdentityParams } from "~/dwdy/types/core";
 import { DiarySortedBy } from "~/dwdy/services/configOption";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import {
@@ -12,7 +12,7 @@ import {
   defaultFeatureConfig,
   defaultFeatureStat,
 } from "~/dwdy/feature/map";
-import { DiaryLayout, DiaryLayoutComponent } from "~/dwdy/layout/def";
+import { DiaryLayout } from "~/dwdy/layout/def";
 import { defaultLayoutConfig, DiaryLayoutConfigMap } from "~/dwdy/layout/map";
 import {
   DiaryEntry,
@@ -24,8 +24,8 @@ import {
   DiaryConfigAttrs,
   DiaryConfigParams,
 } from "~/models/dwdy/config";
+import { SearchQuery } from "~/dwdy/types/search";
 import { AppError } from "~/models/app/error";
-import { layoutComponent } from "~/dwdy/layout/component";
 
 export interface DiaryTemplate {
   mobile: DiaryFeature[];
@@ -47,6 +47,7 @@ export interface DiaryAttrs {
     content: Partial<DiaryFeatureConfigMap>;
     layout: Partial<DiaryLayoutConfigMap>;
   };
+  searchHistories: SearchQuery[];
 }
 export type DiaryParams = Partial<DiaryAttrs>;
 
@@ -89,6 +90,7 @@ export const DEFAULT_ATTRS: DiaryAttrs = Object.assign(
       content: {},
       layout: {},
     },
+    searchHistories: [],
   }
 );
 
@@ -112,6 +114,23 @@ export class Diary implements BaseModel<Diary, DiaryDoc, DiaryParams> {
       return null;
     }
     return new Diary(dDoc);
+  }
+
+  static async fetchDiaryAndEntry(
+    dei: DiaryEntryIdentityParams
+  ): Promise<{ diary: Diary; entry: DiaryEntry } | false> {
+    if (!dei.dUid || !dei.dIndex) {
+      return false;
+    }
+    const diary = await Diary.fetch(dei.dUid);
+    if (!diary) {
+      return false;
+    }
+    const entry = await diary.fetchEntry({ dIndex: dei.dIndex });
+    if (!entry) {
+      return false;
+    }
+    return { diary, entry };
   }
 
   static async list({
@@ -228,10 +247,6 @@ export class Diary implements BaseModel<Diary, DiaryDoc, DiaryParams> {
       (feature) => !this.enabledFeatures.includes(feature as DiaryFeature)
     ) as DiaryFeature[];
     return features;
-  }
-
-  layoutComponent(componentType: keyof DiaryLayoutComponent) {
-    return layoutComponent(this.doc.layout, componentType);
   }
 
   get firstEntry(): Promise<DiaryEntry | null> {

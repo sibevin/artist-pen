@@ -46,6 +46,8 @@ export interface SoundTrack extends SoundSource {
   duration: number;
 }
 
+export type AudioRecord = { chunks: Array<Blob>; duration: number };
+
 export const FEATURE_ICON: DiaryFeatureIcon = {
   main: { set: "mdi", path: mdiVolumeSource },
   create: { set: "mdi", path: mdiVolumePlus },

@@ -1,8 +1,7 @@
-import fixWebmDuration from "fix-webm-duration";
+// import fixWebmDuration from "fix-webm-duration";
+import { AudioRecord } from "~/dwdy/feature/sound/def";
 
 const RECORD_TIME_SLICE = 100;
-
-export type AudioRecord = { dataUrl: string; duration: number; blob: Blob };
 
 class RecordingTimer {
   private _duration = 0;
@@ -46,6 +45,8 @@ export class AudioRecorderProcessor {
   private _duration = 0;
   private _storedAudio?: AudioRecord;
   private _recordingTimer: RecordingTimer = new RecordingTimer();
+  private _tickFn?: () => void = undefined;
+  private _stopCallback?: (record: AudioRecord) => void = undefined;
 
   async setupRecorder(): Promise<void> {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -60,6 +61,7 @@ export class AudioRecorderProcessor {
         this.buildRecorder(stream);
         this.setupAudioGraph(stream);
         this._status = "ready";
+        this.tick();
       }
     } catch (err) {
       this.setupErrorState(err as DOMException);
@@ -98,6 +100,14 @@ export class AudioRecorderProcessor {
     return this._duration;
   }
 
+  set tickFn(givenFn: () => void) {
+    this._tickFn = givenFn;
+  }
+
+  set stopCallback(givenFn: (record: AudioRecord) => void) {
+    this._stopCallback = givenFn;
+  }
+
   async start(): Promise<void> {
     if (this._recorder && this._status === "ready") {
       this._duration = 0;
@@ -110,6 +120,7 @@ export class AudioRecorderProcessor {
         this.setupErrorState(e as DOMException);
       }
     }
+    this.tick();
   }
 
   pause(): void {
@@ -118,6 +129,7 @@ export class AudioRecorderProcessor {
       this._recorder.pause();
       this._status = "paused";
     }
+    this.tick();
   }
 
   stop(): void {
@@ -126,6 +138,7 @@ export class AudioRecorderProcessor {
       this._recordingTimer.stop();
       this._status = "stopped";
     }
+    this.tick();
   }
 
   resume(): void {
@@ -134,6 +147,7 @@ export class AudioRecorderProcessor {
       this._recorder.resume();
       this._status = "recording";
     }
+    this.tick();
   }
 
   private isChunkEmpty(): boolean {
@@ -152,24 +166,36 @@ export class AudioRecorderProcessor {
       this._audioChunks.push(event.data);
       this.buildVisualData();
       this._duration += RECORD_TIME_SLICE / 1000;
+      this.tick();
     };
     this._recorder.onstop = async () => {
+      this.tick();
+      this._tickFn = undefined;
       if (this.isChunkEmpty()) {
         return;
       }
-      const rawBlob = new Blob(this._audioChunks, {
-        type: "audio/webm;codecs=opus",
-      });
-      const blob = await fixWebmDuration(
-        rawBlob,
-        this._recordingTimer.duration
-      );
-      this._visualDataSet = new Uint8Array();
       this._storedAudio = {
-        dataUrl: URL.createObjectURL(blob),
+        chunks: this._audioChunks,
         duration: this._recordingTimer.duration,
-        blob: blob,
       };
+      // const rawBlob = new Blob(this._audioChunks, {
+      //   type: "audio/webm;codecs=opus",
+      // });
+      // const blob = await fixWebmDuration(
+      //   rawBlob,
+      //   this._recordingTimer.duration
+      // );
+      // this._visualDataSet = new Uint8Array();
+      // this._storedAudio = {
+      //   chunks: this._audioChunks,
+      //   dataUrl: URL.createObjectURL(blob),
+      //   duration: this._recordingTimer.duration,
+      //   blob: blob,
+      // };
+      if (this._stopCallback) {
+        this._stopCallback(this._storedAudio);
+        this._stopCallback = undefined;
+      }
     };
   }
 
@@ -215,6 +241,12 @@ export class AudioRecorderProcessor {
       default:
         this._errorReason = "unknown";
         break;
+    }
+  }
+
+  private tick(): void {
+    if (this._tickFn) {
+      this._tickFn();
     }
   }
 }

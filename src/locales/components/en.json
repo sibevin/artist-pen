@@ -1,10 +1,33 @@
 {
+  "input": {
+    "DateRangeSelector": {
+      "selectDateRange": "Select particular dates",
+      "predefined": {
+        "1w": "The recent week (7 days)",
+        "1m": "The recent month (30 days)",
+        "1q": "The recent quarter (120 days)",
+        "1h": "The recent 6 months (180 days)",
+        "1y": "The recent year (360 days)"
+      },
+      "from": "From: ",
+      "to": "To: ",
+      "indefinite": "Indefinite",
+      "invalidDateRange": "Invalid time range"
+    }
+  },
   "dwdy": {
     "diaryContent": {
       "DeletionModal": {
         "deletionHint_zero": "Please select items to delete.",
         "deletionHint_one": "An item is selected, are your sure to delete it?",
         "deletionHint_other": "{{count}} items are selected, are your sure to delete them?"
+      }
+    },
+    "DiaryPage": {
+      "SearchModal": {
+        "queryHint": "Content or comment keywords",
+        "searchHistory": "Search history",
+        "clear": "Clear query"
       }
     }
   }

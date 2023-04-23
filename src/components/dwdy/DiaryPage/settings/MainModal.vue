@@ -6,9 +6,9 @@ import { useAppState } from "~/states/useAppState";
 
 import SvgIcon from "~/components/SvgIcon.vue";
 import ModalBase from "~/components/ModalBase.vue";
-import DiarySettingsGeneralPanel from "~/components/dwdy/diarySettings/GeneralPanel.vue";
-import DiarySettingsFeaturePanel from "~/components/dwdy/diarySettings/FeaturePanel.vue";
-import DiarySettingsDataPanel from "~/components/dwdy/diarySettings/DataPanel.vue";
+import DiarySettingsGeneralPanel from "~/components/dwdy/DiaryPage/settings/GeneralPanel.vue";
+import DiarySettingsFeaturePanel from "~/components/dwdy/DiaryPage/settings/FeaturePanel.vue";
+import DiarySettingsDataPanel from "~/components/dwdy/DiaryPage/settings/DataPanel.vue";
 
 interface Props {
   modelValue: boolean;

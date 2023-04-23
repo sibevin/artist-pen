@@ -1,6 +1,7 @@
 {
   "serviceName": "藝術家的筆",
   "action": {
+    "apply": "套用",
     "cancel": "取消",
     "changeOrder": "變更順序",
     "close": "關閉",

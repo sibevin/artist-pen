@@ -4,16 +4,17 @@ import { useRouter, useRoute } from "vue-router";
 import { mdiFileEditOutline } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
+import { layoutComponent } from "~/dwdy/layout/component";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { featureComponent } from "~/dwdy/feature/component";
 import { DiaryContentFeatureIndex } from "~/dwdy/types/core";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
-import DiaryEditorFeatureSelectorModal from "~/components/dwdy/diaryEditor/FeatureSelectorModal.vue";
-import DiaryEditorPositionChangeModal from "~/components/dwdy/diaryEditor/PositionChangeModal.vue";
-import DiaryEditorDeletionModal from "~/components/dwdy/diaryEditor/DeletionModal.vue";
-import DiaryEditorJumpModal from "~/components/dwdy/diaryEditor/JumpModal.vue";
-import ControlMenu from "~/components/dwdy/diaryEditor/ControlMenu.vue";
+import DiaryEditorFeatureSelectorModal from "~/components/dwdy/common/FeatureSelectorModal.vue";
+import DiaryEditorPositionChangeModal from "~/components/dwdy/DiaryEditorPage/PositionChangeModal.vue";
+import DiaryEditorDeletionModal from "~/components/dwdy/DiaryEditorPage/DeletionModal.vue";
+import DiaryEditorJumpModal from "~/components/dwdy/DiaryEditorPage/JumpModal.vue";
+import ControlMenu from "~/components/dwdy/DiaryEditorPage/ControlMenu.vue";
 import {
   initDwdyStateByRoute,
   insertEntryByRoute,
@@ -119,7 +120,7 @@ function onMenuEntriesChanged(entries: string[] = []) {
     </div>
     <template #header-title>
       <component
-        :is="dwdyState.diary.value.layoutComponent('titlePanel')"
+        :is="layoutComponent(dwdyState.diary.value.doc.layout, 'titlePanel')"
       ></component>
     </template>
     <template #header-panel>

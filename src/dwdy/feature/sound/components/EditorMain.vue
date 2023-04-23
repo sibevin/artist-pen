@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, nextTick } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
+import { useWorkerState } from "~/states/useWorkerState";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { featureIcon } from "~/dwdy/feature/map";
 import { FeatureMeta, FeatureConfig } from "~/dwdy/feature/sound/def";
-import { addSound } from "~/dwdy/feature/sound/action";
-import { AudioRecord } from "~/dwdy/feature/sound/services/AudioRecorderProcessor";
+// import { addSound } from "~/dwdy/feature/sound/action";
+import { AudioRecord } from "~/dwdy/feature/sound/def";
 import { useAudioState } from "~/dwdy/feature/sound/state/useAudioState";
 import { FileSizeDisplay, displayFileSize } from "~/services/file";
-import { buildDtString } from "~/dwdy/services/dateUtils";
+import { dtToDs } from "~/dwdy/services/dateUtils";
 import SvgIcon from "~/components/SvgIcon.vue";
 import PaginationPanel from "~/components/PaginationPanel.vue";
 import AudioRecorderUi from "~/dwdy/feature/sound/components/AudioRecorderUi.vue";
 import AudioPlayerUi from "~/dwdy/feature/sound/components/AudioPlayerUi.vue";
 import RichTextEditor from "~/components/input/RichTextEditor.vue";
-// import testMp3 from "~/assets/audio/test.mp3";
 
 const props = defineProps({
   contentCount: {
@@ -43,16 +43,28 @@ const soundMeta = ref<FeatureMeta>();
 const fileSize = ref<FileSizeDisplay>({ unit: "kb", amount: "" });
 const soundComment = ref<string>();
 const soundCommentEditor = ref();
-const isRecorderShown = ref(false);
+const isRecorderShown = ref(true);
 const audioRecorderUi = ref();
 const audioPlayerUi = ref();
 const audioState = useAudioState();
-const storedRecords = ref<
-  Record<
-    string,
-    { record: AudioRecord; status: "init" | "processing" | "done" }
-  >
->({});
+const workerState = useWorkerState();
+// const storedRecords = ref<
+//   Record<
+//     string,
+//     { record: AudioRecord; status: "init" | "processing" | "done" }
+//   >
+// >({});
+
+audioState.recorder.stopCallback = async (record: AudioRecord) => {
+  if (dwdyState.entry.value.doc.dUid && dwdyState.entry.value.doc.dIndex) {
+    await workerState.sound.createSound({
+      dUid: dwdyState.entry.value.doc.dUid,
+      dIndex: dwdyState.entry.value.doc.dIndex,
+      record,
+    });
+    await dwdyState.reloadEntry();
+  }
+};
 
 const currentPage = computed<number>(() => {
   if (isRecorderShown.value) {
@@ -76,7 +88,7 @@ const soundDownloadFileName = computed<string>(() => {
     : "";
   const pageStr = String(currentPage.value).padStart(3, "0");
   if (entryDt) {
-    return `${buildDtString(entryDt)}_${pageStr}${fileSuffix}`;
+    return `${dtToDs(entryDt)}_${pageStr}${fileSuffix}`;
   }
   return `${dwdyState.entry.value.doc.dUid}_${pageStr}${fileSuffix}`;
 });
@@ -84,8 +96,10 @@ const soundDownloadFileName = computed<string>(() => {
 watch(
   () => [props.contentIndex],
   async () => {
-    audioState.stopAllAudioDevices();
-    await initSoundEditor();
+    if (!isRecorderShown.value) {
+      audioState.stopAllAudioDevices();
+      await initSoundEditor();
+    }
   }
 );
 
@@ -177,35 +191,32 @@ async function onCommentChanged(text: {
   }
 }
 
-async function onRecorderStored(): Promise<void> {
-  const stateStoredRecords = audioState.recorder.value.storedRecords;
-  Object.keys(stateStoredRecords).forEach((key) => {
-    const stateStoredRecord = stateStoredRecords[key];
-    const storedRecord = storedRecords.value[key];
-    if (stateStoredRecord && !storedRecord) {
-      storedRecords.value[key] = {
-        record: Object.assign(
-          {},
-          audioState.recorder.value.pullStoredAudio(key)
-        ),
-        status: "init",
-      };
-    }
-  });
-  Object.keys(storedRecords.value).forEach(async (key) => {
-    const storedRecord = storedRecords.value[key];
-    if (storedRecord) {
-      if (storedRecord.status === "init") {
-        storedRecord.status = "processing";
-        await addSound(storedRecord.record.blob, storedRecord.record.duration);
-        storedRecord.status = "done";
-      }
-      if (storedRecord.status === "done") {
-        delete storedRecords.value[key];
-      }
-    }
-  });
-}
+// async function onRecorderStored(): Promise<void> {
+//   const stateStoredRecords = audioState.recorder.storedRecords;
+//   Object.keys(stateStoredRecords).forEach((key) => {
+//     const stateStoredRecord = stateStoredRecords[key];
+//     const storedRecord = storedRecords.value[key];
+//     if (stateStoredRecord && !storedRecord) {
+//       storedRecords.value[key] = {
+//         record: Object.assign({}, audioState.recorder.pullStoredAudio(key)),
+//         status: "init",
+//       };
+//     }
+//   });
+//   Object.keys(storedRecords.value).forEach(async (key) => {
+//     const storedRecord = storedRecords.value[key];
+//     if (storedRecord) {
+//       if (storedRecord.status === "init") {
+//         storedRecord.status = "processing";
+//         await addSound(storedRecord.record.blob, storedRecord.record.duration);
+//         storedRecord.status = "done";
+//       }
+//       if (storedRecord.status === "done") {
+//         delete storedRecords.value[key];
+//       }
+//     }
+//   });
+// }
 
 function onRecorderSelected(): void {
   audioState.stopAllAudioDevices();
@@ -228,11 +239,7 @@ function onCurrentPageSelected(): void {
       class="grow min-h-0 overflow-y-auto"
       :class="{ hidden: contentCount !== 0 && !isRecorderShown }"
     >
-      <AudioRecorderUi
-        ref="audioRecorderUi"
-        class="h-full"
-        @store="onRecorderStored"
-      ></AudioRecorderUi>
+      <AudioRecorderUi ref="audioRecorderUi" class="h-full"></AudioRecorderUi>
     </div>
     <div
       class="grow min-h-0 overflow-y-auto flex flex-col"

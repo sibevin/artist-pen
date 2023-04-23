@@ -66,25 +66,6 @@ const currentSoundTrack = computed<SoundTrack | undefined>(() => {
 });
 
 initPlayer();
-audioState.player.endCallback = () => {
-  const nextIndex = chooseNextTrackIndex(
-    playerConfig.value,
-    currentSoundTrackIndex.value,
-    soundTracks.value.length,
-    randomPlayedIndexes
-  );
-  if (nextIndex !== null) {
-    if (playerConfig.value.isShuffleOn) {
-      if (randomPlayedIndexes.length === soundTracks.value.length) {
-        randomPlayedIndexes.splice(0);
-      }
-      randomPlayedIndexes.push(nextIndex);
-    }
-    switchTrack(nextIndex, true);
-  } else {
-    audioState.player.stop();
-  }
-};
 
 watch(
   () => [props.soundSources],
@@ -99,6 +80,25 @@ function initPlayer(): void {
   });
   currentSoundTrackIndex.value = 0;
   loadTrack();
+  audioState.player.endCallback = () => {
+    const nextIndex = chooseNextTrackIndex(
+      playerConfig.value,
+      currentSoundTrackIndex.value,
+      soundTracks.value.length,
+      randomPlayedIndexes
+    );
+    if (nextIndex !== null) {
+      if (playerConfig.value.isShuffleOn) {
+        if (randomPlayedIndexes.length === soundTracks.value.length) {
+          randomPlayedIndexes.splice(0);
+        }
+        randomPlayedIndexes.push(nextIndex);
+      }
+      switchTrack(nextIndex, true);
+    } else {
+      audioState.player.stop();
+    }
+  };
 }
 
 function loadTrack(playFrom?: number): void {
@@ -130,7 +130,7 @@ function currentRepectIcon(): string {
 
 const playerCurrentTimeBinding = computed<number>({
   get() {
-    audioState.refreshKey.value;
+    audioState.tickKey.value;
     return audioState.player.currentTime;
   },
   set(value: number) {
@@ -143,7 +143,7 @@ const playerCurrentTimeBinding = computed<number>({
 
 const playerVolumeBinding = computed<number>({
   get() {
-    audioState.refreshKey.value;
+    audioState.tickKey.value;
     return playerConfig.value.volume;
   },
   set(value: number) {
@@ -561,6 +561,9 @@ function switchPlayerIsMuted(): void {
           </div>
         </div>
       </div>
+    </div>
+    <div>
+      {{ currentSoundTrackIndex }}
     </div>
     <div
       v-for="(soundTrack, index) in soundTracks"

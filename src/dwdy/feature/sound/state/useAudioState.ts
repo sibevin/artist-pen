@@ -1,23 +1,26 @@
 import { ref } from "vue";
 import { createGlobalState } from "@vueuse/core";
 import { AudioRecorder } from "~/dwdy/feature/sound/services/AudioRecorder";
-import { AudioPlayerProcessor } from "../services/AudioPlayerProcessor";
+import { AudioPlayerProcessor } from "~/dwdy/feature/sound/services/AudioPlayerProcessor";
 
 export const useAudioState = createGlobalState(() => {
-  const recorder = ref<AudioRecorder>(new AudioRecorder());
+  const recorder: AudioRecorder = new AudioRecorder();
   const player: AudioPlayerProcessor = new AudioPlayerProcessor();
-  const refreshKey = ref<number>(1);
-  player.refreshFn = () => {
-    refreshKey.value *= -1;
+  const tickKey = ref<number>(1);
+  recorder.tickFn = () => {
+    tickKey.value *= -1;
+  };
+  player.tickFn = () => {
+    tickKey.value *= -1;
   };
   function stopAllAudioDevices(): void {
-    recorder.value.stop();
+    recorder.stop();
     player.stop();
   }
   return {
     recorder,
     player,
-    refreshKey,
+    tickKey,
     stopAllAudioDevices,
   };
 });

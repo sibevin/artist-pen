@@ -4,7 +4,6 @@ import {
   DiaryAttachment,
   DiaryAttachmentDoc,
 } from "~/models/dwdy/diaryAttachment";
-import { useDwdyState } from "~/states/useDwdyState";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import {
   SoundFrom,
@@ -12,31 +11,20 @@ import {
   FeatureMeta,
   FeatureStat,
   SoundSource,
+  DEFAULT_FEATURE_STAT,
 } from "~/dwdy/feature/sound/def";
-import { DUid } from "~/dwdy/types/core";
+import { DUid, DiaryEntryIdentityParams } from "~/dwdy/types/core";
+import { Diary } from "~/models/dwdy/diary";
 import { displayFileName, genRandomFileName } from "~/services/file";
 
-const DEFAULT_META: FeatureMeta = {
-  fileSize: 0,
-  duration: 0,
-};
-
-const DEFAULT_STAT: FeatureStat = {
-  count: 0,
-  fileSize: 0,
-  duration: 0,
-};
-
 async function updateDiarySoundStat(
+  diary: Diary,
   statDelta: Partial<FeatureStat>
 ): Promise<void> {
-  const dwdyState = useDwdyState();
-  let stat = dwdyState.diary.value.fetchStat<DiaryFeature.Sound>(
-    DiaryFeature.Sound
-  );
+  let stat = diary.fetchStat<DiaryFeature.Sound>(DiaryFeature.Sound);
   if (!stat) {
     if (statDelta.count && statDelta.count > 0) {
-      stat = Object.assign({}, DEFAULT_STAT);
+      stat = Object.assign({}, DEFAULT_FEATURE_STAT);
     } else {
       return;
     }
@@ -44,106 +32,132 @@ async function updateDiarySoundStat(
   stat["count"] += statDelta.count || 0;
   stat["fileSize"] += statDelta.fileSize || 0;
   stat["duration"] += statDelta.fileSize || 0;
-  dwdyState.diary.value.assignStat<DiaryFeature.Sound>(
-    DiaryFeature.Sound,
-    stat
-  );
-  await dwdyState.diary.value.save();
+  diary.assignStat<DiaryFeature.Sound>(DiaryFeature.Sound, stat);
+  await diary.save();
 }
 
-export async function addEmptySound(): Promise<void> {
-  await dbDwdy.transaction(
-    "rw",
-    dbDwdy.diaryEntries,
-    dbDwdy.diaries,
-    async () => {
-      const dwdyState = useDwdyState();
-      dwdyState.entry.value.appendContent<DiaryFeature.Sound>(
-        DiaryFeature.Sound,
-        Object.assign({}, DEFAULT_META)
-      );
-      await dwdyState.entry.value.save();
-      await updateDiarySoundStat({
-        count: 1,
-      });
-      dwdyState.updateEntry(dwdyState.entry.value.doc);
-    }
-  );
-}
-
-export async function addSound(blob: Blob, duration: number): Promise<void> {
+export async function addSound(
+  dei: DiaryEntryIdentityParams,
+  blob: Blob,
+  duration: number
+): Promise<void> {
   await dbDwdy.transaction(
     "rw",
     dbDwdy.diaryEntries,
     dbDwdy.diaryAttachments,
     dbDwdy.diaries,
     async () => {
-      const dwdyState = useDwdyState();
-      if (dwdyState.entry.value.doc.dUid && dwdyState.entry.value.doc.dIndex) {
-        const da = await DiaryAttachment.upload(
-          {
-            dUid: dwdyState.entry.value.doc.dUid,
-            dIndex: dwdyState.entry.value.doc.dIndex,
-          },
-          {
-            fileName: `${genUid()}.webm`,
-            fileType: "audio/webm",
-            size: blob.size,
-            blob: blob,
-          }
-        );
-        const soundContent = {
-          from: "record" as SoundFrom,
-          daUid: da.doc.daUid,
-          fileSize: blob.size,
-          fileType: "audio/webm",
-          fileExt: "webm",
-          duration,
-        };
-        dwdyState.entry.value.appendContent<DiaryFeature.Sound>(
-          DiaryFeature.Sound,
-          soundContent
-        );
-        await dwdyState.entry.value.save();
-        await updateDiarySoundStat({ count: 1, fileSize: blob.size, duration });
-        dwdyState.updateEntry(dwdyState.entry.value.doc);
+      const fetchedResult = await Diary.fetchDiaryAndEntry(dei);
+      if (!fetchedResult) {
+        return Promise<void>;
       }
+      const { diary, entry } = fetchedResult;
+      const da = await DiaryAttachment.upload(dei, {
+        fileName: `${genUid()}.webm`,
+        fileType: "audio/webm",
+        size: blob.size,
+        blob: blob,
+      });
+      const soundContent = {
+        from: "record" as SoundFrom,
+        daUid: da.doc.daUid,
+        fileSize: blob.size,
+        fileType: "audio/webm",
+        fileExt: "webm",
+        duration,
+      };
+      entry.appendContent<DiaryFeature.Sound>(DiaryFeature.Sound, soundContent);
+      await entry.save();
+      await updateDiarySoundStat(diary, {
+        count: 1,
+        fileSize: blob.size,
+        duration,
+      });
       return Promise<void>;
     }
   );
 }
 
-export async function deleteSound(index: number): Promise<void> {
+export async function deleteSound(
+  dei: DiaryEntryIdentityParams,
+  index: number
+): Promise<void> {
   await dbDwdy.transaction(
     "rw",
     dbDwdy.diaryEntries,
     dbDwdy.diaryAttachments,
     dbDwdy.diaries,
     async () => {
-      const dwdyState = useDwdyState();
-      const selectedContent =
-        dwdyState.entry.value.fetchContent<DiaryFeature.Sound>(
-          DiaryFeature.Sound,
-          index
-        );
+      const fetchedResult = await Diary.fetchDiaryAndEntry(dei);
+      if (!fetchedResult) {
+        return Promise<void>;
+      }
+      const { diary, entry } = fetchedResult;
+      const selectedContent = entry.fetchContent<DiaryFeature.Sound>(
+        DiaryFeature.Sound,
+        index
+      );
       if (!selectedContent || !selectedContent.daUid) {
         return Promise<void>;
       }
-      const da = await dwdyState.entry.value.fetchAttachment(
-        selectedContent.daUid
-      );
+      const da = await entry.fetchAttachment(selectedContent.daUid);
       if (!da) {
         return Promise<void>;
       }
       await da.delete();
-      dwdyState.entry.value.deleteContent(DiaryFeature.Sound, index);
-      await updateDiarySoundStat({
+      entry.deleteContent(DiaryFeature.Sound, index);
+      await updateDiarySoundStat(diary, {
         count: -1,
         fileSize: -selectedContent.fileSize,
         duration: -selectedContent.duration,
       });
-      await dwdyState.entry.value.save();
-      dwdyState.updateEntry(dwdyState.entry.value.doc);
+      await entry.save();
+      return Promise<void>;
+    }
+  );
+}
+
+export async function importAudio(
+  dei: DiaryEntryIdentityParams,
+  file: File,
+  buffer: ArrayBuffer
+): Promise<void> {
+  const blob = new Blob([buffer], { type: file.type });
+  const audioInfo = await buildAudioInfo(file);
+  const fileExt = displayFileName(file.name).ext;
+  await dbDwdy.transaction(
+    "rw",
+    dbDwdy.diaryEntries,
+    dbDwdy.diaryAttachments,
+    dbDwdy.diaries,
+    async () => {
+      const fetchedResult = await Diary.fetchDiaryAndEntry(dei);
+      if (!fetchedResult) {
+        return Promise<void>;
+      }
+      const { diary, entry } = fetchedResult;
+      const da = await DiaryAttachment.upload(dei, {
+        fileName: genRandomFileName(fileExt),
+        fileType: file.type,
+        size: file.size,
+        blob,
+      });
+      const soundContent = {
+        from: "file" as SoundFrom,
+        daUid: da.doc.daUid,
+        fileExt: fileExt,
+        fileType: file.type,
+        fileSize: file.size,
+        duration: audioInfo.duration,
+        comment: `<p>${file.name}</p>`,
+      };
+      entry.appendContent<DiaryFeature.Sound>(DiaryFeature.Sound, soundContent);
+      await entry.save();
+      await updateDiarySoundStat(diary, {
+        count: 1,
+        fileSize: file.size,
+        duration: audioInfo.duration,
+      });
       return Promise<void>;
     }
   );
@@ -213,57 +227,4 @@ async function buildAudioInfo(file: File): Promise<{ duration: number }> {
     };
     audio.src = URL.createObjectURL(file);
   });
-}
-
-export async function importAudio(
-  file: File,
-  buffer: ArrayBuffer
-): Promise<void> {
-  const blob = new Blob([buffer], { type: file.type });
-  const audioInfo = await buildAudioInfo(file);
-  const fileExt = displayFileName(file.name).ext;
-  await dbDwdy.transaction(
-    "rw",
-    dbDwdy.diaryEntries,
-    dbDwdy.diaryAttachments,
-    dbDwdy.diaries,
-    async () => {
-      const dwdyState = useDwdyState();
-      if (dwdyState.entry.value.doc.dUid && dwdyState.entry.value.doc.dIndex) {
-        const da = await DiaryAttachment.upload(
-          {
-            dUid: dwdyState.entry.value.doc.dUid,
-            dIndex: dwdyState.entry.value.doc.dIndex,
-          },
-          {
-            fileName: genRandomFileName(fileExt),
-            fileType: file.type,
-            size: file.size,
-            blob,
-          }
-        );
-        const soundContent = {
-          from: "file" as SoundFrom,
-          daUid: da.doc.daUid,
-          fileExt: fileExt,
-          fileType: file.type,
-          fileSize: file.size,
-          duration: audioInfo.duration,
-          comment: `<p>${file.name}</p>`,
-        };
-        dwdyState.entry.value.appendContent<DiaryFeature.Sound>(
-          DiaryFeature.Sound,
-          soundContent
-        );
-        await dwdyState.entry.value.save();
-        await updateDiarySoundStat({
-          count: 1,
-          fileSize: file.size,
-          duration: audioInfo.duration,
-        });
-        dwdyState.updateEntry(dwdyState.entry.value.doc);
-      }
-      return Promise<void>;
-    }
-  );
 }

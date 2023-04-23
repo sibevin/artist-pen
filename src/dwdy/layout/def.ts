@@ -17,6 +17,12 @@ export type DiaryLayoutComponent = {
   editorMain?: any;
   lastContentPanel?: any;
   configPanel?: any;
+  searchMain?: any;
+  searchMainMenuEntry?: any;
+  searchMainModal?: any;
+  searchSortMenuEntry?: any;
+  searchSortModal?: any;
+  searchResultEntry?: any;
 };
 
 export type DiaryInsertEntryTarget = {

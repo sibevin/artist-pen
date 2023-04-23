@@ -12,7 +12,7 @@ import { useDwdyState } from "~/states/useDwdyState";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { featureIcon } from "~/dwdy/feature/map";
 import { FeatureMeta } from "~/dwdy/feature/image/def";
-import { replaceImage, uploadImage } from "~/dwdy/feature/image/action";
+import { replaceImage, importImage } from "~/dwdy/feature/image/action";
 import { FileSizeDisplay, displayFileSize } from "~/services/file";
 import SvgIcon from "~/components/SvgIcon.vue";
 import RichTextEditor from "~/components/input/RichTextEditor.vue";
@@ -139,7 +139,13 @@ async function onReplaceFileSelected(event: Event): Promise<void> {
   fr.onload = async () => {
     const result = fr.result as string;
     if (result) {
-      await replaceImage(props.contentIndex, file, result);
+      await replaceImage(
+        dwdyState.entry.value.identity,
+        props.contentIndex,
+        file,
+        result
+      );
+      await dwdyState.reloadEntry();
       isInLoading.value = false;
     }
   };
@@ -160,9 +166,10 @@ async function onUploadFileSelected(event: Event): Promise<void> {
     fr.onload = async () => {
       const result = fr.result as string;
       if (result) {
-        await uploadImage(file, result);
+        await importImage(dwdyState.entry.value.identity, file, result);
         storedCount++;
         if (storedCount === totalCount) {
+          await dwdyState.reloadEntry();
           isInLoading.value = false;
           emit("creationDone", oriLastIndex + 1);
         }

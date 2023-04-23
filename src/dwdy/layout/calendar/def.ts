@@ -26,3 +26,6 @@ export const LAYOUT_DISPLAY_FEATURES: DiaryFeature[] = [
   DiaryFeature.Text,
   DiaryFeature.Sound,
 ];
+
+export const SEARCH_SORT_OPTS = ["timestamp_desc", "timestamp_asc"] as const;
+export type SearchSortOpt = typeof SEARCH_SORT_OPTS[number];

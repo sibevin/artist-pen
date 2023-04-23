@@ -1,18 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import {
-  mdiCog,
-  mdiBookshelf,
-  mdiMagnify,
-  mdiCheck,
-  mdiClose,
-  mdiCalendarClock,
-} from "@mdi/js";
+import { mdiCog, mdiBookshelf, mdiMagnify, mdiCalendarClock } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useAppState } from "~/states/useAppState";
 import { useDwdyState } from "~/states/useDwdyState";
 import { PageNavigator, NavCellSpec } from "~/services/pageNavigator";
+import { DiaryFeature } from "~/dwdy/feature/def";
+import { featureComponent } from "~/dwdy/feature/component";
 import { layoutComponent } from "~/dwdy/layout/component";
 import {
   DiaryContentFeatureIndex,
@@ -22,12 +17,12 @@ import {
 import { dtToEntryTs } from "~/dwdy/services/dateUtils";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
-import ModalBase from "~/components/ModalBase.vue";
 import ModalDateSelector from "~/components/ModalDateSelector.vue";
 import ControlMenu from "~/components/dwdy/common/ControlMenu.vue";
-import DiarySettingsModal from "~/components/dwdy/diarySettings/MainModal.vue";
-import DiaryContentFullViewerModal from "~/components/dwdy/diaryContent/FullViewerModal.vue";
-import DiaryContentEditorSelectorModal from "~/components/dwdy/diaryEditor/FeatureSelectorModal.vue";
+import DiarySettingsModal from "~/components/dwdy/DiaryPage/settings/MainModal.vue";
+import FullViewerModal from "~/components/dwdy/DiaryPage/FullViewerModal.vue";
+import SearchModal from "~/components/dwdy/DiaryPage/SearchModal.vue";
+import FeatureSelectorModal from "~/components/dwdy/common/FeatureSelectorModal.vue";
 import { initDwdyStateByRoute } from "~/dwdy/services/initDwdyStateByRoute";
 
 const route = useRoute();
@@ -38,6 +33,7 @@ const la = new LocaleActor("pages.dwdy.DiaryPage");
 const mainLayout = ref();
 const controlMenu = ref();
 const contentFullViewer = ref();
+const diaryEntrySearchModal = ref();
 const pageScope = "diary-page";
 const controlMenuSelectedBtn = ref<string>();
 const isDiarySettingsMoodalOn = ref(false);
@@ -45,6 +41,10 @@ const isCurrentDateSelectorModalOn = ref(false);
 const isContentFullViewerModalOn = ref(false);
 const isEditorSelectorModalOn = ref(false);
 const isDiarySearchModalOn = ref(false);
+const isSearchMainModalOn = ref(false);
+const isSearchSortModalOn = ref(false);
+const isSearchTagModalOn = ref(false);
+const isSearchStickerModalOn = ref(false);
 const layoutContentMain = ref();
 
 const currentDate = computed(() => {
@@ -187,6 +187,21 @@ function triggerAction(params: DiaryPageActionParams): void {
     if (contentFullViewer.value) {
       contentFullViewer.value.openModal(params.cfi);
     }
+  } else if (params.action === "open-search-main-modal") {
+    isSearchMainModalOn.value = true;
+  } else if (params.action === "open-search-sort-modal") {
+    isSearchSortModalOn.value = true;
+  } else if (params.action === "open-search-feature-modal") {
+    if (params.cfi?.feature === DiaryFeature.Tag) {
+      isSearchTagModalOn.value = true;
+    }
+    if (params.cfi?.feature === DiaryFeature.Sticker) {
+      isSearchStickerModalOn.value = true;
+    }
+  } else if (params.action === "apply-search") {
+    if (diaryEntrySearchModal.value) {
+      diaryEntrySearchModal.value.applySearch();
+    }
   }
 }
 </script>
@@ -296,18 +311,18 @@ function triggerAction(params: DiaryPageActionParams): void {
         class="fixed z-10"
         :from-page-scope="pageScope"
       ></DiarySettingsModal>
-      <DiaryContentEditorSelectorModal
+      <FeatureSelectorModal
         ref="editorSelector"
         v-model="isEditorSelectorModalOn"
         class="fixed z-10"
         @select="onContentEditorOpen"
-      ></DiaryContentEditorSelectorModal>
-      <DiaryContentFullViewerModal
+      ></FeatureSelectorModal>
+      <FullViewerModal
         ref="contentFullViewer"
         v-model="isContentFullViewerModalOn"
         class="fixed z-10"
         @open-content-editor="onContentEditorOpen"
-      ></DiaryContentFullViewerModal>
+      ></FullViewerModal>
       <ModalDateSelector
         v-model="isCurrentDateSelectorModalOn"
         modal-id="current-date-selector"
@@ -326,57 +341,41 @@ function triggerAction(params: DiaryPageActionParams): void {
           </h2>
         </template>
       </ModalDateSelector>
-      <ModalBase
+      <SearchModal
+        ref="diaryEntrySearchModal"
         v-model="isDiarySearchModalOn"
         class="fixed z-10"
-        modal-base-id="diary-show-search"
-      >
-        <template #modal-title>
-          <div>
-            <h2 class="card-title mb-2">
-              <SvgIcon
-                class="text-base-content mr-1"
-                icon-set="mdi"
-                :path="mdiMagnify"
-                :size="24"
-              ></SvgIcon>
-              {{ la.t("app.action.search") }}
-            </h2>
-          </div>
-        </template>
-        <template #modal-content>
-          <div>
-            <div class="input-hint-block">
-              {{ la.t(".creationHint") }}
-            </div>
-            <div class="card-actions mt-3 items-center">
-              <div class="grow flex items-center">
-                <button class="btn btn-primary">
-                  <SvgIcon
-                    class="mr-2"
-                    icon-set="mdi"
-                    :path="mdiCheck"
-                    :size="16"
-                  ></SvgIcon>
-                  {{ la.t("app.action.create") }}
-                </button>
-                <label
-                  class="btn btn-ghost ml-2"
-                  for="modal-base_diary-show-search"
-                >
-                  <SvgIcon
-                    class="text-base-content mr-2"
-                    icon-set="mdi"
-                    :path="mdiClose"
-                    :size="16"
-                  ></SvgIcon>
-                  {{ la.t("app.action.cancel") }}
-                </label>
-              </div>
-            </div>
-          </div>
-        </template>
-      </ModalBase>
+        @trigger-action="triggerAction"
+      ></SearchModal>
+      <component
+        :is="
+          layoutComponent(dwdyState.diary.value.doc.layout, 'searchMainModal')
+        "
+        v-model="isSearchMainModalOn"
+        @select="triggerAction({ action: 'apply-search' })"
+      ></component>
+      <component
+        :is="
+          layoutComponent(dwdyState.diary.value.doc.layout, 'searchSortModal')
+        "
+        v-model="isSearchSortModalOn"
+        @select="triggerAction({ action: 'apply-search' })"
+      ></component>
+      <component
+        :is="featureComponent(DiaryFeature.Tag, 'searchQuerySelector')"
+        v-if="dwdyState.diary.value.enabledFeatures.includes(DiaryFeature.Tag)"
+        v-model="isSearchTagModalOn"
+        @select="triggerAction({ action: 'apply-search' })"
+      ></component>
+      <component
+        :is="featureComponent(DiaryFeature.Sticker, 'searchQuerySelector')"
+        v-if="
+          dwdyState.diary.value.enabledFeatures.includes(DiaryFeature.Sticker)
+        "
+        v-model="isSearchStickerModalOn"
+        modal-id="diary-search-feature-sticker-modal"
+        @select="triggerAction({ action: 'apply-search' })"
+      ></component>
     </template>
   </MainLayout>
 </template>

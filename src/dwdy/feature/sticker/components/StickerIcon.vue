@@ -58,6 +58,10 @@ const iconSize = computed(() => {
   }
   return ICON_SIZE * props.sizeMultiplier;
 });
+
+const iconMargin = computed<number>(() => {
+  return iconSize.value / 5;
+});
 </script>
 
 <template>
@@ -71,12 +75,14 @@ const iconSize = computed(() => {
       <div class="flex justify-center items-center">
         <SvgIcon
           v-if="sticker.icon && sticker.icon.path"
+          :style="{ margin: iconMargin }"
           :icon-set="sticker.icon.set"
           :path="sticker.icon.path"
           :size="iconSize"
         ></SvgIcon>
         <Icon
           v-if="sticker.icon && sticker.icon.raw"
+          :style="{ margin: iconMargin }"
           :icon="sticker.icon.raw"
           :width="iconSize"
           :height="iconSize"

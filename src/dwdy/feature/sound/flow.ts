@@ -1,13 +1,9 @@
 import { DiaryFeatureFlow } from "~/dwdy/feature/def";
-import { addEmptySound, deleteSound } from "~/dwdy/feature/sound/action";
+import { deleteSound } from "~/dwdy/feature/sound/action";
 
 export const FEATURE_FLOW: DiaryFeatureFlow = {
   creation: {
-    creator: {
-      create: async () => {
-        await addEmptySound();
-      },
-    },
+    customized: true,
   },
   deletion: {
     delete: deleteSound,

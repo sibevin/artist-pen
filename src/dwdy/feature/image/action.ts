@@ -1,25 +1,20 @@
 import { dbDwdy } from "~/services/db/dwdy";
-import { useDwdyState } from "~/states/useDwdyState";
 import {
   DiaryAttachment,
   DiaryAttachmentDocMap,
 } from "~/models/dwdy/diaryAttachment";
 import { displayFileName, genRandomFileName } from "~/services/file";
+import { DiaryEntryIdentityParams } from "~/dwdy/types/core";
+import { Diary } from "~/models/dwdy/diary";
 import { DiaryFeature } from "~/dwdy/feature/def";
-import { FeatureMeta, FeatureStat, ImagePack } from "~/dwdy/feature/image/def";
+import {
+  FeatureMeta,
+  FeatureStat,
+  ImagePack,
+  DEFAULT_FEATURE_STAT,
+} from "~/dwdy/feature/image/def";
 
 const THUMBNAIL_W = 120;
-
-const DEFAULT_META = {
-  fileSize: 0,
-  width: 0,
-  height: 0,
-};
-
-const DEFAULT_STAT = {
-  count: 0,
-  fileSize: 0,
-};
 
 async function buildImageInfo(
   srcData: string,
@@ -60,49 +55,28 @@ async function buildImageInfo(
 }
 
 async function updateDiaryImageStat(
+  diary: Diary,
   statDelta: Partial<FeatureStat>
 ): Promise<void> {
-  const dwdyState = useDwdyState();
-  let stat = dwdyState.diary.value.fetchStat<DiaryFeature.Image>(
-    DiaryFeature.Image
-  );
+  let stat = diary.fetchStat<DiaryFeature.Image>(DiaryFeature.Image);
   if (!stat) {
     if (statDelta.count && statDelta.count > 0) {
-      stat = Object.assign({}, DEFAULT_STAT);
+      stat = Object.assign({}, DEFAULT_FEATURE_STAT);
     } else {
       return;
     }
   }
   stat["count"] += statDelta.count || 0;
   stat["fileSize"] += statDelta.fileSize || 0;
-  dwdyState.diary.value.assignStat<DiaryFeature.Image>(
-    DiaryFeature.Image,
-    stat
-  );
-  await dwdyState.diary.value.save();
+  diary.assignStat<DiaryFeature.Image>(DiaryFeature.Image, stat);
+  await diary.save();
 }
 
-export async function addEmptyImage(): Promise<void> {
-  await dbDwdy.transaction(
-    "rw",
-    dbDwdy.diaryEntries,
-    dbDwdy.diaries,
-    async () => {
-      const dwdyState = useDwdyState();
-      dwdyState.entry.value.appendContent<DiaryFeature.Image>(
-        DiaryFeature.Image,
-        Object.assign({}, DEFAULT_META)
-      );
-      await dwdyState.entry.value.save();
-      await updateDiaryImageStat({
-        count: 1,
-      });
-      dwdyState.updateEntry(dwdyState.entry.value.doc);
-    }
-  );
-}
-
-export async function uploadImage(file: File, data: string): Promise<void> {
+export async function importImage(
+  dei: DiaryEntryIdentityParams,
+  file: File,
+  data: string
+): Promise<void> {
   const imageInfo = await buildImageInfo(data, file.type);
   const fileExt = displayFileName(file.name).ext;
   await dbDwdy.transaction(
@@ -111,93 +85,93 @@ export async function uploadImage(file: File, data: string): Promise<void> {
     dbDwdy.diaryAttachments,
     dbDwdy.diaries,
     async () => {
-      const dwdyState = useDwdyState();
-      if (dwdyState.entry.value.doc.dUid && dwdyState.entry.value.doc.dIndex) {
-        const da = await DiaryAttachment.upload(
-          {
-            dUid: dwdyState.entry.value.doc.dUid,
-            dIndex: dwdyState.entry.value.doc.dIndex,
-          },
-          {
-            fileName: genRandomFileName(fileExt),
-            fileType: file.type,
-            size: file.size,
-            data,
-          }
-        );
-        const imageContent = {
-          daUid: da.doc.daUid,
-          fileExt: fileExt,
-          fileType: file.type,
-          fileSize: file.size,
-          width: imageInfo.width,
-          height: imageInfo.height,
-          thumbnail: imageInfo.thumbnail,
-        };
-        dwdyState.entry.value.appendContent<DiaryFeature.Image>(
-          DiaryFeature.Image,
-          imageContent
-        );
-        await dwdyState.entry.value.save();
-        await updateDiaryImageStat({ count: 1, fileSize: file.size });
-        dwdyState.updateEntry(dwdyState.entry.value.doc);
+      const fetchedResult = await Diary.fetchDiaryAndEntry(dei);
+      if (!fetchedResult) {
+        return Promise<void>;
       }
+      const { diary, entry } = fetchedResult;
+      const da = await DiaryAttachment.upload(dei, {
+        fileName: genRandomFileName(fileExt),
+        fileType: file.type,
+        size: file.size,
+        data,
+      });
+      const imageContent = {
+        daUid: da.doc.daUid,
+        fileExt: fileExt,
+        fileType: file.type,
+        fileSize: file.size,
+        width: imageInfo.width,
+        height: imageInfo.height,
+        thumbnail: imageInfo.thumbnail,
+      };
+      entry.appendContent<DiaryFeature.Image>(DiaryFeature.Image, imageContent);
+      await entry.save();
+      await updateDiaryImageStat(diary, { count: 1, fileSize: file.size });
       return Promise<void>;
     }
   );
 }
 
-export async function deleteImage(index: number): Promise<void> {
+export async function deleteImage(
+  dei: DiaryEntryIdentityParams,
+  index: number
+): Promise<void> {
   await dbDwdy.transaction(
     "rw",
     dbDwdy.diaryEntries,
     dbDwdy.diaryAttachments,
     dbDwdy.diaries,
     async () => {
-      const dwdyState = useDwdyState();
-      const selectedContent =
-        dwdyState.entry.value.fetchContent<DiaryFeature.Image>(
-          DiaryFeature.Image,
-          index
-        );
+      const fetchedResult = await Diary.fetchDiaryAndEntry(dei);
+      if (!fetchedResult) {
+        return Promise<void>;
+      }
+      const { diary, entry } = fetchedResult;
+      const selectedContent = entry.fetchContent<DiaryFeature.Image>(
+        DiaryFeature.Image,
+        index
+      );
       if (!selectedContent || !selectedContent.daUid) {
         return Promise<void>;
       }
-      const da = await dwdyState.entry.value.fetchAttachment(
-        selectedContent.daUid
-      );
+      const da = await entry.fetchAttachment(selectedContent.daUid);
       if (!da) {
         return Promise<void>;
       }
       await da.delete();
-      dwdyState.entry.value.deleteContent(DiaryFeature.Image, index);
-      await updateDiaryImageStat({
+      entry.deleteContent(DiaryFeature.Image, index);
+      await updateDiaryImageStat(diary, {
         count: -1,
         fileSize: -selectedContent.fileSize,
       });
-      await dwdyState.entry.value.save();
-      dwdyState.updateEntry(dwdyState.entry.value.doc);
+      await entry.save();
       return Promise<void>;
     }
   );
 }
 
 export async function replaceImage(
+  dei: DiaryEntryIdentityParams,
   index: number,
   file: File,
   data: string
 ): Promise<void> {
   const imageInfo = await buildImageInfo(data, file.type);
   const fileExt = displayFileName(file.name).ext;
-  const dwdyState = useDwdyState();
-  const imageMeta = dwdyState.entry.value.fetchContent<DiaryFeature.Image>(
+  const fetchedResult = await Diary.fetchDiaryAndEntry(dei);
+  if (!fetchedResult) {
+    return;
+  }
+  const { diary, entry } = fetchedResult;
+  const imageMeta = entry.fetchContent<DiaryFeature.Image>(
     DiaryFeature.Image,
     index
   );
   if (!imageMeta || !imageMeta.daUid) {
     return;
   }
-  const oriDa = await dwdyState.entry.value.fetchAttachment(imageMeta.daUid);
+  const oriDa = await entry.fetchAttachment(imageMeta.daUid);
   if (!oriDa) {
     return;
   }
@@ -207,12 +181,12 @@ export async function replaceImage(
     dbDwdy.diaryAttachments,
     dbDwdy.diaries,
     async () => {
-      if (dwdyState.entry.value.doc.dUid && dwdyState.entry.value.doc.dIndex) {
+      if (entry.doc.dUid && entry.doc.dIndex) {
         await oriDa.delete();
         const da = await DiaryAttachment.upload(
           {
-            dUid: dwdyState.entry.value.doc.dUid,
-            dIndex: dwdyState.entry.value.doc.dIndex,
+            dUid: entry.doc.dUid,
+            dIndex: entry.doc.dIndex,
           },
           {
             fileName: genRandomFileName(fileExt),
@@ -221,25 +195,20 @@ export async function replaceImage(
             data,
           }
         );
-        dwdyState.entry.value.assignContent<DiaryFeature.Image>(
-          DiaryFeature.Image,
-          index,
-          {
-            daUid: da.doc.daUid,
-            fileExt,
-            fileType: file.type,
-            fileSize: file.size,
-            width: imageInfo.width,
-            height: imageInfo.height,
-            thumbnail: imageInfo.thumbnail,
-            comment: imageMeta.comment,
-          }
-        );
-        await dwdyState.entry.value.save();
-        await updateDiaryImageStat({
+        entry.assignContent<DiaryFeature.Image>(DiaryFeature.Image, index, {
+          daUid: da.doc.daUid,
+          fileExt,
+          fileType: file.type,
+          fileSize: file.size,
+          width: imageInfo.width,
+          height: imageInfo.height,
+          thumbnail: imageInfo.thumbnail,
+          comment: imageMeta.comment,
+        });
+        await entry.save();
+        await updateDiaryImageStat(diary, {
           fileSize: file.size - imageMeta.fileSize,
         });
-        dwdyState.updateEntry(dwdyState.entry.value.doc);
       }
       return Promise<void>;
     }

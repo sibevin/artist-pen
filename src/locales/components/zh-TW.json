@@ -1,10 +1,33 @@
 {
+  "input": {
+    "DateRangeSelector": {
+      "selectDateRange": "選擇特定日期",
+      "predefined": {
+        "1w": "最近 1 週（ 7 天）",
+        "1m": "最近 1 個月（ 30 天）",
+        "1q": "最近 1 季（ 120 天）",
+        "1h": "最近半年（ 180 天）",
+        "1y": "最近 1 年（ 360 天）"
+      },
+      "from": "從：",
+      "to": "到：",
+      "indefinite": "沒有期限",
+      "invalidDateRange": "無效的時間範圍"
+    }
+  },
   "dwdy": {
     "diaryContent": {
       "DeletionModal": {
         "deletionHint_zero": "請選取您要刪除的資料。",
         "deletionHint_one": "已選取 1 筆資料，確定要刪除它嗎？",
         "deletionHint_other": "已選取 {{count}} 筆資料，確定要刪除這些資料嗎？"
+      }
+    },
+    "DiaryPage": {
+      "SearchModal": {
+        "queryHint": "關鍵字搜尋筆記內容",
+        "searchHistory": "搜尋記錄",
+        "clear": "重設條件"
       }
     }
   }

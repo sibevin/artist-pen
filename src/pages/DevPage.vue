@@ -5,31 +5,25 @@ import { mdiMenu, mdiBookshelf } from "@mdi/js";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import { LocaleActor } from "~/services/locale";
-import ContentGallery from "~/dwdy/feature/sound/components/ContentGallery.vue";
-import AudioPlayerUi from "~/dwdy/feature/sound/components/AudioPlayerUi.vue";
-import testMp3 from "~/assets/audio/test.mp3";
-import test2Mp3 from "~/assets/audio/test2.mp3";
+import DateRangeSelector from "~/components/input/DateRangeSelector.vue";
+
 const la = new LocaleActor("app");
 useMeta({
   title: "Dev",
 });
-const audioSrc = ref<string | undefined>(testMp3);
 
-function switchAudioSrc(): void {
-  if (audioSrc.value === testMp3) {
-    audioSrc.value = undefined;
-  } else {
-    audioSrc.value = testMp3;
-  }
+function onDateRangeSelected(value: { mark: string; value: string }): void {
+  console.log("select:", value);
 }
 </script>
 
 <template>
   <MainLayout>
-    <div>Dev</div>
-    <button class="btn" @click="switchAudioSrc">Switch audio</button>
-    <div class="m-2">
-      <AudioPlayerUi :audio-data="audioSrc" class="grow"></AudioPlayerUi>
+    <div class="pb-16">
+      <div>Dev</div>
+      <div class="m-2">
+        <DateRangeSelector @select="onDateRangeSelected"></DateRangeSelector>
+      </div>
     </div>
     <template #header-title>
       {{ la.t("app.serviceName") }}

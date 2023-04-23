@@ -13,7 +13,7 @@ export class AudioPlayerProcessor {
   private _isLoading = false;
   private _currentTime = 0;
   private _visualDataSet: Uint8Array = new Uint8Array();
-  private _refreshFn?: () => void = undefined;
+  private _tickFn?: () => void = undefined;
   private _startPlayingTime?: number;
   private _endCallback?: () => void;
 
@@ -36,7 +36,7 @@ export class AudioPlayerProcessor {
     this._isLoading = false;
     this._currentTime = 0;
     this._audioEle.loop = false;
-    this.refresh();
+    this.tick();
   }
 
   play(seekToTime?: number): void {
@@ -102,7 +102,7 @@ export class AudioPlayerProcessor {
     this._audioStereoPanner.pan.value = value;
   }
 
-  set endCallback(callbackFn: () => void) {
+  set endCallback(callbackFn: (() => void) | undefined) {
     this._endCallback = callbackFn;
   }
 
@@ -142,17 +142,17 @@ export class AudioPlayerProcessor {
     return this._visualDataSet;
   }
 
-  set refreshFn(givenFn: () => void) {
-    this._refreshFn = givenFn;
+  set tickFn(givenFn: () => void) {
+    this._tickFn = givenFn;
   }
 
   set startPlayingTime(givenTime: number) {
     this._startPlayingTime = givenTime;
   }
 
-  private refresh(): void {
-    if (this._refreshFn) {
-      this._refreshFn();
+  private tick(): void {
+    if (this._tickFn) {
+      this._tickFn();
     }
   }
 
@@ -166,23 +166,23 @@ export class AudioPlayerProcessor {
         this.play(this._startPlayingTime);
         this._startPlayingTime = undefined;
       }
-      this.refresh();
+      this.tick();
     });
     this._audioEle.addEventListener("loadedmetadata", () => {
       this._duration = this._audioEle.duration;
-      this.refresh();
+      this.tick();
     });
     this._audioEle.addEventListener("loadstart", () => {
       this._isLoading = true;
-      this.refresh();
+      this.tick();
     });
     this._audioEle.addEventListener("pause", () => {
       this._status = "paused";
-      this.refresh();
+      this.tick();
     });
     this._audioEle.addEventListener("play", () => {
       this._status = "playing";
-      this.refresh();
+      this.tick();
     });
     this._audioEle.addEventListener("timeupdate", () => {
       this._currentTime = this._audioEle.currentTime;
@@ -200,11 +200,11 @@ export class AudioPlayerProcessor {
         this._audioAnalyser.getByteTimeDomainData(dataArray);
         this._visualDataSet = dataArray;
       }
-      this.refresh();
+      this.tick();
     });
     this._audioEle.addEventListener("emptied", () => {
       this.reset();
-      this.refresh();
+      this.tick();
     });
     this._audioEle.addEventListener("ended", () => {
       this._currentTime = 0;
@@ -213,7 +213,7 @@ export class AudioPlayerProcessor {
       if (this._endCallback) {
         this._endCallback();
       }
-      this.refresh();
+      this.tick();
     });
   }
 
