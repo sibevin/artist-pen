@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
-import { mdiMagnify, mdiTextSearchVariant, mdiTrashCan } from "@mdi/js";
+import { ref, watch, onMounted } from "vue";
+import {
+  mdiMagnify,
+  mdiTextSearchVariant,
+  mdiTrashCan,
+  mdiArrowLeftBottom,
+} from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
 import { useSearchState } from "~/states/useSearchState";
+import { Diary } from "~/models/dwdy/diary";
 import { layoutComponent } from "~/dwdy/layout/component";
-import { EMPTY_SEARCH_QUERY, isQueryEmpty } from "~/services/dwdy/search";
-import { DiaryFeature } from "~/dwdy/feature/def";
-import { featureText, featureIcon } from "~/dwdy/feature/map";
+import {
+  buildEmptySearchQuery,
+  isQueryEmpty,
+  addToSearchHistories,
+} from "~/services/dwdy/search";
 import { featureComponent } from "~/dwdy/feature/component";
 import { DiaryPageActionParams } from "~/dwdy/types/core";
 import SvgIcon from "~/components/SvgIcon.vue";
@@ -25,11 +33,12 @@ const emit = defineEmits<{
   (e: "triggerAction", params: DiaryPageActionParams): void;
 }>();
 
-const la = new LocaleActor("components.dwdy.DiaryPage.SearchModal");
+const la = new LocaleActor("components.dwdy.DiaryPage.search");
 const dwdyState = useDwdyState();
 const searchState = useSearchState();
 const isModalOn = ref(false);
 const diaryPageSearchModal = ref();
+const keywordInput = ref<string>("");
 
 onMounted(() => {
   isModalOn.value = props.modelValue;
@@ -49,33 +58,6 @@ watch(
   }
 );
 
-const keywordOption = computed<string>({
-  get() {
-    return searchState.query.value.keywords.join(" ");
-  },
-  set(value: string) {
-    searchState.query.value.keywords = value
-      .split(" ")
-      .filter((word) => word !== "");
-  },
-});
-
-function onQueryInputTyped(): void {
-  console.log("query typed", searchState.query.value.keywords);
-}
-
-function onSearchWithFeatureBtnClicked(feature: DiaryFeature): void {
-  emit("triggerAction", {
-    action: "open-search-feature-modal",
-    cfi: { feature: feature },
-  });
-}
-
-function onSearchCombinationBtnClicked(): void {
-  console.log("search combination");
-  // TODO: Store the current query combination
-}
-
 function triggerModelUpdate(): void {
   if (diaryPageSearchModal.value) {
     emit("update:modelValue", isModalOn.value);
@@ -87,9 +69,22 @@ function triggerAction(params: DiaryPageActionParams): void {
 }
 
 function onSearchClearBtnClicked(): void {
-  searchState.query.value = Object.assign({}, EMPTY_SEARCH_QUERY);
+  searchState.query.value = buildEmptySearchQuery();
+  keywordInput.value = "";
 }
-function applySearch(): void {
+
+function applySearch(fromKeywordInput = false): void {
+  if (fromKeywordInput) {
+    searchState.query.value.keywords = keywordInput.value
+      .split(" ")
+      .filter((word) => word !== "");
+  }
+  keywordInput.value = searchState.query.value.keywords.join(" ");
+  addToSearchHistories(
+    "recent",
+    new Diary(dwdyState.diary.value.doc),
+    searchState.query.value
+  );
   console.log("apply-search", searchState.query.value);
 }
 defineExpose({ applySearch });
@@ -129,8 +124,8 @@ defineExpose({ applySearch });
             "
           ></component>
           <template
-            v-for="(feature, index) in dwdyState.diary.value.enabledFeatures"
-            :key="index"
+            v-for="feature in dwdyState.diary.value.enabledFeatures"
+            :key="feature"
           >
             <component
               :is="featureComponent(feature, 'searchMenuEntry')"
@@ -148,43 +143,59 @@ defineExpose({ applySearch });
               triggerAction({ action: 'open-search-sort-modal' })
             "
           ></component>
-          <div class="grow flex justify-end gap-2">
-            <button
-              class="btn btn-primary btn-outline rounded-full flex items-center flex-nowrap"
-              @click="onSearchCombinationBtnClicked"
-            >
-              <SvgIcon
-                class="mr-2"
-                icon-set="mdi"
-                :path="mdiTextSearchVariant"
-                :size="24"
-              ></SvgIcon>
-              {{ la.t(".searchHistory") }}
-            </button>
-          </div>
         </div>
         <div class="flex justify-between gap-2">
-          <input
-            ref="queryInput"
-            v-model="keywordOption"
-            class="flex-1 input input-bordered border-base-200 w-full"
-            :placeholder="(la.t('.queryHint') as string)"
-            type="text"
-            name="query"
-            @input="onQueryInputTyped"
-          />
+          <label class="input-group">
+            <input
+              ref="queryInput"
+              v-model="keywordInput"
+              class="flex-1 input input-bordered border-base-200 w-full"
+              :placeholder="(la.t('.queryHint') as string)"
+              type="search"
+              name="query"
+              @keyup.enter="applySearch(true)"
+            />
+            <span
+              v-if="keywordInput.length > 0"
+              class="bg-base-200 px-2 cursor-pointer"
+              @click="applySearch(true)"
+            >
+              <SvgIcon
+                icon-set="mdi"
+                :path="mdiArrowLeftBottom"
+                :size="20"
+              ></SvgIcon>
+            </span>
+          </label>
           <button
             v-if="!isQueryEmpty(searchState.query.value)"
-            class="flex-none btn btn-error btn-outline rounded-full flex items-center flex-nowrap"
-            @click="onSearchClearBtnClicked"
+            class="flex-none btn btn-primary"
+            @click="applySearch(true)"
           >
             <SvgIcon
               class="mr-2"
               icon-set="mdi"
-              :path="mdiTrashCan"
+              :path="mdiMagnify"
               :size="24"
             ></SvgIcon>
-            {{ la.t(".clear") }}
+            {{ la.t("app.action.search") }}
+          </button>
+          <button
+            v-if="!isQueryEmpty(searchState.query.value)"
+            class="flex-none btn btn-error"
+            @click="onSearchClearBtnClicked"
+          >
+            <SvgIcon icon-set="mdi" :path="mdiTrashCan" :size="24"></SvgIcon>
+          </button>
+          <button
+            class="flex-none btn"
+            @click="triggerAction({ action: 'open-search-history-modal' })"
+          >
+            <SvgIcon
+              icon-set="mdi"
+              :path="mdiTextSearchVariant"
+              :size="24"
+            ></SvgIcon>
           </button>
         </div>
       </div>

@@ -1,9 +1,10 @@
 import { DiaryFeatureComponent } from "~/dwdy/feature/def";
-import EditorMain from "~/dwdy/feature/tag/components/EditorMain.vue";
-import ContentGallery from "~/dwdy/feature/tag/components/ContentGallery.vue";
-import ContentSlate from "~/dwdy/feature/tag/components/ContentSlate.vue";
-import SearchQuerySelector from "~/dwdy/feature/tag/components/SearchQuerySelector.vue";
-import SearchMenuEntry from "~/dwdy/feature/tag/components/SearchMenuEntry.vue";
+import EditorMain from "./components/EditorMain.vue";
+import ContentGallery from "./components/ContentGallery.vue";
+import ContentSlate from "./components/ContentSlate.vue";
+import SearchQuerySelector from "./components/SearchQuerySelector.vue";
+import SearchMenuEntry from "./components/SearchMenuEntry.vue";
+import SearchHistoryEntry from "./components/SearchHistoryEntry.vue";
 
 export const FEATURE_COMPONENT: DiaryFeatureComponent = {
   editorMain: EditorMain,
@@ -11,4 +12,5 @@ export const FEATURE_COMPONENT: DiaryFeatureComponent = {
   slate: ContentSlate,
   searchQuerySelector: SearchQuerySelector,
   searchMenuEntry: SearchMenuEntry,
+  searchHistoryEntry: SearchHistoryEntry,
 };

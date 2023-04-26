@@ -1,9 +1,9 @@
 import { DiaryFeatureComponent } from "~/dwdy/feature/def";
-import EditorMain from "~/dwdy/feature/sound/components/EditorMain.vue";
-import EditorMenu from "~/dwdy/feature/sound/components/EditorMenu.vue";
-import ContentGallery from "~/dwdy/feature/sound/components/ContentGallery.vue";
-import ContentSlate from "~/dwdy/feature/sound/components/ContentSlate.vue";
-import ContentListEntry from "~/dwdy/feature/sound/components/ContentListEntry.vue";
+import EditorMain from "./components/EditorMain.vue";
+import EditorMenu from "./components/EditorMenu.vue";
+import ContentGallery from "./components/ContentGallery.vue";
+import ContentSlate from "./components/ContentSlate.vue";
+import ContentListEntry from "./components/ContentListEntry.vue";
 
 export const FEATURE_COMPONENT: DiaryFeatureComponent = {
   editorMain: EditorMain,

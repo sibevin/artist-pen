@@ -1,7 +1,6 @@
 {
   "config": {
     "displayIcon": {
-      "name": "日曆圖示",
       "options": {
         "dot": "點點",
         "sticker": "貼紙",
@@ -13,14 +12,7 @@
     "name": "日曆",
     "description": "提供一個日曆可以快速瀏覽特定日期的內容。",
     "config": {
-      "calendarDisplay": {
-        "name": "日曆顯示"
-      },
-      "firstWeekDay": {
-        "name": "開始星期"
-      },
       "searchSort": {
-        "name": "搜尋排序",
         "options": {
           "timestampDesc": "日期順序：晚 > 早",
           "timestampAsc": "日期順序：早 > 晚"
@@ -28,8 +20,17 @@
       }
     },
     "components": {
-      "SearchMain": {
-        "timeRange": "時間"
+      "search": {
+        "timeRange": "時間",
+        "sort": "搜尋排序"
+      },
+      "ConfigPanel": {
+        "example": "圖例",
+        "calendarDisplay": "日曆顯示",
+        "displayIcon": "日曆圖示",
+        "highlightedWeekDays": "標記星期",
+        "firstWeekDay": "開始星期",
+        "weekOfTheYear": "顯示週數"
       }
     }
   },

@@ -61,7 +61,7 @@ function onApplyBtnClicked(): void {
   <ModalBase
     ref="dateSelectorModel"
     v-model="isModalOn"
-    class="fixed z-10"
+    class="fixed z-10 modal-w-3xl"
     :modal-base-id="MODAL_ID"
   >
     <template #modal-title>

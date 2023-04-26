@@ -5,12 +5,13 @@ import { LocaleActor } from "~/services/locale";
 import { useSearchState } from "~/states/useSearchState";
 import { DiaryPageActionParams } from "~/dwdy/types/core";
 import SvgIcon from "~/components/SvgIcon.vue";
+import SearchHistoryEntry from "./SearchHistoryEntry.vue";
 
 const emit = defineEmits<{
   (e: "triggerAction", params: DiaryPageActionParams): void;
 }>();
 
-const la = new LocaleActor("dwdy.layout.calendar.components.SearchMain");
+const la = new LocaleActor("dwdy.layout.calendar.components.search");
 const searchState = useSearchState();
 
 const currentMark = computed<string | undefined>(() => {
@@ -28,25 +29,28 @@ const currentMark = computed<string | undefined>(() => {
   return undefined;
 });
 
-function onSearchWithTimeRangeBtnClicked(): void {
+function onSearchMainMenuEntryBtnClicked(): void {
   emit("triggerAction", { action: "open-search-time-range-modal" });
 }
 </script>
 <template>
-  <button
-    class="btn btn-primary btn-outline rounded-full flex items-center flex-nowrap"
-    @click="onSearchWithTimeRangeBtnClicked"
-  >
-    <SvgIcon class="mr-2" icon-set="mdi" :path="mdiClock" :size="24"></SvgIcon>
-
+  <button @click="onSearchMainMenuEntryBtnClicked">
     <div
-      v-if="currentMark"
-      class="mr-1 px-2 py-1 border-2 border-primary rounded text-sm font-bold font-mono"
+      v-if="currentMark === undefined"
+      class="btn btn-primary btn-outline rounded-xl flex items-center flex-nowrap"
     >
-      {{ currentMark.toUpperCase() }}
-    </div>
-    <div v-else>
+      <SvgIcon
+        class="mr-2"
+        icon-set="mdi"
+        :path="mdiClock"
+        :size="24"
+      ></SvgIcon>
       {{ la.t(".timeRange") }}
     </div>
+    <SearchHistoryEntry
+      v-else
+      :query="searchState.query.value"
+      :enable-hover="true"
+    ></SearchHistoryEntry>
   </button>
 </template>

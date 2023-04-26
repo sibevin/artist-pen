@@ -13,7 +13,7 @@ import CalendarPanel from "~/dwdy/layout/calendar/components/CalendarPanel.vue";
 import YmdNavPanel from "~/components/dwdy/common/YmdNavPanel.vue";
 
 const dwdyState = useDwdyState();
-const la = new LocaleActor("pages.dwdy.DiaryPage.settingsModal");
+const la = new LocaleActor("dwdy.layout.calendar.components.ConfigPanel");
 const diaryConfig = ref<DiaryConfigAttrs>(
   dwdyState.diary.value.fetchDiaryConfig()
 );
@@ -67,12 +67,14 @@ async function onHighlightedWeekDaysUpdated(): Promise<void> {
   <div>
     <div class="cell-block mt-5">
       <div class="cell-title">
-        {{ la.t("dwdy.layout.calendar.config.calendarDisplay.name") }}
+        {{ la.t(".calendarDisplay") }}
       </div>
       <div class="p-3 flex flex-col items-center">
         <div class="relative p-2 border-2 border-base-200">
-          <div class="absolute top-0 left-0 p-2 rounded-br-lg bg-base-200">
-            圖例
+          <div
+            class="absolute top-0 left-0 px-2 py-1 rounded-br-lg bg-base-200"
+          >
+            {{ la.t(".example") }}
           </div>
           <div class="max-w-v80 overflow-hidden">
             <YmdNavPanel
@@ -89,7 +91,7 @@ async function onHighlightedWeekDaysUpdated(): Promise<void> {
         >
           <div class="flex-1 cell-block flex justify-center items-center">
             <div class="cell-title">
-              {{ la.t("dwdy.layout.calendar.config.firstWeekDay.name") }}
+              {{ la.t(".firstWeekDay") }}
             </div>
             <div class="p-5 flex justify-center items-center">
               <label
@@ -120,7 +122,7 @@ async function onHighlightedWeekDaysUpdated(): Promise<void> {
           </div>
           <div class="flex-1 cell-block">
             <div class="cell-title">
-              {{ la.t("dwdy.layout.config.displayIcon.name") }}
+              {{ la.t(".displayIcon") }}
             </div>
             <div class="p-5 flex">
               <div class="w-full grid grid-cols-3 gap-2">
@@ -162,7 +164,7 @@ async function onHighlightedWeekDaysUpdated(): Promise<void> {
         >
           <div class="flex-1 cell-block flex justify-center items-center">
             <div class="cell-title">
-              {{ la.t("models.dwdy.config.field.highlightedWeekDays") }}
+              {{ la.t(".highlightedWeekDays") }}
             </div>
             <div class="p-5 flex justify-center items-center">
               <label
@@ -189,7 +191,7 @@ async function onHighlightedWeekDaysUpdated(): Promise<void> {
           </div>
           <div class="flex-1 cell-block">
             <div class="cell-title">
-              {{ la.t("dwdy.config.isWeekShown.name") }}
+              {{ la.t(".weekOfTheYear") }}
             </div>
             <div class="h-full p-5 flex justify-center items-center">
               <label

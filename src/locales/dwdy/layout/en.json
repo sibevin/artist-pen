@@ -1,7 +1,6 @@
 {
   "config": {
     "displayIcon": {
-      "name": "Calendar icon",
       "options": {
         "dot": "Dot",
         "sticker": "Sticker",
@@ -13,14 +12,7 @@
     "name": "Calendar",
     "description": "Provide a calendar to quickly access contents for a particular date.",
     "config": {
-      "calendarDisplay": {
-        "name": "Calendar display"
-      },
-      "firstWeekDay": {
-        "name": "Calendar started day"
-      },
       "searchSort": {
-        "name": "Sorted by",
         "options": {
           "timestampDesc": "Date: Late> Early",
           "timestampAsc": "Date: Early > Late"
@@ -28,8 +20,17 @@
       }
     },
     "components": {
-      "SearchMain": {
-        "timeRange": "Date"
+      "search": {
+        "timeRange": "Date",
+        "sort": "Sorted by"
+      },
+      "ConfigPanel": {
+        "example": "Example",
+        "calendarDisplay": "Calendar display",
+        "displayIcon": "Calendar icon",
+        "highlightedWeekDays": "Highlighted days",
+        "firstWeekDay": "Calendar started day",
+        "weekOfTheYear": "Week of the year"
       }
     }
   },

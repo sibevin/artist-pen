@@ -1,11 +1,11 @@
 import { DiaryFeatureComponent } from "~/dwdy/feature/def";
-import EditorMain from "~/dwdy/feature/text/components/EditorMain.vue";
-import EditorMenu from "~/dwdy/feature/text/components/EditorMenu.vue";
-import ContentGallery from "~/dwdy/feature/text/components/ContentGallery.vue";
-import ContentSlate from "~/dwdy/feature/text/components/ContentSlate.vue";
-import ContentFullViewer from "~/dwdy/feature/text/components/ContentFullViewer.vue";
-import ContentListEntry from "~/dwdy/feature/text/components/ContentListEntry.vue";
-import ConfigPanel from "~/dwdy/feature/text/components/ConfigPanel.vue";
+import EditorMain from "./components/EditorMain.vue";
+import EditorMenu from "./components/EditorMenu.vue";
+import ContentGallery from "./components/ContentGallery.vue";
+import ContentSlate from "./components/ContentSlate.vue";
+import ContentFullViewer from "./components/ContentFullViewer.vue";
+import ContentListEntry from "./components/ContentListEntry.vue";
+import ConfigPanel from "./components/ConfigPanel.vue";
 
 export const FEATURE_COMPONENT: DiaryFeatureComponent = {
   editorMain: EditorMain,

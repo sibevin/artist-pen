@@ -15,7 +15,6 @@ import {
   getHalfYear,
   getHalfYearFirstDt,
 } from "~/dwdy/services/dateUtils";
-import YmdBlock from "~/components/dwdy/common/YmdBlock.vue";
 import SvgIcon from "~/components/SvgIcon.vue";
 
 const DATE_RANGE_TYPES = ["none", "1w", "1m", "1q", "1h", "1y"] as const;
@@ -28,6 +27,7 @@ type DateRangeMapDef = {
 };
 type DateRangeMapEntry = {
   mark: string;
+  display: string;
   value: string;
   valid: boolean;
   text?: string;
@@ -68,28 +68,6 @@ const isToEnabled = ref(true);
 const currentEntry = ref<DateRangeMapEntry | undefined>();
 const predefinedDateRanges = buildPredefinedDateRanges();
 
-const currentEntryFromDt = computed<Date | undefined>(() => {
-  if (!currentEntry.value) {
-    return undefined;
-  }
-  const fromDs = currentEntry.value.value.split("_")[0];
-  if (fromDs) {
-    return dsToDt(fromDs);
-  }
-  return undefined;
-});
-
-const currentEntryToDt = computed<Date | undefined>(() => {
-  if (!currentEntry.value) {
-    return undefined;
-  }
-  const toDs = currentEntry.value.value.split("_")[1];
-  if (toDs) {
-    return dsToDt(toDs);
-  }
-  return undefined;
-});
-
 const selectedValue = computed<string>({
   get() {
     if (currentEntry.value) {
@@ -104,6 +82,7 @@ const selectedValue = computed<string>({
       const toDs = isToEnabled.value ? customizedDateRange.value.to : "";
       currentEntry.value = {
         mark: "customized",
+        display: `${fromDs}_${toDs}`,
         value: `${fromDs}_${toDs}`,
         valid: isValidDateRange.value,
       };
@@ -164,9 +143,11 @@ watch(
       }
       const fromDs = isFromEnabled.value ? customizedDateRange.value.from : "";
       const toDs = isToEnabled.value ? customizedDateRange.value.to : "";
+      const value = `${fromDs}_${toDs}`;
       currentEntry.value = {
         mark: "customized",
-        value: `${fromDs}_${toDs}`,
+        display: value.replaceAll("-", ".").replace("_", " - "),
+        value,
         valid: isValidDateRange.value,
       };
     }
@@ -193,6 +174,7 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
       type: "none",
       recentEntry: {
         mark: "none",
+        display: la.t(`.indefinite`) as string,
         value: `_`,
         valid: true,
         text: la.t(`.indefinite`) as string,
@@ -222,6 +204,7 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
           });
           return {
             mark: `${wFirstDt.getFullYear()}.W${subW}`,
+            display: `${wFirstDt.getFullYear()}.W${subW}`,
             value: `${fromDs}_${toDs}`,
             valid: true,
           };
@@ -246,10 +229,12 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
             alignment: "begin",
           });
           const fromDt = dsToDt(fromDs);
+          const mark = `${fromDt.getFullYear()}.${String(
+            fromDt.getMonth() + 1
+          ).padStart(2, "0")}`;
           return {
-            mark: `${fromDt.getFullYear()}.${String(
-              fromDt.getMonth() + 1
-            ).padStart(2, "0")}`,
+            mark,
+            display: mark,
             value: `${fromDs}_${toDs}`,
             valid: true,
           };
@@ -278,6 +263,7 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
           });
           return {
             mark: `${qFirstDt.getFullYear()}.Q${subQ}`,
+            display: `${qFirstDt.getFullYear()}.Q${subQ}`,
             value: `${fromDs}_${toDs}`,
             valid: true,
           };
@@ -306,6 +292,7 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
           });
           return {
             mark: `${hyFirstDt.getFullYear()}.H${subHy}`,
+            display: `${hyFirstDt.getFullYear()}.H${subHy}`,
             value: `${fromDs}_${toDs}`,
             valid: true,
           };
@@ -327,6 +314,7 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
           const toDs = dtToDs(new Date(baseDt.getFullYear(), 11, 31));
           return {
             mark: `${fromDt.getFullYear()}`,
+            display: `${fromDt.getFullYear()}`,
             value: `${fromDs}_${toDs}`,
             valid: true,
           };
@@ -345,10 +333,11 @@ function buildRecentDateRangeEntry(
     Object.assign({}, dateRangeDef.recentOpt)
   );
   return {
-    mark: dateRangeDef.type.toUpperCase(),
+    mark: dateRangeDef.type,
+    display: la.t(`.predefined.${dateRangeDef.type}.display`) as string,
     value: `${fromDs}_${todayDs}`,
     valid: true,
-    text: la.t(`.predefined.${dateRangeDef.type}`) as string,
+    text: la.t(`.predefined.${dateRangeDef.type}.text`) as string,
   };
 }
 
@@ -405,7 +394,7 @@ onMounted(() => {
           v-if="dateRange.recentEntry.mark !== 'none'"
           class="px-2 py-1 border-2 border-primary rounded text-sm font-bold font-mono"
         >
-          {{ dateRange.recentEntry.mark.toUpperCase() }}
+          {{ dateRange.recentEntry.display }}
         </div>
         <div>{{ dateRange.recentEntry.text }}</div>
       </label>
@@ -428,7 +417,7 @@ onMounted(() => {
             <div
               class="px-2 py-1 border-2 border-primary rounded text-sm font-bold font-mono"
             >
-              {{ subEntry.mark.toUpperCase() }}
+              {{ subEntry.display }}
             </div>
             <div>{{ subEntry.text }}</div>
           </label>
@@ -494,44 +483,6 @@ onMounted(() => {
           ></SvgIcon>
           {{ la.t(".invalidDateRange") }}
         </div>
-      </div>
-    </div>
-    <div class="mx-2 flex justify-center items-center gap-4">
-      <YmdBlock
-        v-if="currentEntryFromDt"
-        class="flex-none hidden md:flex"
-        :current-date="currentEntryFromDt"
-        week-day-format="long"
-      ></YmdBlock>
-      <YmdBlock
-        v-if="currentEntryFromDt"
-        class="flex-none md:hidden"
-        :current-date="currentEntryFromDt"
-        week-day-format="short"
-      ></YmdBlock>
-      <div
-        v-else
-        class="border-2 border-t-[1rem] border-base-200 p-5 whitespace-nowrap"
-      >
-        {{ la.t(".indefinite") }}
-      </div>
-      <div class="min-w-[2rem] border-2 border-base-200"></div>
-      <YmdBlock
-        v-if="currentEntryToDt"
-        class="flex-none hidden md:flex"
-        :current-date="currentEntryToDt"
-      ></YmdBlock>
-      <YmdBlock
-        v-if="currentEntryToDt"
-        class="flex-none md:hidden"
-        :current-date="currentEntryToDt"
-        week-day-format="short"
-      ></YmdBlock>
-      <div
-        v-else
-        class="border-2 border-t-[1rem] border-base-200 p-5 whitespace-nowrap"
-      >
-        {{ la.t(".indefinite") }}
       </div>
     </div>
   </div>

@@ -47,7 +47,10 @@ export interface DiaryAttrs {
     content: Partial<DiaryFeatureConfigMap>;
     layout: Partial<DiaryLayoutConfigMap>;
   };
-  searchHistories: SearchQuery[];
+  searchHistory: {
+    recent: SearchQuery[];
+    stored: SearchQuery[];
+  };
 }
 export type DiaryParams = Partial<DiaryAttrs>;
 
@@ -90,7 +93,10 @@ export const DEFAULT_ATTRS: DiaryAttrs = Object.assign(
       content: {},
       layout: {},
     },
-    searchHistories: [],
+    searchHistory: {
+      recent: [],
+      stored: [],
+    },
   }
 );
 

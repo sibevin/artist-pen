@@ -26,6 +26,7 @@ module.exports = {
         v50: "calc(var(--vh) * 50)",
       },
       maxHeight: {
+        v30: "calc(var(--vh) * 30)",
         v60: "calc(var(--vh) * 60)",
         v90: "calc(var(--vh) * 90)",
       },

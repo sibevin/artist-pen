@@ -3,11 +3,26 @@
     "DateRangeSelector": {
       "selectDateRange": "Select particular dates",
       "predefined": {
-        "1w": "The recent week (7 days)",
-        "1m": "The recent month (30 days)",
-        "1q": "The recent quarter (120 days)",
-        "1h": "The recent 6 months (180 days)",
-        "1y": "The recent year (360 days)"
+        "1w": {
+          "text": "The recent week (7 days)",
+          "display": "1W"
+        },
+        "1m": {
+          "text": "The recent month (30 days)",
+          "display": "1M"
+        },
+        "1q": {
+          "text": "The recent quarter (120 days)",
+          "display": "1Q"
+        },
+        "1h": {
+          "text": "The recent 6 months (180 days)",
+          "display": "1YH"
+        },
+        "1y": {
+          "text": "The recent year (360 days)",
+          "display": "1Y"
+        }
       },
       "from": "From: ",
       "to": "To: ",
@@ -24,10 +39,13 @@
       }
     },
     "DiaryPage": {
-      "SearchModal": {
+      "search": {
         "queryHint": "Content or comment keywords",
         "searchHistory": "Search history",
-        "clear": "Clear query"
+        "clear": "Clear query",
+        "recentHistories": "Recent",
+        "storedHistories": "Stored",
+        "noHistories": "No histories"
       }
     }
   }

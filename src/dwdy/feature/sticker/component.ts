@@ -1,12 +1,14 @@
 import { DiaryFeatureComponent } from "~/dwdy/feature/def";
-import EditorMain from "~/dwdy/feature/sticker/components/EditorMain.vue";
-import ContentGallery from "~/dwdy/feature/sticker/components/ContentGallery.vue";
-import SearchQuerySelector from "~/dwdy/feature/sticker/components/SearchQuerySelector.vue";
-import SearchMenuEntry from "~/dwdy/feature/sticker/components/SearchMenuEntry.vue";
+import EditorMain from "./components/EditorMain.vue";
+import ContentGallery from "./components/ContentGallery.vue";
+import SearchQuerySelector from "./components/SearchQuerySelector.vue";
+import SearchMenuEntry from "./components/SearchMenuEntry.vue";
+import SearchHistoryEntry from "./components/SearchHistoryEntry.vue";
 
 export const FEATURE_COMPONENT: DiaryFeatureComponent = {
   editorMain: EditorMain,
   gallery: ContentGallery,
   searchQuerySelector: SearchQuerySelector,
   searchMenuEntry: SearchMenuEntry,
+  searchHistoryEntry: SearchHistoryEntry,
 };

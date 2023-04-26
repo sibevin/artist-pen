@@ -12,6 +12,7 @@ export type SearchQuery = {
   sorts: SearchSortQuery[];
   timestampRange?: {
     mark: string;
+    display: string;
     query: string;
     from?: number;
     to?: number;
@@ -20,6 +21,7 @@ export type SearchQuery = {
 
 export type SearchDateRangeQuery = {
   mark: string;
+  display: string;
   value: string;
   valid: boolean;
   text?: string;

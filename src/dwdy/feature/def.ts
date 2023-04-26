@@ -42,4 +42,5 @@ export type DiaryFeatureComponent = {
   fullViewerConfigPanel?: any;
   searchQuerySelector?: any;
   searchMenuEntry?: any;
+  searchHistoryEntry?: any;
 };

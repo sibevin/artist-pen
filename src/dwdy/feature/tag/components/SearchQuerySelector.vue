@@ -163,7 +163,7 @@ function onApplyBtnClicked(): void {
   <ModalBase
     ref="dateSelectorModel"
     v-model="isModalOn"
-    class="fixed z-10"
+    class="fixed z-10 modal-w-3xl"
     :modal-base-id="MODAL_ID"
   >
     <template #modal-title>
@@ -267,7 +267,7 @@ function onApplyBtnClicked(): void {
       </div>
     </template>
     <template #modal-content>
-      <div c class="w-full max-h-v60 p-3 flex flex-col">
+      <div c class="w-full max-h-v30 p-3 flex flex-col">
         <div
           class="min-w-0 flex-1 overflow-x-auto flex flex-col justify-start items-start flex-wrap"
         >

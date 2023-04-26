@@ -3,11 +3,26 @@
     "DateRangeSelector": {
       "selectDateRange": "選擇特定日期",
       "predefined": {
-        "1w": "最近 1 週（ 7 天）",
-        "1m": "最近 1 個月（ 30 天）",
-        "1q": "最近 1 季（ 120 天）",
-        "1h": "最近半年（ 180 天）",
-        "1y": "最近 1 年（ 360 天）"
+        "1w": {
+          "text": "最近 1 週（ 7 天）",
+          "display": "週"
+        },
+        "1m": {
+          "text": "最近 1 個月（ 30 天）",
+          "display": "月"
+        },
+        "1q": {
+          "text": "最近 1 季（ 120 天）",
+          "display": "季"
+        },
+        "1h": {
+          "text": "最近半年（ 180 天）",
+          "display": "半年"
+        },
+        "1y": {
+          "text": "最近 1 年（ 360 天）",
+          "display": "年"
+        }
       },
       "from": "從：",
       "to": "到：",
@@ -24,10 +39,13 @@
       }
     },
     "DiaryPage": {
-      "SearchModal": {
+      "search": {
         "queryHint": "關鍵字搜尋筆記內容",
         "searchHistory": "搜尋記錄",
-        "clear": "重設條件"
+        "clear": "重設條件",
+        "recentHistories": "近期",
+        "storedHistories": "已儲存",
+        "noHistories": "沒有記錄"
       }
     }
   }

@@ -21,7 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const searchState = useSearchState();
-const la = new LocaleActor("dwdy.layout.calendar.config.searchSort");
+const la = new LocaleActor("dwdy.layout.calendar.components.search");
 const isModalOn = ref(false);
 
 const sortOption = computed<string>({
@@ -79,7 +79,7 @@ function onSearchSortChanged(value: string): void {
           :path="mdiSortAscending"
           :size="24"
         ></SvgIcon>
-        {{ la.t(".name") }}
+        {{ la.t(".sort") }}
       </h2>
     </template>
   </ModalSelector>

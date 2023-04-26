@@ -6,6 +6,7 @@ import { useSearchState } from "~/states/useSearchState";
 import { SearchDateRangeQuery } from "~/dwdy/types/search";
 import { dsToDt, dtToEntryTs } from "~/dwdy/services/dateUtils";
 import DateRangeSelector from "~/components/input/DateRangeSelector.vue";
+import DateRangePanel from "~/components/panels/DateRangePanel.vue";
 import ModalBase from "~/components/ModalBase.vue";
 import SvgIcon from "~/components/SvgIcon.vue";
 
@@ -23,7 +24,7 @@ const emit = defineEmits<{
 
 const MODAL_ID = "layout-calendar-search-main";
 const searchState = useSearchState();
-const la = new LocaleActor("dwdy.layout.calendar.components.SearchMain");
+const la = new LocaleActor("dwdy.layout.calendar.components.search");
 const isModalOn = ref(false);
 const dateRangeQuery = ref<SearchDateRangeQuery>();
 
@@ -68,16 +69,15 @@ function onApplyBtnClicked(): void {
   }
   searchState.query.value.timestampRange = {
     mark: dateRangeQuery.value.mark,
+    display: dateRangeQuery.value.display,
     query: dateRangeQuery.value.value,
     from: fromTs,
     to: toTs,
   };
-  console.log("apply", searchState.query.value);
   isModalOn.value = false;
 }
 
 function onDateRangeSelected(query: SearchDateRangeQuery): void {
-  console.log("select", query);
   dateRangeQuery.value = query;
 }
 </script>
@@ -103,7 +103,15 @@ function onDateRangeSelected(query: SearchDateRangeQuery): void {
       <div class="p-3 border rounded-lg">
         <DateRangeSelector @select="onDateRangeSelected"></DateRangeSelector>
       </div>
-      <div class="card-actions mt-3 items-center">
+    </template>
+    <template #modal-fixed-bottom-panel>
+      <div class="w-full flex justify-center">
+        <DateRangePanel
+          class="mt-3"
+          :date-range="dateRangeQuery?.value"
+        ></DateRangePanel>
+      </div>
+      <div class="card-actions mt-2 items-center">
         <div class="grow flex items-center">
           <button
             class="btn btn-primary"
