@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from "vue";
-import { mdiCloseCircle, mdiPound, mdiArrowLeftBottom } from "@mdi/js";
+import {
+  mdiCloseCircle,
+  mdiPound,
+  mdiArrowLeftBottom,
+  mdiDeleteForever,
+} from "@mdi/js";
 import { useDwdyState } from "~/states/useDwdyState";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { TagValue } from "~/dwdy/feature/tag/def";
 import {
   addTag,
   deleteTag,
+  deleteAllTags,
   listCandidateTags,
   normalizeTag,
 } from "~/dwdy/feature/tag/action";
@@ -16,9 +22,8 @@ import ShlPanel from "~/components/panels/StringHighlightPanel.vue";
 const dwdyState = useDwdyState();
 const currentTags = ref<TagValue[]>([]);
 const storedTags = ref<TagValue[]>([]);
-const editingTag = ref<TagValue>("");
-const selectedTag = ref<TagValue>("");
-const isEditingTagEmpty = ref(true);
+const keyword = ref<TagValue>("");
+const markedTag = ref<TagValue>("");
 
 fetchTags();
 
@@ -36,12 +41,16 @@ const filteredTags = computed<TagValue[]>(() => {
       return !currentTags.value.includes(tag);
     });
   }
-  if (editingTag.value) {
+  if (keyword.value) {
     tags = tags.filter((tag) => {
-      return tag.toLowerCase().includes(editingTag.value.toLowerCase());
+      return tag.toLowerCase().includes(keyword.value.toLowerCase());
     });
   }
   return tags;
+});
+
+const isTagFound = computed<boolean>(() => {
+  return markedTag.value !== "" || keyword.value !== "";
 });
 
 async function fetchTags(): Promise<void> {
@@ -65,118 +74,125 @@ async function onTagDeleted(index: number): Promise<void> {
 }
 
 async function onTagInputEnterPressed(): Promise<void> {
-  if (selectedTag.value !== "") {
-    await onTagAdded(selectedTag.value);
+  if (markedTag.value !== "") {
+    await onTagAdded(markedTag.value);
   } else {
-    await onTagAdded(editingTag.value);
+    await onTagAdded(keyword.value);
   }
-  selectedTag.value = "";
-  editingTag.value = "";
+  markedTag.value = "";
+  keyword.value = "";
 }
 
 function onTagInputTyped(): void {
   nextTick(() => {
-    selectedTag.value = "";
-    editingTag.value = normalizeTag(editingTag.value);
+    markedTag.value = "";
+    keyword.value = normalizeTag(keyword.value);
   });
 }
 
-function onTagInputMoved(direction: "up" | "down"): void {
-  const selectedIndex = filteredTags.value.indexOf(selectedTag.value);
+function onTagInputMoved(event: KeyboardEvent, direction: "up" | "down"): void {
+  const selectedIndex = filteredTags.value.indexOf(markedTag.value);
   if (selectedIndex < 0) {
-    selectedTag.value = filteredTags.value[0];
+    markedTag.value = filteredTags.value[0];
   } else if (direction === "up") {
     if (selectedIndex === 0) {
-      selectedTag.value = filteredTags.value[filteredTags.value.length - 1];
+      markedTag.value = filteredTags.value[filteredTags.value.length - 1];
     } else {
-      selectedTag.value = filteredTags.value[selectedIndex - 1];
+      markedTag.value = filteredTags.value[selectedIndex - 1];
     }
   } else if (direction === "down") {
     if (selectedIndex === filteredTags.value.length - 1) {
-      selectedTag.value = filteredTags.value[0];
+      markedTag.value = filteredTags.value[0];
     } else {
-      selectedTag.value = filteredTags.value[selectedIndex + 1];
+      markedTag.value = filteredTags.value[selectedIndex + 1];
     }
   }
+  event.stopPropagation();
 }
 
-async function onTagInputBackspacePressed(): Promise<void> {
-  if (editingTag.value !== "") {
-    isEditingTagEmpty.value = false;
-    return;
-  }
-  if (!isEditingTagEmpty.value) {
-    isEditingTagEmpty.value = true;
-    return;
-  }
-  isEditingTagEmpty.value = false;
-  const lastIndex = currentTags.value.length - 1;
-  if (lastIndex >= 0) {
-    editingTag.value = currentTags.value[lastIndex];
-    await onTagDeleted(lastIndex);
-  }
+async function onCleanAllTagsBtnClicked(): Promise<void> {
+  await deleteAllTags();
+  currentTags.value = [];
 }
 </script>
 <template>
   <div class="w-full h-full p-3 flex flex-col">
     <div
-      class="flex-none rounded border-2 border-dashed border-base-300 p-3 flex justify-start items-start flex-wrap"
-    >
-      <div v-for="(value, index) in currentTags" :key="index">
-        <div
-          class="w-fit mr-2 mb-2 text-primary bg-base-100 p-1 border border-base-content rounded shadow flex justify-start items-center"
-        >
-          <SvgIcon icon-set="mdi" :path="mdiPound" :size="16"></SvgIcon>
-          <div class="mx-1">{{ value }}</div>
-          <div
-            class="pl-2 py-1 text-base-200 cursor-pointer"
-            @click="onTagDeleted(index)"
-          >
-            <SvgIcon icon-set="mdi" :path="mdiCloseCircle" :size="16"></SvgIcon>
-          </div>
-        </div>
-      </div>
-      <div
-        class="w-fit text-primary bg-base-100 p-2 pl-1 border border-base-content rounded shadow flex justify-start items-center"
-      >
-        <SvgIcon icon-set="mdi" :path="mdiPound" :size="16"></SvgIcon>
-        <label class="w-48 input-group">
-          <input
-            ref="tagInput"
-            v-model="editingTag"
-            class="ml-1 input input-bordered border-base-200 w-full"
-            type="text"
-            name="fileName"
-            @input="onTagInputTyped"
-            @keyup.up="onTagInputMoved('up')"
-            @keyup.down="onTagInputMoved('down')"
-            @keyup.enter="onTagInputEnterPressed"
-            @keyup.delete="onTagInputBackspacePressed"
-          />
-          <span class="bg-base-200 px-2">
-            <SvgIcon
-              icon-set="mdi"
-              :path="mdiArrowLeftBottom"
-              :size="20"
-            ></SvgIcon>
-          </span>
-        </label>
-      </div>
-    </div>
-    <div
-      class="min-w-0 pt-2 flex-1 overflow-x-auto flex flex-col justify-start items-start flex-wrap"
+      class="min-w-0 flex-1 overflow-x-auto flex flex-col justify-start items-start flex-wrap"
     >
       <div v-for="(value, index) in filteredTags" :key="index">
         <div
           class="w-fit mr-2 mb-2 p-1 text-primary bg-base-100 cursor-pointer flex justify-start items-center"
-          :class="{ 'border-2 border-base-200': selectedTag === value }"
+          :class="{ 'border-2 border-base-200': markedTag === value }"
           @click="onTagAdded(value)"
         >
           <SvgIcon icon-set="mdi" :path="mdiPound" :size="16"></SvgIcon>
           <div class="mx-1">
-            <ShlPanel :target="value" :keyword="editingTag"></ShlPanel>
+            <ShlPanel :target="value" :keyword="keyword"></ShlPanel>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="w-full flex items-stretch">
+      <div
+        class="w-full rounded border-2 border-dashed border-base-300 p-3 flex justify-start items-start flex-wrap"
+      >
+        <div v-for="(value, index) in currentTags" :key="index">
+          <div
+            class="w-fit mr-2 mb-2 text-primary bg-base-100 p-1 border border-base-content rounded shadow flex justify-start items-center"
+          >
+            <SvgIcon icon-set="mdi" :path="mdiPound" :size="16"></SvgIcon>
+            <div class="ml-1 mr-2">{{ value }}</div>
+            <button
+              class="py-1 text-base-200 cursor-pointer"
+              @click="onTagDeleted(index)"
+            >
+              <SvgIcon
+                icon-set="mdi"
+                :path="mdiCloseCircle"
+                :size="16"
+              ></SvgIcon>
+            </button>
+          </div>
+        </div>
+        <div
+          class="w-fit text-primary bg-base-100 p-2 pl-1 border border-base-content rounded shadow flex justify-start items-center"
+        >
+          <SvgIcon icon-set="mdi" :path="mdiPound" :size="16"></SvgIcon>
+          <label class="w-48 input-group">
+            <input
+              ref="tagInput"
+              v-model="keyword"
+              class="ml-1 input input-bordered border-base-200 w-full"
+              type="text"
+              name="fileName"
+              autocomplete="off"
+              @input="onTagInputTyped"
+              @keyup.up="onTagInputMoved($event, 'up')"
+              @keyup.down="onTagInputMoved($event, 'down')"
+              @keyup.enter="onTagInputEnterPressed"
+            />
+            <span
+              v-if="isTagFound"
+              class="bg-base-200 px-2 cursor-pointer"
+              @click="onTagInputEnterPressed"
+            >
+              <SvgIcon
+                icon-set="mdi"
+                :path="mdiArrowLeftBottom"
+                :size="20"
+              ></SvgIcon>
+            </span>
+          </label>
+        </div>
+      </div>
+      <div v-if="currentTags.length > 0" class="flex-none m-3">
+        <button
+          class="btn btn-ghost flex h-full text-error"
+          @click="onCleanAllTagsBtnClicked"
+        >
+          <SvgIcon icon-set="mdi" :path="mdiDeleteForever" :size="24"></SvgIcon>
+        </button>
       </div>
     </div>
   </div>

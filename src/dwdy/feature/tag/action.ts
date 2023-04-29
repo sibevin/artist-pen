@@ -45,7 +45,7 @@ async function addTagToDiaryStat(tag: TagValue): Promise<void> {
   await dwdyState.diary.value.save();
 }
 
-async function deleteTagFromDiaryStat(tag: TagValue): Promise<void> {
+function deleteTagFromDiaryStat(tag: TagValue): void {
   if (!tag) {
     return;
   }
@@ -60,7 +60,6 @@ async function deleteTagFromDiaryStat(tag: TagValue): Promise<void> {
   stat["fileSize"] += -getStringBytes(tag);
   stat["distribution"] = deleteKey(tag, stat["distribution"]);
   dwdyState.diary.value.assignStat<DiaryFeature.Tag>(DiaryFeature.Tag, stat);
-  await dwdyState.diary.value.save();
 }
 
 async function addTagToDwdyConfig(tag: TagValue): Promise<void> {
@@ -71,7 +70,7 @@ async function addTagToDwdyConfig(tag: TagValue): Promise<void> {
   await dwdyState.config.value.save();
 }
 
-async function deleteTagFromDwdyConfig(tag: TagValue): Promise<void> {
+function deleteTagFromDwdyConfig(tag: TagValue): void {
   if (!tag) {
     return;
   }
@@ -79,7 +78,6 @@ async function deleteTagFromDwdyConfig(tag: TagValue): Promise<void> {
   let tagDis = dwdyState.config.value.doc.tagDistribution;
   tagDis = deleteKey(tag, tagDis);
   dwdyState.config.value.assign({ tagDistribution: tagDis });
-  await dwdyState.config.value.save();
 }
 
 export async function addTag(tag: TagValue): Promise<TagValue[]> {
@@ -130,12 +128,39 @@ export async function deleteTag(index: number): Promise<TagValue[]> {
         index
       );
       const entryDoc = await deleteTagFromDiaryEntryContent(index);
-      await deleteTagFromDiaryStat(tag);
-      await deleteTagFromDwdyConfig(tag);
+      deleteTagFromDiaryStat(tag);
+      deleteTagFromDwdyConfig(tag);
+      await dwdyState.diary.value.save();
+      await dwdyState.config.value.save();
       dwdyState.updateEntry(entryDoc);
       return dwdyState.entry.value.fetchContents<DiaryFeature.Tag>(
         DiaryFeature.Tag
       );
+    }
+  );
+}
+
+export async function deleteAllTags(): Promise<void> {
+  return await dbDwdy.transaction(
+    "rw",
+    dbDwdy.diaryEntries,
+    dbDwdy.diaries,
+    dbDwdy.configs,
+    async () => {
+      const dwdyState = useDwdyState();
+      const tags = dwdyState.entry.value.fetchContents<DiaryFeature.Tag>(
+        DiaryFeature.Tag
+      );
+      dwdyState.entry.value.assignContents(DiaryFeature.Tag, []);
+      await dwdyState.entry.value.save();
+      dwdyState.updateEntry(dwdyState.entry.value.doc);
+      for (let i = 0; i < tags.length; i++) {
+        const tag = tags[i];
+        deleteTagFromDiaryStat(tag);
+        deleteTagFromDwdyConfig(tag);
+      }
+      await dwdyState.diary.value.save();
+      await dwdyState.config.value.save();
     }
   );
 }
