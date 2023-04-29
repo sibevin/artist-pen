@@ -1,22 +1,10 @@
 import { createApp } from "vue";
-import { createWebHistory, createRouter } from "vue-router";
 import { createMetaManager } from "vue-meta";
 import "./assets/css/tailwind.css";
 import App from "./App.vue";
-import { routes } from "./configs/routes";
-import { useAudioState } from "~/dwdy/feature/sound/state/useAudioState";
+import { buildRouter } from "./services/route";
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-});
-router.beforeEach(() => {
-  const audioState = useAudioState();
-  audioState.stopAllAudioDevices();
-  audioState.recorder.stopCallback = undefined;
-  audioState.player.endCallback = undefined;
-});
-
+const router = buildRouter();
 const metaManager = createMetaManager();
 
 const app = createApp(App);

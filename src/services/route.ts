@@ -1,3 +1,5 @@
+import { createWebHistory, createRouter, Router } from "vue-router";
+import { useAudioState } from "~/dwdy/feature/sound/state/useAudioState";
 import EntryPage from "~/pages/EntryPage.vue";
 import DiariesPage from "~/pages/dwdy/DiariesPage.vue";
 import DiaryPage from "~/pages/dwdy/DiaryPage.vue";
@@ -8,7 +10,7 @@ import AboutPage from "~/pages/AboutPage.vue";
 import ErrorPage from "~/pages/ErrorPage.vue";
 import DevPage from "~/pages/DevPage.vue";
 
-export const routes = [
+const ROUTES = [
   {
     path: "/",
     name: "entry",
@@ -61,3 +63,21 @@ export const routes = [
     },
   },
 ];
+
+export function buildRouter(): Router {
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: ROUTES,
+  });
+  setupGlobalRouteGuard(router);
+  return router;
+}
+
+function setupGlobalRouteGuard(router: Router): void {
+  router.beforeEach(() => {
+    const audioState = useAudioState();
+    audioState.stopAllAudioDevices();
+    audioState.recorder.stopCallback = undefined;
+    audioState.player.endCallback = undefined;
+  });
+}
