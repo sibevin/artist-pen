@@ -18,6 +18,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: "change", value: string[]): void;
+  (e: "select", value: string): void;
 }>();
 
 const la = new LocaleActor("dwdy.feature.sticker");
@@ -36,7 +37,7 @@ watch(
 
 function fetchSticker(): void {
   currentStickers.value = props.stickers;
-  recentStickers.value = [...dwdyState.config.value.doc.recentStickerCodes];
+  updateRecentStickers();
 }
 
 function stickerSelectedIndex(code: string): number {
@@ -50,54 +51,23 @@ function selectSticker(code: string): void {
   } else {
     currentStickers.value.push(code);
   }
-  emit("change", currentStickers.value);
+  emit("select", code);
+  emit("change", [...currentStickers.value]);
 }
 
 function clearAllStickers(): void {
   currentStickers.value = [];
-  emit("change", currentStickers.value);
+  emit("change", [...currentStickers.value]);
 }
 
-defineExpose({ selectSticker, clearAllStickers });
+function updateRecentStickers(): void {
+  recentStickers.value = [...dwdyState.config.value.doc.recentStickerCodes];
+}
+
+defineExpose({ selectSticker, clearAllStickers, updateRecentStickers });
 </script>
 <template>
   <div class="w-full h-full flex flex-col">
-    <div class="flex-none">
-      <div class="cell-block mt-6">
-        <div class="cell-title flex items-center uppercase px-2">
-          <SvgIcon
-            class="mr-2"
-            :icon-set="recentStickerCategory.icon.set"
-            :path="recentStickerCategory.icon.path"
-            :size="24"
-          ></SvgIcon>
-          {{ la.t(`.category.${recentStickerCategory.code}`) }}
-        </div>
-        <div class="mx-auto flex flex-wrap p-2 max-h-32 overflow-y-hidden">
-          <div
-            v-for="stickerCode in recentStickers"
-            :key="stickerCode"
-            class="indicator"
-            @click="selectSticker(stickerCode)"
-          >
-            <div
-              v-if="stickerSelectedIndex(stickerCode) >= 0"
-              class="indicator-item indicator-bottom"
-            >
-              <div
-                class="bg-primary text-base-100 opacity-70 rounded h-6 w-6 -ml-7 -mt-7 p-2 font-bold cursor-pointer flex justify-center items-center"
-              >
-                {{ stickerSelectedIndex(stickerCode) + 1 }}
-              </div>
-            </div>
-            <StickerIcon
-              class="m-1 text-primary cursor-pointer"
-              :code="stickerCode"
-            ></StickerIcon>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="min-h-0 overflow-y-auto">
       <div v-for="stickerCa in stickerCategories" :key="stickerCa.code">
         <div class="cell-block mt-6 mb-2">
@@ -132,6 +102,42 @@ defineExpose({ selectSticker, clearAllStickers });
                 :code="stickerCode"
               ></StickerIcon>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex-none">
+      <div class="cell-block mt-4">
+        <div class="cell-title flex items-center uppercase px-2">
+          <SvgIcon
+            class="mr-2"
+            :icon-set="recentStickerCategory.icon.set"
+            :path="recentStickerCategory.icon.path"
+            :size="24"
+          ></SvgIcon>
+          {{ la.t(`.category.${recentStickerCategory.code}`) }}
+        </div>
+        <div class="mx-auto flex flex-wrap p-2 max-h-36 overflow-y-hidden">
+          <div
+            v-for="stickerCode in recentStickers"
+            :key="stickerCode"
+            class="indicator"
+            @click="selectSticker(stickerCode)"
+          >
+            <div
+              v-if="stickerSelectedIndex(stickerCode) >= 0"
+              class="indicator-item indicator-bottom"
+            >
+              <div
+                class="bg-primary text-base-100 opacity-70 rounded h-6 w-6 -ml-7 -mt-7 p-2 font-bold cursor-pointer flex justify-center items-center"
+              >
+                {{ stickerSelectedIndex(stickerCode) + 1 }}
+              </div>
+            </div>
+            <StickerIcon
+              class="m-1 text-primary cursor-pointer"
+              :code="stickerCode"
+            ></StickerIcon>
           </div>
         </div>
       </div>

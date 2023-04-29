@@ -75,76 +75,77 @@ function onApplyBtnClicked(): void {
       </h2>
     </template>
     <template #modal-fixed-bottom-panel>
-      <div class="mt-2 w-full flex justify-between items-center">
-        <div
-          class="grow min-w-0 rounded border-2 border-dashed border-base-300 p-3"
-        >
-          <div v-if="currentStickers.length > 0" class="w-full">
-            <Flicking
-              class="w-full"
-              :options="{
-                align: 'center',
-                bound: true,
-              }"
-            >
-              <div
-                v-for="(stickerCode, index) in currentStickers"
-                :id="stickerCode"
-                :key="index"
-                class="panel"
-              >
-                <StickerIcon
-                  class="mx-1 cursor-pointer"
-                  :code="stickerCode"
-                  @click="stickerSelector.selectSticker(stickerCode)"
-                ></StickerIcon>
-              </div>
-            </Flicking>
-          </div>
-          <div v-else class="h-12"></div>
-        </div>
-        <div v-if="currentStickers.length > 0" class="flex-none p-3">
-          <button
-            class="btn btn-circle btn-ghost text-error"
-            @click="stickerSelector.clearAllStickers()"
+      <div class="max-h-v60 flex flex-col">
+        <StickerSelector
+          ref="stickerSelector"
+          class="min-h-0 flex-1"
+          :stickers="currentStickers"
+          @change="onStickersChanged"
+        ></StickerSelector>
+        <div class="flex-none my-3 w-full flex justify-between items-center">
+          <div
+            class="grow min-w-0 rounded border-2 border-dashed border-base-300 p-3"
           >
-            <SvgIcon
-              icon-set="mdi"
-              :path="mdiDeleteForever"
-              :size="24"
-            ></SvgIcon>
-          </button>
+            <div v-if="currentStickers.length > 0" class="w-full">
+              <Flicking
+                class="w-full"
+                :options="{
+                  align: 'center',
+                  bound: true,
+                }"
+              >
+                <div
+                  v-for="(stickerCode, index) in currentStickers"
+                  :id="stickerCode"
+                  :key="index"
+                  class="panel"
+                >
+                  <StickerIcon
+                    class="mx-1 cursor-pointer"
+                    :code="stickerCode"
+                    @click="stickerSelector.selectSticker(stickerCode)"
+                  ></StickerIcon>
+                </div>
+              </Flicking>
+            </div>
+            <div v-else class="h-12"></div>
+          </div>
+          <div v-if="currentStickers.length > 0" class="flex-none p-3">
+            <button
+              class="btn btn-circle btn-ghost text-error"
+              @click="stickerSelector.clearAllStickers()"
+            >
+              <SvgIcon
+                icon-set="mdi"
+                :path="mdiDeleteForever"
+                :size="24"
+              ></SvgIcon>
+            </button>
+          </div>
+        </div>
+        <div class="flex-none card-actions items-center">
+          <div class="grow flex items-center">
+            <button class="btn btn-primary" @click="onApplyBtnClicked">
+              <SvgIcon
+                class="mr-2"
+                icon-set="mdi"
+                :path="mdiCheck"
+                :size="16"
+              ></SvgIcon>
+              {{ la.t("app.action.apply") }}
+            </button>
+            <label class="btn btn-ghost ml-2" :for="`modal-base_${MODAL_ID}`">
+              <SvgIcon
+                class="text-base-content mr-2"
+                icon-set="mdi"
+                :path="mdiClose"
+                :size="16"
+              ></SvgIcon>
+              {{ la.t("app.action.cancel") }}
+            </label>
+          </div>
         </div>
       </div>
-      <div class="card-actions mt-2 items-center">
-        <div class="grow flex items-center">
-          <button class="btn btn-primary" @click="onApplyBtnClicked">
-            <SvgIcon
-              class="mr-2"
-              icon-set="mdi"
-              :path="mdiCheck"
-              :size="16"
-            ></SvgIcon>
-            {{ la.t("app.action.apply") }}
-          </button>
-          <label class="btn btn-ghost ml-2" :for="`modal-base_${MODAL_ID}`">
-            <SvgIcon
-              class="text-base-content mr-2"
-              icon-set="mdi"
-              :path="mdiClose"
-              :size="16"
-            ></SvgIcon>
-            {{ la.t("app.action.cancel") }}
-          </label>
-        </div>
-      </div>
-    </template>
-    <template #modal-content>
-      <StickerSelector
-        ref="stickerSelector"
-        :stickers="currentStickers"
-        @change="onStickersChanged"
-      ></StickerSelector>
     </template>
   </ModalBase>
 </template>
