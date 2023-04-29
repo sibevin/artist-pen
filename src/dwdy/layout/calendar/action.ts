@@ -19,7 +19,6 @@ export function buildDisplayIcons(
   const displayIcon = diary.fetchLayoutConfig(DiaryLayout.Calendar).displayIcon;
   let icons: DisplayIconFormat[] = [];
   if (displayIcon === "content") {
-    let i = 0;
     for (const feature of LAYOUT_DISPLAY_FEATURES) {
       if (!diary.enabledFeatures.includes(feature)) {
         continue;
@@ -28,9 +27,8 @@ export function buildDisplayIcons(
       if (contents.length > 0) {
         icons.push({
           icon: featureIcon(feature),
-          size: i === 0 ? 1 : 0.8,
+          size: 1.2,
         });
-        i++;
       }
       if (icons.length > 0) {
         break;
@@ -46,10 +44,10 @@ export function buildDisplayIcons(
       const contents = entry.fetchContents(feature);
       contentLength += contents.length;
     }
-    const size = (contentLength / 10 + 1) * 0.5;
+    const size = (contentLength / 20 + 1) * 0.5;
     icons.push({
       icon: { set: "mdi", path: mdiCircle },
-      size: size >= 1 ? 1 : size,
+      size: size >= 1.2 ? 1.2 : size,
     });
   }
   if (displayIcon === "sticker") {

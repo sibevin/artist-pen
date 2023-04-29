@@ -23,8 +23,10 @@ export type DisplayIconFormat = {
 
 export const LAYOUT_DISPLAY_FEATURES: DiaryFeature[] = [
   DiaryFeature.Image,
-  DiaryFeature.Text,
   DiaryFeature.Sound,
+  DiaryFeature.Text,
+  DiaryFeature.Sticker,
+  DiaryFeature.Tag,
 ];
 
 export const SEARCH_SORT_OPTS = ["timestamp_desc", "timestamp_asc"] as const;

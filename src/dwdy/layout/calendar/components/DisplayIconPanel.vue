@@ -15,7 +15,7 @@ const props = defineProps({
 function calculateIconSize(di: DisplayIconFormat): number {
   const baseSize = ["xs", "sm", "md", "lg"].includes(getCurrentBreakpoint())
     ? 16
-    : 28;
+    : 26;
   return baseSize * (di.size || 1);
 }
 function calculateStickerSizeMultiplier(): number {
