@@ -108,10 +108,13 @@ async function fetchBunchByTimestamp(
   if (!timestamp && options.entry) {
     timestamp = options.entry.doc.timestamp || undefined;
   }
-  if (!timestamp) {
-    return { dIndexes: [], entryMap: {} };
+  if (!timestamp || !diary.doc.dUid) {
+    return { dUid: diary.doc.dUid, dIndexes: [], entryMap: {} };
   }
-  if (options.bunch && isInBunchByTimestamp(options.bunch, timestamp)) {
+  if (
+    options.bunch &&
+    !isBunchRefetchRequired(options.bunch, timestamp, diary.doc.dUid)
+  ) {
     return options.bunch;
   }
   const dIndexes: DIndex[] = [];
@@ -149,6 +152,7 @@ async function fetchBunchByTimestamp(
     }
   });
   return {
+    dUid: diary.doc.dUid,
     dIndexes,
     entryMap,
     tsRange: {
@@ -159,14 +163,18 @@ async function fetchBunchByTimestamp(
   };
 }
 
-function isInBunchByTimestamp(
+function isBunchRefetchRequired(
   bunch: DiaryEntryBunch,
-  timestamp: number
+  timestamp: number,
+  dUid: DUid
 ): boolean {
   if (!bunch.tsRange) {
-    return false;
+    return true;
   }
-  return bunch.tsRange.begin <= timestamp && bunch.tsRange.end >= timestamp;
+  if (dUid != bunch.dUid) {
+    return true;
+  }
+  return bunch.tsRange.begin > timestamp || bunch.tsRange.end < timestamp;
 }
 
 async function updateBunchByEntryTimestamp(

@@ -8,6 +8,7 @@ import { layoutComponent } from "~/dwdy/layout/component";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { featureComponent } from "~/dwdy/feature/component";
 import { DiaryContentFeatureIndex } from "~/dwdy/types/core";
+import { insertEntryByRoute } from "~/dwdy/services/initDwdyStateByRoute";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import DiaryEditorFeatureSelectorModal from "~/components/dwdy/common/FeatureSelectorModal.vue";
@@ -15,13 +16,7 @@ import DiaryEditorPositionChangeModal from "~/components/dwdy/DiaryEditorPage/Po
 import DiaryEditorDeletionModal from "~/components/dwdy/DiaryEditorPage/DeletionModal.vue";
 import DiaryEditorJumpModal from "~/components/dwdy/DiaryEditorPage/JumpModal.vue";
 import ControlMenu from "~/components/dwdy/DiaryEditorPage/ControlMenu.vue";
-import {
-  initDwdyStateByRoute,
-  insertEntryByRoute,
-} from "~/dwdy/services/initDwdyStateByRoute";
 
-const route = useRoute();
-const router = useRouter();
 const dwdyState = useDwdyState();
 const la = new LocaleActor("pages.dwdy.DiaryEditorPage");
 const pageScope = ref<string>("diaryEdit");
@@ -40,14 +35,18 @@ const menuEntries = ref<string[]>([]);
 await initPage();
 
 async function initPage(): Promise<void> {
-  if (!(await initDwdyStateByRoute(dwdyState, route))) {
+  const route = useRoute();
+  const router = useRouter();
+  if (!dwdyState.diary.value.isStored) {
     router.push({ name: "diaries" });
+    return;
   }
   if (!(await insertEntryByRoute(dwdyState, route))) {
     router.push({
       name: "diary",
       params: { dUid: dwdyState.diary.value.doc.dUid },
     });
+    return;
   }
   currentFeature.value = (route.query.f as DiaryFeature) || DiaryFeature.Text;
   currentContentIndex.value = parseInt(route.query.ci as string) || 0;

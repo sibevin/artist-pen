@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onActivated } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { mdiCog, mdiBookshelf, mdiMagnify, mdiCalendarClock } from "@mdi/js";
 import { useAppState } from "~/states/useAppState";
@@ -26,7 +26,6 @@ import SearchMainModal from "~/components/dwdy/DiaryPage/search/MainModal.vue";
 import FeatureSelectorModal from "~/components/dwdy/common/FeatureSelectorModal.vue";
 import SearchHistoryModal from "~/components/dwdy/DiaryPage/search/HistoryModal.vue";
 
-const route = useRoute();
 const router = useRouter();
 const appState = useAppState();
 const dwdyState = useDwdyState();
@@ -48,13 +47,17 @@ const isSearchSortModalOn = ref(false);
 const layoutContentMain = ref();
 const isSearchFeatureModalOn = ref<{ [key in DiaryFeature]?: boolean }>({});
 
+onActivated(async () => {
+  const route = useRoute();
+  if (!(await initDwdyStateByRoute(dwdyState, route))) {
+    router.push({ name: "diaries" });
+  }
+});
+
 const currentDate = computed(() => {
   return dwdyState.entry.value.tsDate || new Date();
 });
 
-if (!(await initDwdyStateByRoute(dwdyState, route))) {
-  router.push({ name: "diaries" });
-}
 (Object.values(DiaryFeature) as DiaryFeature[]).forEach((feature) => {
   isSearchFeatureModalOn.value[feature] = false;
 });
@@ -173,7 +176,11 @@ function triggerAction(params: DiaryPageActionParams): void {
   } else if (params.action === "open-feature-editor") {
     const query = Object.assign(
       {},
-      { f: params.cfi?.feature, ci: params.cfi?.index },
+      {
+        uid: dwdyState.diary.value.doc.dUid,
+        f: params.cfi?.feature,
+        ci: params.cfi?.index,
+      },
       {
         i: params.dIndex || dwdyState.entry.value.doc.dIndex,
         ts: params.timestamp || dwdyState.entry.value.doc.timestamp,
@@ -214,9 +221,11 @@ function triggerAction(params: DiaryPageActionParams): void {
     <div class="relatvie top-0 bottom-0 w-full h-full">
       <component
         :is="layoutComponent(dwdyState.diary.value.doc.layout, 'contentMain')"
+        v-if="dwdyState.diary.value.isStored"
         ref="layoutContentMain"
         @trigger-action="triggerAction"
       ></component>
+      <div v-else>Loading</div>
     </div>
     <template #layout-overlay-bottom-panel>
       <ControlMenu
@@ -234,6 +243,7 @@ function triggerAction(params: DiaryPageActionParams): void {
                   'contentNavMenu'
                 )
               "
+              v-if="dwdyState.diary.value.isStored"
               :current-date="currentDate"
               @move-to-entry="moveToEntry"
               @trigger-action="triggerAction"
@@ -258,7 +268,7 @@ function triggerAction(params: DiaryPageActionParams): void {
               </div>
             </button>
           </div>
-          <div class="indicator">
+          <div v-if="dwdyState.diary.value.isStored" class="indicator">
             <span
               v-if="appState.hk.value.isMarkShown(pageScope)"
               class="indicator-item indicator-bottom mr-2 mb-2 hotkey-mark"
@@ -275,7 +285,7 @@ function triggerAction(params: DiaryPageActionParams): void {
               </div>
             </button>
           </div>
-          <div class="indicator">
+          <div v-if="dwdyState.diary.value.isStored" class="indicator">
             <span
               v-if="appState.hk.value.isMarkShown(pageScope)"
               class="indicator-item indicator-bottom mr-2 mb-2 hotkey-mark"
@@ -292,7 +302,10 @@ function triggerAction(params: DiaryPageActionParams): void {
               </div>
             </button>
           </div>
-          <div class="hidden md:flex ml-6">
+          <div
+            v-if="dwdyState.diary.value.isStored"
+            class="hidden md:flex ml-6"
+          >
             <component
               :is="
                 layoutComponent(
@@ -310,23 +323,27 @@ function triggerAction(params: DiaryPageActionParams): void {
     </template>
     <template #layout-top-layer>
       <SettingsMainModal
+        v-if="dwdyState.diary.value.isStored"
         v-model="isDiarySettingsMoodalOn"
         class="fixed z-10"
         :from-page-scope="pageScope"
       ></SettingsMainModal>
       <FeatureSelectorModal
+        v-if="dwdyState.diary.value.isStored"
         ref="editorSelector"
         v-model="isEditorSelectorModalOn"
         class="fixed z-10"
         @select="onContentEditorOpen"
       ></FeatureSelectorModal>
       <FullViewerModal
+        v-if="dwdyState.diary.value.isStored"
         ref="contentFullViewer"
         v-model="isContentFullViewerModalOn"
         class="fixed z-10"
         @open-content-editor="onContentEditorOpen"
       ></FullViewerModal>
       <ModalDateSelector
+        v-if="dwdyState.diary.value.isStored"
         v-model="isCurrentDateSelectorModalOn"
         modal-id="current-date-selector"
         :current-date="currentDate"
@@ -345,12 +362,14 @@ function triggerAction(params: DiaryPageActionParams): void {
         </template>
       </ModalDateSelector>
       <SearchMainModal
+        v-if="dwdyState.diary.value.isStored"
         ref="diaryEntrySearchModal"
         v-model="isDiarySearchModalOn"
         class="fixed z-10"
         @trigger-action="triggerAction"
       ></SearchMainModal>
       <SearchHistoryModal
+        v-if="dwdyState.diary.value.isStored"
         ref="diaryEntrySearchHistoryModal"
         v-model="isSearchHistoryModalOn"
         class="fixed z-10"
@@ -360,6 +379,7 @@ function triggerAction(params: DiaryPageActionParams): void {
         :is="
           layoutComponent(dwdyState.diary.value.doc.layout, 'searchMainModal')
         "
+        v-if="dwdyState.diary.value.isStored"
         v-model="isSearchMainModalOn"
         @select="triggerAction({ action: 'apply-search' })"
       ></component>
@@ -367,6 +387,7 @@ function triggerAction(params: DiaryPageActionParams): void {
         :is="
           layoutComponent(dwdyState.diary.value.doc.layout, 'searchSortModal')
         "
+        v-if="dwdyState.diary.value.isStored"
         v-model="isSearchSortModalOn"
         @select="triggerAction({ action: 'apply-search' })"
       ></component>
@@ -376,6 +397,7 @@ function triggerAction(params: DiaryPageActionParams): void {
       >
         <component
           :is="featureComponent(feature, 'searchQuerySelector')"
+          v-if="dwdyState.diary.value.isStored"
           v-model="isSearchFeatureModalOn[feature]"
           @select="triggerAction({ action: 'apply-search' })"
         ></component>

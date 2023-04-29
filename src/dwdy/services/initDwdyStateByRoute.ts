@@ -9,38 +9,77 @@ export async function initDwdyStateByRoute(
   dwdyState: ReturnType<typeof useDwdyState>,
   route: RouteLocationNormalizedLoaded
 ): Promise<boolean> {
+  if (!route.params.uid) {
+    return false;
+  }
+  if (!(await fetchDiaryToState(dwdyState, route))) {
+    return false;
+  }
+  await fetchEntryToState(dwdyState, route);
+  await fetchBunchToState(dwdyState);
+  return true;
+}
+
+async function fetchDiaryToState(
+  dwdyState: ReturnType<typeof useDwdyState>,
+  route: RouteLocationNormalizedLoaded
+): Promise<boolean> {
+  if (route.params.uid === dwdyState.diary.value.doc.dUid) {
+    return true;
+  }
+  dwdyState.resetDiaryState();
   const fetchedDiary = await Diary.fetch(route.params.uid as string);
   if (fetchedDiary) {
     dwdyState.diary.value = fetchedDiary;
-  } else {
-    return false;
+    return true;
   }
-  const flow = layoutFlow(fetchedDiary);
-  let entry: DiaryEntry | null = null;
+  return false;
+}
+
+async function fetchEntryToState(
+  dwdyState: ReturnType<typeof useDwdyState>,
+  route: RouteLocationNormalizedLoaded
+): Promise<void> {
   const queryDIndex = route.query.i as DIndex;
   if (queryDIndex) {
-    entry = await fetchedDiary.fetchEntry({ dIndex: queryDIndex });
+    if (
+      dwdyState.entry.value.isStored &&
+      dwdyState.entry.value.doc.dUid === dwdyState.diary.value.doc.dUid &&
+      dwdyState.entry.value.doc.dIndex === queryDIndex
+    ) {
+      return;
+    }
+    const fetchedEntry = await dwdyState.diary.value.fetchEntry({
+      dIndex: queryDIndex,
+    });
+    if (fetchedEntry) {
+      dwdyState.entry.value = fetchedEntry;
+      return;
+    }
   }
-  if (entry === null) {
-    entry = await flow.fetchEntryByRouteQuery(fetchedDiary, route.query);
-  }
-  dwdyState.entry.value = entry;
+  const diary = new Diary(dwdyState.diary.value.doc);
+  const flow = layoutFlow(diary);
+  dwdyState.entry.value = await flow.fetchEntryByRouteQuery(diary, route.query);
+}
+
+async function fetchBunchToState(
+  dwdyState: ReturnType<typeof useDwdyState>
+): Promise<void> {
+  const diary = new Diary(dwdyState.diary.value.doc);
+  const entry = new DiaryEntry(dwdyState.entry.value.doc);
+  const flow = layoutFlow(diary);
   dwdyState.bunch.value = await flow.fetchBunchByEntry(
-    fetchedDiary,
+    diary,
     entry,
     dwdyState.bunch.value
   );
-  return true;
 }
 
 export async function insertEntryByRoute(
   dwdyState: ReturnType<typeof useDwdyState>,
   route: RouteLocationNormalizedLoaded
 ): Promise<boolean> {
-  if (!dwdyState.diary.value) {
-    return false;
-  }
-  if (!dwdyState.entry.value) {
+  if (!dwdyState.diary.value.isStored) {
     return false;
   }
   if (dwdyState.entry.value.isStored) {

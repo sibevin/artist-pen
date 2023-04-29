@@ -46,6 +46,12 @@ export const useDwdyState = createGlobalState(() => {
     await flow.fetchBunchByEntry(currentDiary, entry, bunch.value);
   }
 
+  async function resetDiaryState(): Promise<void> {
+    diary.value = new Diary();
+    entry.value = new DiaryEntry();
+    bunch.value = undefined;
+  }
+
   return {
     config,
     diary,
@@ -54,5 +60,6 @@ export const useDwdyState = createGlobalState(() => {
     fetchEntry,
     updateEntry,
     reloadEntry,
+    resetDiaryState,
   };
 });

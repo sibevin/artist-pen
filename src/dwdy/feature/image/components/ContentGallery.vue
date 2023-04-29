@@ -47,9 +47,16 @@ const currentImageCount = computed<number>(() => {
 fetchImages();
 
 watch(
-  () => [dwdyState.entry.value],
+  () => dwdyState.entry.value,
   () => {
-    fetchImages();
+    const stateDaUids = dwdyState.entry.value
+      .fetchContents<DiaryFeature.Image>(DiaryFeature.Image)
+      .map((content) => content.daUid)
+      .toString();
+    const currentDaUids = imagePacks.value.map((pack) => pack.daUid).toString();
+    if (stateDaUids != currentDaUids) {
+      fetchImages();
+    }
   }
 );
 

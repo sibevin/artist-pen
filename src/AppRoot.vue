@@ -33,14 +33,16 @@ function reloadPage(): void {
       @reload-page="reloadPage"
     >
       <template v-if="Component">
-        <Transition>
-          <Suspense>
-            <!-- main content -->
-            <component :is="Component"></component>
+        <Transition name="page-tran">
+          <KeepAlive exclude="DiaryEditorPage">
+            <Suspense>
+              <!-- main content -->
+              <component :is="Component" :key="$route.fullPath"></component>
 
-            <!-- loading state -->
-            <template #fallback> Loading... </template>
-          </Suspense>
+              <!-- loading state -->
+              <template #fallback> Loading... </template>
+            </Suspense>
+          </KeepAlive>
         </Transition>
       </template>
     </RouterView>
