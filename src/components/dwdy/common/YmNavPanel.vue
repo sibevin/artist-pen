@@ -5,7 +5,7 @@ import { useDwdyState } from "~/states/useDwdyState";
 import {
   DiaryEntryMovementParams,
   DiaryPageActionParams,
-} from "~/dwdy/types/core";
+} from "~/types/dwdy/core";
 import SvgIcon from "~/components/SvgIcon.vue";
 
 const props = defineProps({

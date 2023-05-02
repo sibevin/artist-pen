@@ -1,5 +1,5 @@
 import * as Comlink from "comlink";
-import { DIndex, DUid } from "~/dwdy/types/core";
+import { DIndex, DUid } from "~/types/dwdy/core";
 import {
   DiaryAttachment,
   DiaryAttachmentDoc,

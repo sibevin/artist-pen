@@ -3,11 +3,11 @@ import { ref, computed, watch } from "vue";
 import { mdiChevronLeft, mdiChevronRight, mdiCircleSmall } from "@mdi/js";
 import { useDwdyState } from "~/states/useDwdyState";
 import { LocaleActor } from "~/services/locale";
-import { WeekDay } from "~/dwdy/services/configOption";
+import { WeekDay } from "~/services/dwdy/configOption";
 import {
   DiaryEntryMovementParams,
   DiaryPageActionParams,
-} from "~/dwdy/types/core";
+} from "~/types/dwdy/core";
 import SvgIcon from "~/components/SvgIcon.vue";
 
 const props = defineProps({

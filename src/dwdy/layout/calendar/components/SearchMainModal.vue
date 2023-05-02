@@ -3,8 +3,8 @@ import { ref, computed, watch, onMounted } from "vue";
 import { mdiClock, mdiCheck, mdiClose } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useSearchState } from "~/states/useSearchState";
-import { SearchDateRangeQuery } from "~/dwdy/types/search";
-import { dsToDt, dtToEntryTs } from "~/dwdy/services/dateUtils";
+import { SearchDateRangeQuery } from "~/types/dwdy/search";
+import { dsToDt, dtToEntryTs } from "~/services/dwdy/dateUtils";
 import DateRangeSelector from "~/components/input/DateRangeSelector.vue";
 import DateRangePanel from "~/components/panels/DateRangePanel.vue";
 import ModalBase from "~/components/ModalBase.vue";
@@ -71,8 +71,6 @@ function onApplyBtnClicked(): void {
     mark: dateRangeQuery.value.mark,
     display: dateRangeQuery.value.display,
     query: dateRangeQuery.value.value,
-    from: fromTs,
-    to: toTs,
   };
   isModalOn.value = false;
 }

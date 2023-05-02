@@ -1,4 +1,4 @@
-import { MoveDirection, MoveDateUnit, MoveAlignment } from "~/dwdy/types/core";
+import { MoveDirection, MoveDateUnit, MoveAlignment } from "~/types/dwdy/core";
 
 export type GetNeighborOption = {
   direction?: MoveDirection;

@@ -5,7 +5,7 @@ import {
 import camelCase from "lodash-es/camelCase";
 import { Icon, SelectionOption } from "~/models/app/types";
 import { LocaleActor } from "~/services/locale";
-import { SortOrder, SORT_ORDERS } from "~/dwdy/types/core";
+import { SortOrder, SORT_ORDERS } from "~/types/dwdy/core";
 
 export const diaryTimelineOrderIconMap: Record<SortOrder, Icon> = {
   ["asc"]: {

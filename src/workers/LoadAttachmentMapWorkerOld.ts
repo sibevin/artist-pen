@@ -1,4 +1,4 @@
-import { DUid } from "~/dwdy/types/core";
+import { DUid } from "~/types/dwdy/core";
 import {
   DiaryAttachment,
   DiaryAttachmentDoc,

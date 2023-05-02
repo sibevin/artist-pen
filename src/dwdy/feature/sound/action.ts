@@ -13,7 +13,7 @@ import {
   SoundSource,
   DEFAULT_FEATURE_STAT,
 } from "~/dwdy/feature/sound/def";
-import { DUid, DiaryEntryIdentityParams } from "~/dwdy/types/core";
+import { DUid, DiaryEntryIdentityParams } from "~/types/dwdy/core";
 import { Diary } from "~/models/dwdy/diary";
 import { displayFileName, genRandomFileName } from "~/services/file";
 

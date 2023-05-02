@@ -1,4 +1,4 @@
-import { WeekDay } from "~/dwdy/types/core";
+import { WeekDay } from "~/types/dwdy/core";
 import { DisplayIcon } from "~/dwdy/layout/def";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { Icon } from "~/models/app/types";

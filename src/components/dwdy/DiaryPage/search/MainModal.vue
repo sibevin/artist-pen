@@ -17,7 +17,7 @@ import {
   addToSearchHistories,
 } from "~/services/dwdy/search";
 import { featureComponent } from "~/dwdy/feature/component";
-import { DiaryPageActionParams } from "~/dwdy/types/core";
+import { DiaryPageActionParams } from "~/types/dwdy/core";
 import SvgIcon from "~/components/SvgIcon.vue";
 import ModalBase from "~/components/ModalBase.vue";
 

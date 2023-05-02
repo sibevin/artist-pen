@@ -1,10 +1,10 @@
 import { ref } from "vue";
 import { createGlobalState } from "@vueuse/core";
 import { DwdyConfig } from "~/models/dwdy/config";
-import { DiaryEntryBunch } from "~/dwdy/types/bunch";
+import { DiaryEntryBunch } from "~/types/dwdy/bunch";
 import { Diary } from "~/models/dwdy/diary";
 import { DiaryEntry, DiaryEntryDoc } from "~/models/dwdy/diaryEntry";
-import { DIndex } from "~/dwdy/types/core";
+import { DIndex } from "~/types/dwdy/core";
 import { layoutFlow } from "~/dwdy/layout/flow";
 
 export const useDwdyState = createGlobalState(() => {

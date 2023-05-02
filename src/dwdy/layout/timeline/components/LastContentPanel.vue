@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, PropType } from "vue";
 import { mdiClockOutline } from "@mdi/js";
-import { entryTsToDt } from "~/dwdy/services/dateUtils";
+import { entryTsToDt } from "~/services/dwdy/dateUtils";
 import { Diary } from "~/models/dwdy/diary";
 import SvgIcon from "~/components/SvgIcon.vue";
 

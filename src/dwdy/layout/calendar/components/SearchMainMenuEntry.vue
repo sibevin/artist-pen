@@ -3,7 +3,7 @@ import { computed } from "vue";
 import { mdiClock } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useSearchState } from "~/states/useSearchState";
-import { DiaryPageActionParams } from "~/dwdy/types/core";
+import { DiaryPageActionParams } from "~/types/dwdy/core";
 import SvgIcon from "~/components/SvgIcon.vue";
 import SearchHistoryEntry from "./SearchHistoryEntry.vue";
 

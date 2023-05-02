@@ -8,9 +8,9 @@ import {
   getWeekOfYear,
   isSameDt,
   isWeekOfYearFirstDt,
-} from "~/dwdy/services/dateUtils";
-import { DIndex } from "~/dwdy/types/core";
-import { WeekDay } from "~/dwdy/services/configOption";
+} from "~/services/dwdy/dateUtils";
+import { DIndex } from "~/types/dwdy/core";
+import { WeekDay } from "~/services/dwdy/configOption";
 import { Diary } from "~/models/dwdy/diary";
 import { DiaryLayout } from "~/dwdy/layout/def";
 import { LayoutConfig, DisplayIconFormat } from "~/dwdy/layout/calendar/def";

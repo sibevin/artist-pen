@@ -1,4 +1,4 @@
-import { DUid, DIndex } from "~/dwdy/types/core";
+import { DUid, DIndex } from "~/types/dwdy/core";
 import { DiaryEntryFetchParams } from "~/models/dwdy/diary";
 import { InvalidParamsError } from "~/models/app/error";
 import { dbDwdy } from "~/services/db/dwdy";
@@ -9,13 +9,19 @@ import {
   DiaryFeatureContentMap,
   DiaryFeatureMetaMap,
 } from "~/dwdy/feature/map";
-import { getNeighborDt, isToday, entryTsToDt } from "~/dwdy/services/dateUtils";
+import { getNeighborDt, isToday, entryTsToDt } from "~/services/dwdy/dateUtils";
 import { genUid } from "~/services/db";
 import {
   DiaryEntryIdentity,
   DiaryEntryIdentityParams,
   GeoRange,
-} from "~/dwdy/types/core";
+} from "~/types/dwdy/core";
+import {
+  SearchQuery,
+  SearchKeywordOption,
+  SearchKeywordMatch,
+} from "~/types/dwdy/search";
+import { findKeywordMatch } from "~/services/dwdy/search";
 
 type NavInfo = {
   nextDayDt?: Date;
@@ -315,6 +321,12 @@ export class DiaryEntry
     return this;
   }
 
+  private checkContentIndex<T = unknown>(contents: T[], index: number): void {
+    if ((!index && index !== 0) || index < 0 || index >= contents.length) {
+      throw new InvalidParamsError({ params: ["index"], reason: "invalid" });
+    }
+  }
+
   public async fetchAttachment(daUid: DUid): Promise<DiaryAttachment | null> {
     if (this.doc.dUid && this.doc.dIndex) {
       return await DiaryAttachment.fetch({
@@ -327,9 +339,120 @@ export class DiaryEntry
     }
   }
 
-  private checkContentIndex<T = unknown>(contents: T[], index: number): void {
-    if ((!index && index !== 0) || index < 0 || index >= contents.length) {
-      throw new InvalidParamsError({ params: ["index"], reason: "invalid" });
+  public isKeywordsFound(query: SearchQuery): boolean {
+    for (let i = 0; i < query.keywords.length; i++) {
+      const keyword = query.keywords[i];
+      if (
+        this.doc.title &&
+        findKeywordMatch(keyword, this.doc.title, query.keywordOption, false)
+          .index >= 0
+      ) {
+        return true;
+      }
+      const textContents = this.fetchContents<DiaryFeature.Text>(
+        DiaryFeature.Text
+      );
+      if (textContents.length > 0) {
+        for (let j = 0; j < textContents.length; j++) {
+          if (
+            findKeywordMatch(
+              keyword,
+              textContents[j].raw,
+              query.keywordOption,
+              false
+            ).index >= 0
+          ) {
+            return true;
+          }
+        }
+      }
+      const imageContents = this.fetchContents<DiaryFeature.Image>(
+        DiaryFeature.Image
+      );
+      if (imageContents.length > 0) {
+        for (let j = 0; j < imageContents.length; j++) {
+          const comment = imageContents[j].comment;
+          if (
+            comment &&
+            findKeywordMatch(keyword, comment, query.keywordOption, false)
+              .index >= 0
+          ) {
+            return true;
+          }
+        }
+      }
+      const soundContents = this.fetchContents<DiaryFeature.Sound>(
+        DiaryFeature.Sound
+      );
+      if (soundContents.length > 0) {
+        for (let j = 0; j < soundContents.length; j++) {
+          const comment = soundContents[j].comment;
+          if (
+            comment &&
+            findKeywordMatch(keyword, comment, query.keywordOption, false)
+              .index >= 0
+          ) {
+            return true;
+          }
+        }
+      }
+      const tagContents = this.fetchContents<DiaryFeature.Tag>(
+        DiaryFeature.Tag
+      );
+      if (tagContents.length > 0) {
+        for (let j = 0; j < tagContents.length; j++) {
+          if (
+            findKeywordMatch(
+              keyword,
+              tagContents[j],
+              query.keywordOption,
+              false
+            ).index >= 0
+          ) {
+            return true;
+          }
+        }
+      }
     }
+    return false;
+  }
+
+  public getKeywordMatches(
+    keywords: string[],
+    option: SearchKeywordOption
+  ): Record<string, SearchKeywordMatch[]> {
+    if (keywords.length === 0) {
+      return {};
+    }
+    const matches: Record<string, SearchKeywordMatch[]> = {};
+    for (let i = 0; i < keywords.length; i++) {
+      const keyword = keywords[i];
+      matches[keyword] = [];
+      if (this.doc.title) {
+        const km = findKeywordMatch(keyword, this.doc.title, option);
+        if (km.index >= 0) {
+          matches[keyword].push(
+            Object.assign({ source: "title" }, km) as SearchKeywordMatch
+          );
+        }
+      }
+      const textContents = this.fetchContents<DiaryFeature.Text>(
+        DiaryFeature.Text
+      );
+      if (textContents.length > 0) {
+        for (let j = 0; j < textContents.length; j++) {
+          const km = findKeywordMatch(keyword, textContents[j].raw, option);
+          if (km.index >= 0) {
+            matches[keyword].push(
+              Object.assign(
+                { source: "feature", feature: DiaryFeature.Text },
+                km
+              ) as SearchKeywordMatch
+            );
+          }
+        }
+      }
+    }
+    return matches;
   }
 }

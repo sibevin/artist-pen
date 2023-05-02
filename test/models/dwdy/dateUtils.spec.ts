@@ -6,7 +6,7 @@ import {
   dtToEntryTs,
   entryTsToDt,
   GetNeighborOption,
-} from "~/dwdy/services/dateUtils";
+} from "~/services/dwdy/dateUtils";
 
 describe.only(".getNeighborDt", () => {
   it("return the neighbor date", () => {

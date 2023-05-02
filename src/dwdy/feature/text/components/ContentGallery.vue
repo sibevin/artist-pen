@@ -4,7 +4,7 @@ import { mdiCircle, mdiFileEditOutline } from "@mdi/js";
 import Flicking from "@egjs/vue3-flicking";
 import { ChangedEvent } from "@egjs/flicking";
 import { useDwdyState } from "~/states/useDwdyState";
-import { DiaryContentFeatureIndex } from "~/dwdy/types/core";
+import { DiaryContentFeatureIndex } from "~/types/dwdy/core";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { FeatureConfig, FEATURE_ICON } from "~/dwdy/feature/text/def";
 import SvgIcon from "~/components/SvgIcon.vue";

@@ -3,9 +3,9 @@ import { ref, computed, watch } from "vue";
 import { mdiCircleSmall } from "@mdi/js";
 import { useDwdyState } from "~/states/useDwdyState";
 import { LocaleActor } from "~/services/locale";
-import { WeekDay } from "~/dwdy/services/configOption";
+import { WeekDay } from "~/services/dwdy/configOption";
 import SvgIcon from "~/components/SvgIcon.vue";
-import { getWeekOfYear } from "~/dwdy/services/dateUtils";
+import { getWeekOfYear } from "~/services/dwdy/dateUtils";
 
 const props = defineProps({
   currentDate: {

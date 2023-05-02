@@ -7,24 +7,20 @@ import {
   dsToDt,
   getNeighborDs,
   getNeighborDt,
-  GetNeighborOption,
   getWeekOfYear,
   getWeekOfYearFirstDt,
   getQuarter,
   getQuarterFirstDt,
   getHalfYear,
   getHalfYearFirstDt,
-} from "~/dwdy/services/dateUtils";
+} from "~/services/dwdy/dateUtils";
+import { RecentRangeType, getRecentRangeDays } from "~/services/recentRange";
 import SvgIcon from "~/components/SvgIcon.vue";
 
 const DATE_RANGE_TYPES = ["none", "1w", "1m", "1q", "1h", "1y"] as const;
 type DateRangeType = typeof DATE_RANGE_TYPES[number];
 
 type DateRange = { from: string; to: string };
-type DateRangeMapDef = {
-  type: DateRangeType;
-  recentOpt: GetNeighborOption;
-};
 type DateRangeMapEntry = {
   mark: string;
   display: string;
@@ -50,13 +46,7 @@ const emit = defineEmits<{
 
 const la = new LocaleActor("components.input.DateRangeSelector");
 const BASED_DATE_RANGE_COUNT = 4;
-const PREDEFINED_DATE_RANGES: DateRangeMapDef[] = [
-  { type: "1w", recentOpt: { direction: "prev", unit: "day", step: 7 } },
-  { type: "1m", recentOpt: { direction: "prev", unit: "day", step: 30 } },
-  { type: "1q", recentOpt: { direction: "prev", unit: "day", step: 90 } },
-  // { type: "1h", recentOpt: { direction: "prev", unit: "day", step: 180 } },
-  { type: "1y", recentOpt: { direction: "prev", unit: "month", step: 12 } },
-];
+const PREDEFINED_DATE_RANGES: RecentRangeType[] = ["1w", "1m", "1q", "1y"];
 const todayDs = dtToDs(new Date());
 const todayDt = dsToDt(todayDs);
 const customizedDateRange = ref<DateRange>({
@@ -182,11 +172,11 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
       subEntries: [],
     },
   ];
-  PREDEFINED_DATE_RANGES.map((dateRangeDef) => {
-    if (dateRangeDef.type === "1w") {
+  PREDEFINED_DATE_RANGES.map((dateRange) => {
+    if (dateRange === "1w") {
       mapEntries.push({
-        type: dateRangeDef.type,
-        recentEntry: buildRecentDateRangeEntry(dateRangeDef),
+        type: dateRange,
+        recentEntry: buildRecentDateRangeEntry(dateRange),
         subEntries: [...Array(BASED_DATE_RANGE_COUNT).keys()].map((index) => {
           const currentW = getWeekOfYear(todayDt);
           const subW = currentW - index;
@@ -211,10 +201,10 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
         }),
       });
     }
-    if (dateRangeDef.type === "1m") {
+    if (dateRange === "1m") {
       mapEntries.push({
-        type: dateRangeDef.type,
-        recentEntry: buildRecentDateRangeEntry(dateRangeDef),
+        type: dateRange,
+        recentEntry: buildRecentDateRangeEntry(dateRange),
         subEntries: [...Array(BASED_DATE_RANGE_COUNT).keys()].map((index) => {
           const toDs = getNeighborDs(todayDs, {
             direction: "prev",
@@ -241,10 +231,10 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
         }),
       });
     }
-    if (dateRangeDef.type === "1q") {
+    if (dateRange === "1q") {
       mapEntries.push({
-        type: dateRangeDef.type,
-        recentEntry: buildRecentDateRangeEntry(dateRangeDef),
+        type: dateRange,
+        recentEntry: buildRecentDateRangeEntry(dateRange),
         subEntries: [...Array(BASED_DATE_RANGE_COUNT).keys()].map((index) => {
           let subQ = (getQuarter(todayDt) - index) % 4;
           subQ = subQ <= 0 ? subQ + 4 : subQ;
@@ -270,10 +260,10 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
         }),
       });
     }
-    if (dateRangeDef.type === "1h") {
+    if (dateRange === "1h") {
       mapEntries.push({
-        type: dateRangeDef.type,
-        recentEntry: buildRecentDateRangeEntry(dateRangeDef),
+        type: dateRange,
+        recentEntry: buildRecentDateRangeEntry(dateRange),
         subEntries: [...Array(BASED_DATE_RANGE_COUNT).keys()].map((index) => {
           let subHy = (getHalfYear(todayDt) - index) % 2;
           subHy = subHy <= 0 ? subHy + 2 : subHy;
@@ -299,10 +289,10 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
         }),
       });
     }
-    if (dateRangeDef.type === "1y") {
+    if (dateRange === "1y") {
       mapEntries.push({
-        type: dateRangeDef.type,
-        recentEntry: buildRecentDateRangeEntry(dateRangeDef),
+        type: dateRange,
+        recentEntry: buildRecentDateRangeEntry(dateRange),
         subEntries: [...Array(BASED_DATE_RANGE_COUNT).keys()].map((index) => {
           const baseDt = getNeighborDt(todayDt, {
             direction: "prev",
@@ -326,18 +316,20 @@ function buildPredefinedDateRanges(): DateRangeMap[] {
 }
 
 function buildRecentDateRangeEntry(
-  dateRangeDef: DateRangeMapDef
+  dateRange: RecentRangeType
 ): DateRangeMapEntry {
-  const fromDs = getNeighborDs(
-    todayDs,
-    Object.assign({}, dateRangeDef.recentOpt)
-  );
+  const recentDays = getRecentRangeDays(dateRange);
+  const fromDs = getNeighborDs(todayDs, {
+    direction: "prev",
+    unit: "day",
+    step: recentDays,
+  });
   return {
-    mark: dateRangeDef.type,
-    display: la.t(`.predefined.${dateRangeDef.type}.display`) as string,
+    mark: dateRange,
+    display: la.t(`.predefined.${dateRange}.display`) as string,
     value: `${fromDs}_${todayDs}`,
     valid: true,
-    text: la.t(`.predefined.${dateRangeDef.type}.text`) as string,
+    text: la.t(`.predefined.${dateRange}.text`) as string,
   };
 }
 

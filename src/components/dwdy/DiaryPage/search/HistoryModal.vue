@@ -8,7 +8,7 @@ import {
 } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
-import { SearchQuery } from "~/dwdy/types/search";
+import { SearchQuery } from "~/types/dwdy/search";
 import {
   addToSearchHistories,
   removeFromSearchHistories,

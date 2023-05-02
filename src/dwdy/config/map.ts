@@ -5,7 +5,7 @@ import {
 import camelCase from "lodash-es/camelCase";
 import { Icon, SelectionOption } from "~/models/app/types";
 import { LocaleActor } from "~/services/locale";
-import { WEEK_DAYS } from "~/dwdy/types/core";
+import { WEEK_DAYS } from "~/types/dwdy/core";
 import {
   DiarySortedBy,
   DiaryFontFamily,

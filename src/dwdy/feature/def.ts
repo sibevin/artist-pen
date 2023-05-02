@@ -1,4 +1,4 @@
-import { DiaryEntryIdentityParams } from "~/dwdy/types/core";
+import { DiaryEntryIdentityParams } from "~/types/dwdy/core";
 import { Icon } from "~/models/app/types";
 
 export enum DiaryFeature {

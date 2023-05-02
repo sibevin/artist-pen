@@ -4,7 +4,7 @@ import {
   mdiVolumePlus,
   mdiVolumeSource,
 } from "@mdi/js";
-import { DUid } from "~/dwdy/types/core";
+import { DUid } from "~/types/dwdy/core";
 import { DiaryFeatureIcon } from "~/dwdy/feature/def";
 import { Icon } from "~/models/app/types";
 

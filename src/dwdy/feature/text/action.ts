@@ -1,5 +1,5 @@
 import { dbDwdy } from "~/services/db/dwdy";
-import { DiaryEntryIdentityParams } from "~/dwdy/types/core";
+import { DiaryEntryIdentityParams } from "~/types/dwdy/core";
 import { Diary } from "~/models/dwdy/diary";
 import { getStringBytes } from "~/services/file";
 import { DiaryFeature } from "~/dwdy/feature/def";

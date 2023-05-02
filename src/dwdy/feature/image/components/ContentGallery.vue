@@ -11,7 +11,7 @@ import {
   FEATURE_ICON,
   ImagePack,
 } from "~/dwdy/feature/image/def";
-import { DiaryContentFeatureIndex } from "~/dwdy/types/core";
+import { DiaryContentFeatureIndex } from "~/types/dwdy/core";
 import SvgIcon from "~/components/SvgIcon.vue";
 import ContentSlate from "~/dwdy/feature/image/components/ContentSlate.vue";
 

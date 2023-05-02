@@ -2,7 +2,7 @@
 import { PropType } from "vue";
 import { mdiText } from "@mdi/js";
 import { useDwdyState } from "~/states/useDwdyState";
-import { SearchQuery } from "~/dwdy/types/search";
+import { SearchQuery } from "~/types/dwdy/search";
 import { layoutComponent } from "~/dwdy/layout/component";
 import { featureComponent } from "~/dwdy/feature/component";
 import SvgIcon from "~/components/SvgIcon.vue";

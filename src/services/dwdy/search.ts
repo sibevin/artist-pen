@@ -1,17 +1,30 @@
+import Dexie from "dexie";
+import { dbDwdy } from "~/services/db/dwdy";
 import {
   SearchQuery,
   SearchSortQuery,
   SearchSortBy,
-} from "~/dwdy/types/search";
-import { SortOrder } from "~/dwdy/types/core";
+  SearchResult,
+  SearchResultEntry,
+  SearchKeywordOption,
+} from "~/types/dwdy/search";
+import { DUid, SortOrder } from "~/types/dwdy/core";
 import { Diary } from "~/models/dwdy/diary";
 import { unshiftEntry } from "~/services/fixedSizeArray";
+import { dtToEntryTs, dsToDt, getNeighborDt } from "~/services/dwdy/dateUtils";
+import { getRecentRangeDays } from "~/services/recentRange";
+import { DiaryEntry, DiaryEntryExistingDoc } from "~/models/dwdy/diaryEntry";
+import { DiaryFeature } from "~/dwdy/feature/def";
 
 const MAX_HISTORY_SIZE = 10;
 
 export function buildEmptySearchQuery(): SearchQuery {
   return {
     keywords: [],
+    keywordOption: {
+      mode: "substring",
+      caseSensitive: false,
+    },
     feature: {},
     sorts: [],
   };
@@ -130,4 +143,158 @@ function findDuplicatedQuery(
 
 function isSearchQueryEqual(queryA: SearchQuery, queryB: SearchQuery): boolean {
   return JSON.stringify(queryA) === JSON.stringify(queryB);
+}
+
+export async function applySearch(
+  dUid: DUid,
+  query: SearchQuery
+): Promise<SearchResult> {
+  const collection = buildSearchCollection(dUid, query);
+  collection.filter((entryDoc) => {
+    const dEntry = new DiaryEntry(entryDoc);
+    if (query.keywords.length > 0 && dEntry.isKeywordsFound(query)) {
+      return true;
+    }
+    if (query.feature["tag"]) {
+      const tags = dEntry.fetchContents<DiaryFeature.Tag>(DiaryFeature.Tag);
+      for (let i = 0; i < query.feature["tag"].length; i++) {
+        const tag = query.feature["tag"][i];
+        if (tags.includes(tag)) {
+          return true;
+        }
+      }
+    }
+    if (query.feature["sticker"]) {
+      const stickers = dEntry.fetchContents<DiaryFeature.Sticker>(
+        DiaryFeature.Sticker
+      );
+      for (let i = 0; i < query.feature["sticker"].length; i++) {
+        const sticker = query.feature["sticker"][i];
+        if (stickers.includes(sticker)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  });
+  const querySort = query.sorts[0];
+  let entries;
+  if (querySort) {
+    if (querySort.order === "desc") {
+      entries = await collection.distinct().reverse().sortBy(querySort.by);
+    } else {
+      entries = await collection.distinct().sortBy(querySort.by);
+    }
+  } else {
+    entries = await collection.distinct().reverse().sortBy("timestamp");
+  }
+  return {
+    query,
+    results: buildSearchResultEntries(query, entries),
+  };
+}
+
+function buildSearchResultEntries(
+  query: SearchQuery,
+  entries: DiaryEntryExistingDoc[]
+): SearchResultEntry[] {
+  return entries.map((entryDoc) => {
+    const dEntry = new DiaryEntry(entryDoc);
+    return {
+      entry: dEntry,
+      matches: dEntry.getKeywordMatches(query.keywords, query.keywordOption),
+    };
+  });
+}
+
+function buildSearchCollection(
+  dUid: DUid,
+  query: SearchQuery
+): Dexie.Collection<DiaryEntryExistingDoc> {
+  const tsRange = query.timestampRange;
+  if (!tsRange) {
+    return dbDwdy.diaryEntries.where({ dUid });
+  }
+  let fromTs: number | undefined = undefined;
+  let toTs: number | undefined = undefined;
+  const recentDays = getRecentRangeDays(tsRange.mark);
+  if (recentDays) {
+    toTs = dtToEntryTs(new Date());
+    fromTs = dtToEntryTs(
+      getNeighborDt(new Date(), {
+        unit: "day",
+        step: recentDays,
+        direction: "prev",
+      })
+    );
+  } else {
+    const [fromDs, toDs] = tsRange.query.split("_");
+    fromTs = fromDs && fromDs !== "" ? dtToEntryTs(dsToDt(fromDs)) : undefined;
+    toTs = toDs && toDs !== "" ? dtToEntryTs(dsToDt(toDs)) : undefined;
+  }
+  if (fromTs && toTs) {
+    return dbDwdy.diaryEntries
+      .where(["dUid", "timestamp"])
+      .between([dUid, fromTs], [dUid, toTs]);
+  } else if (fromTs) {
+    return dbDwdy.diaryEntries
+      .where(["dUid", "timestamp"])
+      .between([dUid, fromTs], [dUid, Dexie.maxKey]);
+  } else if (toTs) {
+    return dbDwdy.diaryEntries
+      .where(["dUid", "timestamp"])
+      .between([dUid, Dexie.minKey], [dUid, toTs]);
+  } else {
+    return dbDwdy.diaryEntries.where({ dUid });
+  }
+}
+
+const HIGHLIGHTED_BORDER_W = 6;
+
+export function findKeywordMatch(
+  keyword: string,
+  target: string,
+  option: SearchKeywordOption,
+  withHighlight = true
+): {
+  index: number;
+  match: string;
+  highlight: string;
+} {
+  let index = -1;
+  let highlight = target;
+  let match = "";
+  if (option.mode === "regex") {
+    const regex = new RegExp(keyword, `${option.caseSensitive ? "" : "i"}g`);
+    index = target.search(regex);
+    const regexMatch = regex.exec(target);
+    if (regexMatch) {
+      match = regexMatch[0];
+    }
+  } else {
+    // substring
+    if (option.caseSensitive) {
+      index = target.indexOf(keyword);
+    } else {
+      index = target.toLowerCase().indexOf(keyword.toLowerCase());
+    }
+    if (index >= 0) {
+      match = keyword;
+    }
+  }
+  if (!withHighlight) {
+    return { index, match, highlight: "" };
+  }
+  if (index > HIGHLIGHTED_BORDER_W) {
+    highlight = target.slice(
+      index - HIGHLIGHTED_BORDER_W,
+      match.length + index + HIGHLIGHTED_BORDER_W
+    );
+    index = HIGHLIGHTED_BORDER_W - 1;
+  } else if (index >= 0) {
+    highlight = target.slice(0, index + match.length + HIGHLIGHTED_BORDER_W);
+  } else {
+    highlight = "";
+  }
+  return { index, match, highlight };
 }

@@ -13,7 +13,7 @@ import {
   create,
 } from "../../factories/dwdy/diaryEntries";
 import { create as createDiary } from "../../factories/dwdy/diaries";
-import { entryTsToDt } from "~/dwdy/services/dateUtils";
+import { entryTsToDt } from "~/services/dwdy/dateUtils";
 import {
   checkConstructorBehavior,
   checkUidBehavior,

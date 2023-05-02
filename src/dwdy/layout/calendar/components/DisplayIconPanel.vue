@@ -22,7 +22,7 @@ function calculateStickerSizeMultiplier(): number {
   if (["xs", "sm", "md", "lg"].includes(getCurrentBreakpoint())) {
     return 0.45;
   } else {
-    return 0.5;
+    return 0.6;
   }
 }
 </script>

@@ -5,7 +5,7 @@ import { mdiCog, mdiBookshelf, mdiMagnify, mdiCalendarClock } from "@mdi/js";
 import { useAppState } from "~/states/useAppState";
 import { useDwdyState } from "~/states/useDwdyState";
 import { LocaleActor } from "~/services/locale";
-import { initDwdyStateByRoute } from "~/dwdy/services/initDwdyStateByRoute";
+import { initDwdyStateByRoute } from "~/services/dwdy/initDwdyStateByRoute";
 import { PageNavigator, NavCellSpec } from "~/services/pageNavigator";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { featureComponent } from "~/dwdy/feature/component";
@@ -14,8 +14,8 @@ import {
   DiaryContentFeatureIndex,
   DiaryEntryMovementParams,
   DiaryPageActionParams,
-} from "~/dwdy/types/core";
-import { dtToEntryTs } from "~/dwdy/services/dateUtils";
+} from "~/types/dwdy/core";
+import { dtToEntryTs } from "~/services/dwdy/dateUtils";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import ModalDateSelector from "~/components/ModalDateSelector.vue";

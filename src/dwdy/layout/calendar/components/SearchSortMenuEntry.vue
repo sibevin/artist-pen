@@ -4,7 +4,7 @@ import { useSearchState } from "~/states/useSearchState";
 import { LocaleActor } from "~/services/locale";
 import { sortOptionToQuery, sortQueryToOptions } from "~/services/dwdy/search";
 import { searchSortOpts } from "~/dwdy/layout/calendar/map";
-import { DiaryPageActionParams } from "~/dwdy/types/core";
+import { DiaryPageActionParams } from "~/types/dwdy/core";
 import SvgIcon from "~/components/SvgIcon.vue";
 
 const emit = defineEmits<{

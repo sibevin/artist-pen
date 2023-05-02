@@ -1,4 +1,4 @@
-import { DIndex } from "~/dwdy/types/core";
+import { DIndex } from "~/types/dwdy/core";
 
 export enum DiaryLayout {
   Calendar = "calendar",

@@ -10,7 +10,7 @@ import { FeatureMeta, FeatureConfig } from "~/dwdy/feature/sound/def";
 import { AudioRecord } from "~/dwdy/feature/sound/def";
 import { useAudioState } from "~/dwdy/feature/sound/state/useAudioState";
 import { FileSizeDisplay, displayFileSize } from "~/services/file";
-import { dtToDs } from "~/dwdy/services/dateUtils";
+import { dtToDs } from "~/services/dwdy/dateUtils";
 import SvgIcon from "~/components/SvgIcon.vue";
 import PaginationPanel from "~/components/PaginationPanel.vue";
 import AudioRecorderUi from "~/dwdy/feature/sound/components/AudioRecorderUi.vue";

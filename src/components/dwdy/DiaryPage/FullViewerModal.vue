@@ -6,7 +6,7 @@ import { useDwdyState } from "~/states/useDwdyState";
 import { featureComponent } from "~/dwdy/feature/component";
 import { layoutComponent } from "~/dwdy/layout/component";
 import { DiaryFeature } from "~/dwdy/feature/def";
-import { DiaryContentFeatureIndex } from "~/dwdy/types/core";
+import { DiaryContentFeatureIndex } from "~/types/dwdy/core";
 import SvgIcon from "~/components/SvgIcon.vue";
 import ModalBase from "~/components/ModalBase.vue";
 

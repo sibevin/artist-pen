@@ -1,4 +1,4 @@
-import { SortOrder } from "~/dwdy/types/core";
+import { SortOrder } from "~/types/dwdy/core";
 
 export type LayoutConfig = {
   timelineOrder: SortOrder;

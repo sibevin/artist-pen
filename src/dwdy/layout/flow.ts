@@ -4,7 +4,7 @@ import { Diary } from "~/models/dwdy/diary";
 import { DiaryEntry, DiaryEntryParams } from "~/models/dwdy/diaryEntry";
 import { LAYOUT_FLOW as TimeLayoutFlow } from "~/dwdy/layout/flow/time";
 import { LAYOUT_FLOW as DIndexLayoutFlow } from "~/dwdy/layout/flow/dIndex";
-import { DiaryEntryBunch } from "~/dwdy/types/bunch";
+import { DiaryEntryBunch } from "~/types/dwdy/bunch";
 // import { LAYOUT_FLOW as GeoLayoutFlow } from "~/dwdy/layout/flow/geo";
 
 export type DiaryLayoutFlow = {

@@ -1,5 +1,5 @@
-import { DUid, DIndex } from "~/dwdy/types/core";
-import { DiaryEntryIdentity } from "~/models/dwdy/diaryEntry";
+import { DUid, DIndex } from "~/types/dwdy/core";
+import { DiaryEntryIdentity } from "~/types/dwdy/core";
 import { InvalidParamsError } from "~/models/app/error";
 import { dbDwdy } from "~/services/db/dwdy";
 import { BaseModel } from "~/models/baseModel";

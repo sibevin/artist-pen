@@ -2,8 +2,8 @@ import { uniq } from "lodash";
 import { genUid } from "~/services/db";
 import { dbDwdy } from "~/services/db/dwdy";
 import { BaseModel } from "~/models/baseModel";
-import { DIndex, DiaryEntryIdentityParams } from "~/dwdy/types/core";
-import { DiarySortedBy } from "~/dwdy/services/configOption";
+import { DIndex, DiaryEntryIdentityParams } from "~/types/dwdy/core";
+import { DiarySortedBy } from "~/services/dwdy/configOption";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import {
   AVAILABLE_FEATURES,
@@ -24,7 +24,7 @@ import {
   DiaryConfigAttrs,
   DiaryConfigParams,
 } from "~/models/dwdy/config";
-import { SearchQuery } from "~/dwdy/types/search";
+import { SearchQuery } from "~/types/dwdy/search";
 import { AppError } from "~/models/app/error";
 
 export interface DiaryTemplate {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, PropType } from "vue";
 import { mdiClock } from "@mdi/js";
-import { SearchQuery } from "~/dwdy/types/search";
+import { SearchQuery } from "~/types/dwdy/search";
 import SvgIcon from "~/components/SvgIcon.vue";
 
 const props = defineProps({

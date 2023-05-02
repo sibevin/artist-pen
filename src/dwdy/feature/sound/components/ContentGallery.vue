@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from "vue";
-import { DiaryContentFeatureIndex } from "~/dwdy/types/core";
+import { DiaryContentFeatureIndex } from "~/types/dwdy/core";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import {
   FeatureConfig,
@@ -11,7 +11,7 @@ import { buildSoundSources } from "~/dwdy/feature/sound/action";
 import { useDwdyState } from "~/states/useDwdyState";
 import { useWorkerState } from "~/states/useWorkerState";
 import AudioPlayer from "~/dwdy/feature/sound/components/AudioPlayer.vue";
-import { DUid } from "~/dwdy/types/core";
+import { DUid } from "~/types/dwdy/core";
 
 const emit = defineEmits<{
   (e: "openFeatureEditor", params: DiaryContentFeatureIndex): void;

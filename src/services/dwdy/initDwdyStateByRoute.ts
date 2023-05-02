@@ -1,5 +1,5 @@
 import { RouteLocationNormalizedLoaded } from "vue-router";
-import { DIndex } from "~/dwdy/types/core";
+import { DIndex } from "~/types/dwdy/core";
 import { Diary } from "~/models/dwdy/diary";
 import { DiaryEntry } from "~/models/dwdy/diaryEntry";
 import { useDwdyState } from "~/states/useDwdyState";

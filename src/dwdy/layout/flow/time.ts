@@ -1,13 +1,13 @@
 import { LocationQuery } from "vue-router";
 import union from "lodash-es/union";
 import { DiaryInsertEntryTarget } from "~/dwdy/layout/def";
-import { DUid, DIndex } from "~/dwdy/types/core";
+import { DUid, DIndex } from "~/types/dwdy/core";
 import { Diary } from "~/models/dwdy/diary";
 import { DiaryEntry, DiaryEntryParams } from "~/models/dwdy/diaryEntry";
 import { dbDwdy } from "~/services/db/dwdy";
 import { AppError } from "~/models/app/error";
-import { dtToEntryTs, getNeighborTs } from "~/dwdy/services/dateUtils";
-import { DiaryEntryBunch, BunchFetchOption } from "~/dwdy/types/bunch";
+import { dtToEntryTs, getNeighborTs } from "~/services/dwdy/dateUtils";
+import { DiaryEntryBunch, BunchFetchOption } from "~/types/dwdy/bunch";
 
 export const LAYOUT_FLOW = {
   insertNewEntry: insertNewEntryByTimestamp,

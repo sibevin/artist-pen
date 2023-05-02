@@ -7,7 +7,7 @@ import {
   DiaryTimelineOrder,
   DiaryFontFamily,
   DiaryFontFormatSize,
-} from "~/dwdy/services/configOption";
+} from "~/services/dwdy/configOption";
 import { TagValue } from "~/dwdy/feature/tag/def";
 
 export interface DiaryConfigAttrs {

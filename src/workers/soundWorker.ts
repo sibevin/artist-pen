@@ -1,6 +1,6 @@
 import * as Comlink from "comlink";
 import fixWebmDuration from "fix-webm-duration";
-import { DIndex, DUid } from "~/dwdy/types/core";
+import { DIndex, DUid } from "~/types/dwdy/core";
 import { dbDwdy } from "~/services/db/dwdy";
 import { genUid } from "~/services/db";
 import { AudioRecord, DEFAULT_FEATURE_STAT } from "~/dwdy/feature/sound/def";

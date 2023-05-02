@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { createGlobalState } from "@vueuse/core";
-import { SearchQuery } from "~/dwdy/types/search";
+import { SearchQuery } from "~/types/dwdy/search";
 import { buildEmptySearchQuery } from "~/services/dwdy/search";
 
 export const useSearchState = createGlobalState(() => {

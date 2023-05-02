@@ -10,8 +10,8 @@ import {
   DiaryContentFeatureIndex,
   DiaryEntryMovementParams,
   DiaryPageActionParams,
-} from "~/dwdy/types/core";
-import { dtToEntryTs, getNeighborTs } from "~/dwdy/services/dateUtils";
+} from "~/types/dwdy/core";
+import { dtToEntryTs, getNeighborTs } from "~/services/dwdy/dateUtils";
 import SvgIcon from "~/components/SvgIcon.vue";
 import CalendarPanel from "~/dwdy/layout/calendar/components/CalendarPanel.vue";
 import CalendarSwitchBtn from "~/dwdy/layout/calendar/components/CalendarSwitchBtn.vue";

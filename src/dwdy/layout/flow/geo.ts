@@ -1,13 +1,13 @@
 import { LocationQuery } from "vue-router";
 import { DiaryInsertEntryTarget } from "~/dwdy/layout/def";
-import { DIndex } from "~/dwdy/types/core";
+import { DIndex } from "~/types/dwdy/core";
 import { Diary } from "~/models/dwdy/diary";
 import { DiaryEntry, DiaryEntryParams } from "~/models/dwdy/diaryEntry";
 import { dbDwdy } from "~/services/db/dwdy";
 import { AppError } from "~/models/app/error";
 import { GeoLocator } from "~/services/geoLocator";
-import { GeoCoords, GeoRange } from "~/dwdy/types/core";
-import { DiaryEntryBunch, BunchFetchOption } from "~/dwdy/types/bunch";
+import { GeoCoords, GeoRange } from "~/types/dwdy/core";
+import { DiaryEntryBunch, BunchFetchOption } from "~/types/dwdy/bunch";
 
 export const LAYOUT_FLOW = {
   insertNewEntry: insertNewEntryByGeo,

@@ -4,7 +4,7 @@ import {
   DiaryAttachmentDocMap,
 } from "~/models/dwdy/diaryAttachment";
 import { displayFileName, genRandomFileName } from "~/services/file";
-import { DiaryEntryIdentityParams } from "~/dwdy/types/core";
+import { DiaryEntryIdentityParams } from "~/types/dwdy/core";
 import { Diary } from "~/models/dwdy/diary";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import {

@@ -1,7 +1,7 @@
 import { describe, it, expect, afterAll, afterEach } from "vitest";
 import { faker } from "@faker-js/faker";
 import "fake-indexeddb/auto";
-import { DIndex } from "~/dwdy/types/core";
+import { DIndex } from "~/types/dwdy/core";
 import { Diary } from "~/models/dwdy/diary";
 import { AppError } from "~/models/app/error";
 import { dbDwdy } from "~/services/db/dwdy";

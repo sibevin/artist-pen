@@ -5,7 +5,7 @@ import { useSearchState } from "~/states/useSearchState";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { featureText } from "~/dwdy/feature/map";
 import { FEATURE_ICON } from "~/dwdy/feature/tag/def";
-import { DiaryPageActionParams } from "~/dwdy/types/core";
+import { DiaryPageActionParams } from "~/types/dwdy/core";
 import SvgIcon from "~/components/SvgIcon.vue";
 import SearchHistoryEntry from "./SearchHistoryEntry.vue";
 

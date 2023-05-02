@@ -4,7 +4,7 @@ import { dbDwdy } from "~/services/db/dwdy";
 import { AppError } from "~/models/app/error";
 import { create, build } from "=/factories/dwdy/diaries";
 import { LAYOUT_FLOW } from "~/dwdy/layout/flow/time";
-import { dtToEntryTs, getNeighborTs } from "~/dwdy/services/dateUtils";
+import { dtToEntryTs, getNeighborTs } from "~/services/dwdy/dateUtils";
 
 describe("Flow::Time", () => {
   describe("#insertNewEntryByRouteQuery", () => {

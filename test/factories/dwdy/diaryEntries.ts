@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { prepareModelFactory } from "../factoryUtils";
 import { randomSample, genRandomSize } from "../../support/randomUtils";
 import { stickerMap } from "~/dwdy/feature/sticker/data";
-import { DIndex } from "~/dwdy/types/core";
+import { DIndex } from "~/types/dwdy/core";
 import { genUid } from "~/services/db";
 import {
   DiaryEntryAttrs,

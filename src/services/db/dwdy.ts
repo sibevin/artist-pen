@@ -15,7 +15,8 @@ export class DbDwdy extends Dexie {
     this.version(1).stores({
       configs: "dcUid",
       diaries: "dUid,title,lastDIndex",
-      diaryEntries: "[dUid+dIndex],[dUid+timestamp],[dUid+longitude+latitude]",
+      diaryEntries:
+        "dUid,[dUid+dIndex],[dUid+timestamp],[dUid+longitude+latitude]",
       diaryAttachments: "[dUid+dIndex+daUid]",
     });
   }

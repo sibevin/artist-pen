@@ -1,5 +1,5 @@
 import { mdiRdImage, mdiRdImagePlus } from "~/services/iconSetPath";
-import { DUid } from "~/dwdy/types/core";
+import { DUid } from "~/types/dwdy/core";
 import { DiaryFeatureIcon, DisplayMode } from "~/dwdy/feature/def";
 
 export type FeatureMeta = {

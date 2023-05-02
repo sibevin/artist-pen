@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { LocaleActor } from "~/services/locale";
-import { dsToDt } from "~/dwdy/services/dateUtils";
+import { dsToDt } from "~/services/dwdy/dateUtils";
 import YmdBlock from "~/components/dwdy/common/YmdBlock.vue";
 
 const props = defineProps({

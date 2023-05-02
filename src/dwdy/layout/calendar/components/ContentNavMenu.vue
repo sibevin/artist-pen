@@ -10,11 +10,11 @@ import {
 } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
-import { dtToEntryTs } from "~/dwdy/services/dateUtils";
+import { dtToEntryTs } from "~/services/dwdy/dateUtils";
 import {
   DiaryEntryMovementParams,
   DiaryPageActionParams,
-} from "~/dwdy/types/core";
+} from "~/types/dwdy/core";
 import SvgIcon from "~/components/SvgIcon.vue";
 
 const props = defineProps({

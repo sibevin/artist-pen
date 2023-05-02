@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, PropType } from "vue";
 import { FEATURE_ICON } from "~/dwdy/feature/sticker/def";
-import { SearchQuery } from "~/dwdy/types/search";
+import { SearchQuery } from "~/types/dwdy/search";
 import SvgIcon from "~/components/SvgIcon.vue";
 import StickerIcon from "./StickerIcon.vue";
 

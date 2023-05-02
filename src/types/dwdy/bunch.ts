@@ -1,6 +1,6 @@
-import { DIndex, DUid } from "~/dwdy/types/core";
+import { DIndex, DUid } from "~/types/dwdy/core";
 import { DiaryEntry } from "~/models/dwdy/diaryEntry";
-import { GeoRange } from "~/dwdy/types/core";
+import { GeoRange } from "~/types/dwdy/core";
 
 export type DiaryEntryBunch = {
   dUid?: DUid;
