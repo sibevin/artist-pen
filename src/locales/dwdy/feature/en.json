@@ -105,6 +105,9 @@
     "config": {
       "recentRecords": {
         "name": "Recent"
+      },
+      "displayIconTarget": {
+        "name": "Show stickers on calendar"
       }
     },
     "stat": {
@@ -113,6 +116,8 @@
       "distribution": "Distribution"
     },
     "category": {
+      "none": "No stickers",
+      "first": "The first sticker",
       "recent": "Recent",
       "customized": "Customized",
       "mood": "Mood",

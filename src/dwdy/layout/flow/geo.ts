@@ -10,13 +10,13 @@ import { GeoCoords, GeoRange } from "~/types/dwdy/core";
 import { DiaryEntryBunch, BunchFetchOption } from "~/types/dwdy/bunch";
 
 export const LAYOUT_FLOW = {
-  insertNewEntry: insertNewEntryByGeo,
+  fetchOrInsertEntry: fetchOrInsertEntryByGeo,
   fetchEntryByRouteQuery: fetchEntryByGeoQuery,
-  insertNewEntryByRouteQuery: insertNewEntryByGeoQuery,
+  fetchOrInsertEntryByRouteQuery: fetchOrInsertEntryByGeoQuery,
   fetchBunchByEntry: fetchBunchByEntryGeo,
 };
 
-async function insertNewEntryByGeo(
+async function fetchOrInsertEntryByGeo(
   diary: Diary,
   entryParams: DiaryEntryParams = {},
   target: DiaryInsertEntryTarget
@@ -40,7 +40,7 @@ async function insertNewEntryByGeo(
   return entry;
 }
 
-async function insertNewEntryByGeoQuery(
+async function fetchOrInsertEntryByGeoQuery(
   diary: Diary,
   query: LocationQuery
 ): Promise<DiaryEntry> {
@@ -51,7 +51,7 @@ async function insertNewEntryByGeoQuery(
   if (!coords.longitude || !coords.latitude) {
     coords = await fetchCurrentGeoCoords();
   }
-  return await insertNewEntryByGeo(diary, {}, coords);
+  return await fetchOrInsertEntryByGeo(diary, {}, coords);
 }
 
 async function fetchEntryByGeoQuery(

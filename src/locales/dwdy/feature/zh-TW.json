@@ -3,8 +3,8 @@
     "display": {
       "name": "顯示",
       "options": {
-        "carousel": "輪播",
-        "list": "列表"
+        "carousel": "畫廊",
+        "list": "連續"
       }
     }
   },
@@ -14,8 +14,8 @@
       "display": {
         "name": "顯示",
         "options": {
-          "carousel": "輪播",
-          "list": "列表"
+          "carousel": "畫廊",
+          "list": "連續"
         }
       }
     },
@@ -40,8 +40,8 @@
       "display": {
         "name": "顯示",
         "options": {
-          "carousel": "輪播",
-          "list": "列表"
+          "carousel": "畫廊",
+          "list": "連續"
         }
       }
     },
@@ -105,6 +105,9 @@
     "config": {
       "recentRecords": {
         "name": "近期"
+      },
+      "displayIconTarget": {
+        "name": "在日曆顯示貼紙"
       }
     },
     "stat": {
@@ -113,6 +116,8 @@
       "distribution": "數量分佈"
     },
     "category": {
+      "none": "不顯示貼紙",
+      "first": "第一張貼紙",
       "recent": "近期",
       "customized": "個人",
       "mood": "心情",

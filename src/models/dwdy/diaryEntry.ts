@@ -452,6 +452,22 @@ export class DiaryEntry
           }
         }
       }
+      const tagContents = this.fetchContents<DiaryFeature.Tag>(
+        DiaryFeature.Tag
+      );
+      if (tagContents.length > 0) {
+        for (let j = 0; j < tagContents.length; j++) {
+          const km = findKeywordMatch(keyword, tagContents[j], option);
+          if (km.index >= 0) {
+            matches[keyword].push(
+              Object.assign(
+                { source: "feature", feature: DiaryFeature.Tag },
+                km
+              ) as SearchKeywordMatch
+            );
+          }
+        }
+      }
     }
     return matches;
   }

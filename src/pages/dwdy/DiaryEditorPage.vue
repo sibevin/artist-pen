@@ -8,7 +8,7 @@ import { layoutComponent } from "~/dwdy/layout/component";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { featureComponent } from "~/dwdy/feature/component";
 import { DiaryContentFeatureIndex } from "~/types/dwdy/core";
-import { insertEntryByRoute } from "~/services/dwdy/initDwdyStateByRoute";
+import { fetchOrInsertEntryByRoute } from "~/services/dwdy/initDwdyStateByRoute";
 import SvgIcon from "~/components/SvgIcon.vue";
 import MainLayout from "~/layouts/MainLayout.vue";
 import DiaryEditorFeatureSelectorModal from "~/components/dwdy/common/FeatureSelectorModal.vue";
@@ -41,7 +41,7 @@ async function initPage(): Promise<void> {
     router.push({ name: "diaries" });
     return;
   }
-  if (!(await insertEntryByRoute(dwdyState, route))) {
+  if (!(await fetchOrInsertEntryByRoute(dwdyState, route))) {
     router.push({
       name: "diary",
       params: { dUid: dwdyState.diary.value.doc.dUid },

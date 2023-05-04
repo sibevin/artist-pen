@@ -75,22 +75,16 @@ async function fetchBunchToState(
   );
 }
 
-export async function insertEntryByRoute(
+export async function fetchOrInsertEntryByRoute(
   dwdyState: ReturnType<typeof useDwdyState>,
   route: RouteLocationNormalizedLoaded
 ): Promise<boolean> {
   if (!dwdyState.diary.value.isStored) {
     return false;
   }
-  if (dwdyState.entry.value.isStored) {
-    return true;
-  }
   const diary = new Diary(dwdyState.diary.value.doc);
   const flow = layoutFlow(diary);
-  const insertedEntry = await flow.insertNewEntryByRouteQuery(
-    diary,
-    route.query
-  );
-  dwdyState.updateEntry(insertedEntry.doc);
+  const entry = await flow.fetchOrInsertEntryByRouteQuery(diary, route.query);
+  dwdyState.updateEntry(entry.doc);
   return true;
 }

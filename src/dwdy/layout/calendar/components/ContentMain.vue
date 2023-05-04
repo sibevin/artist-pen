@@ -13,8 +13,9 @@ import {
 } from "~/types/dwdy/core";
 import { dtToEntryTs, getNeighborTs } from "~/services/dwdy/dateUtils";
 import SvgIcon from "~/components/SvgIcon.vue";
-import CalendarPanel from "~/dwdy/layout/calendar/components/CalendarPanel.vue";
-import CalendarSwitchBtn from "~/dwdy/layout/calendar/components/CalendarSwitchBtn.vue";
+import CalendarPanel from "./CalendarPanel.vue";
+import CalendarSwitchBtn from "./CalendarSwitchBtn.vue";
+import DisplayIconSwitchBtn from "./DisplayIconSwitchBtn.vue";
 import YmNavPanel from "~/components/dwdy/common/YmNavPanel.vue";
 import YmdNavPanel from "~/components/dwdy/common/YmdNavPanel.vue";
 
@@ -54,6 +55,12 @@ function onContentEditorOpen(cfi: DiaryContentFeatureIndex): void {
 function onOpenFullViewer(cfi: DiaryContentFeatureIndex): void {
   nextTick(() => {
     emit("triggerAction", { action: "open-full-viewer", cfi });
+  });
+}
+
+function onDisplayIconSwitchBtnClicked(): void {
+  nextTick(() => {
+    emit("triggerAction", { action: "open-display-icon-selector" });
   });
 }
 
@@ -123,6 +130,10 @@ defineExpose({ moveToEntry });
               @trigger-action="triggerAction"
               @move-to-entry="moveToEntry"
             ></YmNavPanel>
+            <div class="grow"></div>
+            <DisplayIconSwitchBtn
+              @click="onDisplayIconSwitchBtnClicked"
+            ></DisplayIconSwitchBtn>
             <CalendarSwitchBtn></CalendarSwitchBtn>
           </div>
           <div v-else class="flex justify-between">
@@ -155,7 +166,6 @@ defineExpose({ moveToEntry });
             <component
               :is="featureComponent(feature, 'gallery')"
               class="p-2 pt-4 pb-0"
-              :enable-click="true"
               @open-full-viewer="onOpenFullViewer"
               @open-feature-editor="onOpenFeatureEditor"
             ></component>
@@ -212,6 +222,9 @@ defineExpose({ moveToEntry });
                 @trigger-action="triggerAction"
                 @move-to-entry="moveToEntry"
               ></YmNavPanel>
+              <DisplayIconSwitchBtn
+                @click="onDisplayIconSwitchBtnClicked"
+              ></DisplayIconSwitchBtn>
               <CalendarSwitchBtn></CalendarSwitchBtn>
             </div>
             <div v-else class="flex justify-center">
@@ -244,7 +257,6 @@ defineExpose({ moveToEntry });
               <component
                 :is="featureComponent(feature, 'gallery')"
                 class="p-2 pt-4 pb-0"
-                :enable-click="true"
                 @open-full-viewer="onOpenFullViewer"
                 @open-feature-editor="onOpenFeatureEditor"
               ></component>
@@ -291,7 +303,6 @@ defineExpose({ moveToEntry });
             <component
               :is="featureComponent(feature, 'gallery')"
               class="pt-4 pr-4 pb-0"
-              :enable-click="true"
               @open-full-viewer="onOpenFullViewer"
               @open-feature-editor="onOpenFeatureEditor"
             ></component>

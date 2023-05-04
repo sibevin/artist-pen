@@ -2,13 +2,11 @@ import {
   mdiCalendar,
   mdiTimeline,
   mdiBookOpenPageVariantOutline,
-  mdiChartBubble,
-  mdiCheckboxMultipleBlank,
 } from "@mdi/js";
 import camelCase from "lodash-es/camelCase";
 import { LocaleActor } from "~/services/locale";
 import { Icon, SelectionOption } from "~/models/app/types";
-import { DiaryLayout, DISPLAY_ICONS, DisplayIcon } from "~/dwdy/layout/def";
+import { DiaryLayout } from "~/dwdy/layout/def";
 
 import {
   LayoutConfig as CalendarLayoutConfig,
@@ -22,7 +20,6 @@ import {
   LayoutConfig as NotebookLayoutConfig,
   DEFAULT_LAYOUT_CONFIG as NOTEBOOK_DEFAULT_CONFIG,
 } from "~/dwdy/layout/notebook/def";
-import { bxsRdSticker } from "~/services/iconSetPath";
 
 export type DiaryLayoutConfigMap = {
   [DiaryLayout.Calendar]: CalendarLayoutConfig;
@@ -40,12 +37,6 @@ const LAYOUT_ICON_MAP: Record<DiaryLayout, Icon> = {
   [DiaryLayout.Calendar]: { set: "mdi", path: mdiCalendar },
   [DiaryLayout.Timeline]: { set: "mdi", path: mdiTimeline },
   [DiaryLayout.Notebook]: { set: "mdi", path: mdiBookOpenPageVariantOutline },
-};
-
-const DISPLAY_ICON_MAP: Record<DisplayIcon, Icon> = {
-  ["dot"]: { set: "mdi", path: mdiChartBubble },
-  ["content"]: { set: "mdi", path: mdiCheckboxMultipleBlank },
-  ["sticker"]: { set: "bxs", path: bxsRdSticker },
 };
 
 export function layoutText(layout: DiaryLayout, la: LocaleActor): string {
@@ -82,17 +73,4 @@ export function defaultLayoutConfig<T extends DiaryLayout>(
   layout: DiaryLayout
 ): DiaryLayoutConfigMap[T] {
   return DEFAULT_LAYOUT_CONFIG_MAP[layout] as DiaryLayoutConfigMap[T];
-}
-
-export function displayIconOpts(la: LocaleActor): SelectionOption[] {
-  return DISPLAY_ICONS.map((key) => {
-    const localeKey = camelCase(key);
-    return {
-      label: la.t(
-        `dwdy.layout.config.displayIcon.options.${localeKey}`
-      ) as string,
-      value: key,
-      icon: DISPLAY_ICON_MAP[key],
-    };
-  });
 }

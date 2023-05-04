@@ -5,21 +5,27 @@ import {
   mdiTextSearchVariant,
   mdiTrashCan,
   mdiArrowLeftBottom,
+  mdiDotsCircle,
 } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
 import { useSearchState } from "~/states/useSearchState";
 import { Diary } from "~/models/dwdy/diary";
 import { layoutComponent } from "~/dwdy/layout/component";
+import { SearchResult } from "~/types/dwdy/search";
 import {
   buildEmptySearchQuery,
   isQueryEmpty,
   addToSearchHistories,
+  applyDiaryEntrySearch,
 } from "~/services/dwdy/search";
+import { featureIcon } from "~/dwdy/feature/map";
 import { featureComponent } from "~/dwdy/feature/component";
 import { DiaryPageActionParams } from "~/types/dwdy/core";
+import YmdNavPanel from "~/components/dwdy/common/YmdNavPanel.vue";
 import SvgIcon from "~/components/SvgIcon.vue";
 import ModalBase from "~/components/ModalBase.vue";
+import MhlPanel from "./MatchHightlightPanel.vue";
 
 const props = defineProps({
   modelValue: {
@@ -39,6 +45,11 @@ const searchState = useSearchState();
 const isModalOn = ref(false);
 const diaryPageSearchModal = ref();
 const keywordInput = ref<string>("");
+const isInSearching = ref(false);
+const result = ref<SearchResult>({
+  query: buildEmptySearchQuery(),
+  entries: [],
+});
 
 onMounted(() => {
   isModalOn.value = props.modelValue;
@@ -73,7 +84,10 @@ function onSearchClearBtnClicked(): void {
   keywordInput.value = "";
 }
 
-function applySearch(fromKeywordInput = false): void {
+async function applySearch(fromKeywordInput = false): Promise<void> {
+  if (!dwdyState.diary.value.doc.dUid) {
+    return;
+  }
   if (fromKeywordInput) {
     searchState.query.value.keywords = keywordInput.value
       .split(" ")
@@ -85,7 +99,15 @@ function applySearch(fromKeywordInput = false): void {
     new Diary(dwdyState.diary.value.doc),
     searchState.query.value
   );
-  console.log("apply-search", searchState.query.value);
+  console.log("apply-search: query", searchState.query.value);
+  isInSearching.value = true;
+  const appliedResult = await applyDiaryEntrySearch(
+    dwdyState.diary.value.doc.dUid,
+    searchState.query.value
+  );
+  isInSearching.value = false;
+  result.value = appliedResult;
+  console.log("apply-search: result", result.value);
 }
 defineExpose({ applySearch });
 </script>
@@ -110,7 +132,53 @@ defineExpose({ applySearch });
     </template>
     <template #modal-content>
       <div class="h-full inset-0 flex flex-col gap-2">
-        <div class="grow">[SearchMain]: Calendar</div>
+        <div class="grow">
+          <SvgIcon
+            v-if="isInSearching"
+            class="text-base-300 animate-spin-slow m-5"
+            icon-set="mdi"
+            :path="mdiDotsCircle"
+            :size="20"
+          ></SvgIcon>
+          <div v-if="result.entries.length > 0" class="flex flex-col gap-3">
+            <div
+              v-for="(resultEntry, index) in result.entries"
+              :key="index"
+              class="border flex gap-2"
+            >
+              <div class="flex-none self-stretch text-primary bg-base-200 p-2">
+                {{ index + 1 }}
+              </div>
+              <div class="grow flex flex-col md:flex-row items-start">
+                <div class="flex-none p-3">
+                  <YmdNavPanel
+                    v-if="resultEntry.entry.tsDate"
+                    :current-date="resultEntry.entry.tsDate"
+                  ></YmdNavPanel>
+                </div>
+                <div v-if="result.query.keywords.length > 0" class="grow p-3">
+                  <div
+                    v-for="(match, mIndex) in Object.values(
+                      resultEntry.matches
+                    ).flat()"
+                    :key="mIndex"
+                    class="flex items-center"
+                  >
+                    <div v-if="match.feature">
+                      <SvgIcon
+                        class="mr-2"
+                        :icon-set="featureIcon(match.feature).set"
+                        :path="featureIcon(match.feature).path"
+                        :size="16"
+                      ></SvgIcon>
+                    </div>
+                    <MhlPanel :match="match"></MhlPanel>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="flex-none flex flex-wrap gap-2">
           <component
             :is="

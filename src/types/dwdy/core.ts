@@ -62,6 +62,7 @@ export type DiaryPageActionParams = {
     | "select-feature-editor"
     | "open-feature-editor"
     | "open-full-viewer"
+    | "open-display-icon-selector"
     | "open-search-main-modal"
     | "open-search-history-modal"
     | "open-search-time-range-modal"

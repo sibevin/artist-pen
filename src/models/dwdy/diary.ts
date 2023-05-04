@@ -482,16 +482,8 @@ export class Diary implements BaseModel<Diary, DiaryDoc, DiaryParams> {
     return entries;
   }
 
-  public assignTemplate(
-    template: DiaryTemplate,
-    screen: "mobile" | "desktop"
-  ): void {
-    const givenTemplate = this.buildTemplate({ template });
-    if (screen === "desktop") {
-      this.doc.template.desktop = givenTemplate.desktop;
-    } else if (screen === "mobile") {
-      this.doc.template.mobile = givenTemplate.mobile;
-    }
+  public assignTemplate(template: DiaryTemplate): void {
+    this.doc.template = this.buildTemplate({ template });
   }
 
   public fetchTemplateDisabledFeatures(

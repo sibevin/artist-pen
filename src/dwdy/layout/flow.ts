@@ -8,7 +8,7 @@ import { DiaryEntryBunch } from "~/types/dwdy/bunch";
 // import { LAYOUT_FLOW as GeoLayoutFlow } from "~/dwdy/layout/flow/geo";
 
 export type DiaryLayoutFlow = {
-  insertNewEntry: (
+  fetchOrInsertEntry: (
     diary: Diary,
     entryParams: DiaryEntryParams,
     target: DiaryInsertEntryTarget
@@ -17,7 +17,7 @@ export type DiaryLayoutFlow = {
     diary: Diary,
     query: LocationQuery
   ) => Promise<DiaryEntry>;
-  insertNewEntryByRouteQuery: (
+  fetchOrInsertEntryByRouteQuery: (
     diary: Diary,
     query: LocationQuery
   ) => Promise<DiaryEntry>;

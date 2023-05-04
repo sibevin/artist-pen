@@ -32,8 +32,22 @@ onMounted(() => {
         return diaryTemplate.value.mobile;
       },
       set: function (sortable) {
+        const removedFeatures = diaryTemplate.value.mobile.filter(
+          (feature) => !(sortable.toArray() as DiaryFeature[]).includes(feature)
+        );
+        if (removedFeatures.length > 0) {
+          diaryTemplate.value.desktop.left =
+            diaryTemplate.value.desktop.left.filter(
+              (feature) => !removedFeatures.includes(feature)
+            );
+          diaryTemplate.value.desktop.right =
+            diaryTemplate.value.desktop.right.filter(
+              (feature) => !removedFeatures.includes(feature)
+            );
+        }
         diaryTemplate.value.mobile = sortable.toArray() as DiaryFeature[];
-        dwdyState.diary.value.assignTemplate(diaryTemplate.value, "mobile");
+        dwdyState.diary.value.assignTemplate(diaryTemplate.value);
+        console.log("diary", dwdyState.diary.value.doc.template);
         dwdyState.diary.value.save();
       },
     },
@@ -52,8 +66,16 @@ onMounted(() => {
         return diaryTemplate.value.desktop.left;
       },
       set: function (sortable) {
+        const removedFeatures = diaryTemplate.value.desktop.left.filter(
+          (feature) => !(sortable.toArray() as DiaryFeature[]).includes(feature)
+        );
+        if (removedFeatures.length > 0) {
+          diaryTemplate.value.mobile = diaryTemplate.value.mobile.filter(
+            (feature) => !removedFeatures.includes(feature)
+          );
+        }
         diaryTemplate.value.desktop.left = sortable.toArray() as DiaryFeature[];
-        dwdyState.diary.value.assignTemplate(diaryTemplate.value, "desktop");
+        dwdyState.diary.value.assignTemplate(diaryTemplate.value);
         dwdyState.diary.value.save();
       },
     },
@@ -67,9 +89,17 @@ onMounted(() => {
         return diaryTemplate.value.desktop.right;
       },
       set: function (sortable) {
+        const removedFeatures = diaryTemplate.value.desktop.right.filter(
+          (feature) => !(sortable.toArray() as DiaryFeature[]).includes(feature)
+        );
+        if (removedFeatures.length > 0) {
+          diaryTemplate.value.mobile = diaryTemplate.value.mobile.filter(
+            (feature) => !removedFeatures.includes(feature)
+          );
+        }
         diaryTemplate.value.desktop.right =
           sortable.toArray() as DiaryFeature[];
-        dwdyState.diary.value.assignTemplate(diaryTemplate.value, "desktop");
+        dwdyState.diary.value.assignTemplate(diaryTemplate.value);
         dwdyState.diary.value.save();
       },
     },

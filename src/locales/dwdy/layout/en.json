@@ -25,7 +25,7 @@
         "sort": "Sorted by"
       },
       "ConfigPanel": {
-        "example": "Example",
+        "preview": "Preview",
         "calendarDisplay": "Calendar display",
         "displayIcon": "Calendar icon",
         "highlightedWeekDays": "Highlighted days",

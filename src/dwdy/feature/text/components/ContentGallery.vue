@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from "vue";
-import { mdiCircle, mdiFileEditOutline } from "@mdi/js";
+import { mdiCircle, mdiFileEditOutline, mdiOverscan } from "@mdi/js";
 import Flicking from "@egjs/vue3-flicking";
 import { ChangedEvent } from "@egjs/flicking";
 import { useDwdyState } from "~/states/useDwdyState";
@@ -11,13 +11,6 @@ import SvgIcon from "~/components/SvgIcon.vue";
 import ContentSlate from "~/dwdy/feature/text/components/ContentSlate.vue";
 
 const MAX_CAROUSEL_DOTS = 5;
-
-const props = defineProps({
-  enableClick: {
-    type: Boolean,
-    default: false,
-  },
-});
 
 const emit = defineEmits<{
   (e: "openFullViewer", value: DiaryContentFeatureIndex): void;
@@ -50,12 +43,10 @@ function onFlickerChanged(event: ChangedEvent): void {
   flickerIndex.value = event.index;
 }
 
-function onGalleryClicked(): void {
-  if (props.enableClick) {
-    const index =
-      featureConfig.value.display === "carousel" ? flickerIndex.value : 0;
-    emit("openFullViewer", { feature: DiaryFeature.Text, index });
-  }
+function onFullViewerBtnClicked(): void {
+  const index =
+    featureConfig.value.display === "carousel" ? flickerIndex.value : 0;
+  emit("openFullViewer", { feature: DiaryFeature.Text, index });
 }
 
 function onEditBtnClicked(): void {
@@ -69,7 +60,7 @@ function onEditBtnClicked(): void {
 <template>
   <div v-if="currentTextCount > 0">
     <div class="border border-base-200 rounded-md shadow-md">
-      <div class="w-full flex items-center">
+      <div class="w-full flex items-center gap-2">
         <SvgIcon
           class="flex-none text-primary ml-3.5"
           :icon-set="FEATURE_ICON.main.set"
@@ -114,7 +105,15 @@ function onEditBtnClicked(): void {
             </div>
           </div>
         </div>
-        <div class="m-2 flex gap-2">
+        <div class="my-2 flex gap-2">
+          <button
+            class="flex-none btn btn-circle btn-ghost"
+            @click="onFullViewerBtnClicked"
+          >
+            <SvgIcon icon-set="mdi" :path="mdiOverscan" :size="24"></SvgIcon>
+          </button>
+        </div>
+        <div class="my-2 mr-2 flex gap-2">
           <button
             class="flex-none btn btn-circle btn-ghost"
             @click="onEditBtnClicked"
@@ -128,18 +127,16 @@ function onEditBtnClicked(): void {
         </div>
       </div>
     </div>
-    <button
+    <div
       v-if="featureConfig.display === 'list'"
       class="mt-3 mx-2 flex flex-col"
-      :class="props.enableClick ? 'cursor-pointer' : 'cursor-default'"
-      @click="onGalleryClicked"
     >
       <div
         v-for="index in [...Array(currentTextCount).keys()]"
         :key="index"
         class="mb-2"
       >
-        <div class="mb-2 flex items-center">
+        <div v-if="currentTextCount > 1" class="mb-2 flex items-center">
           <SvgIcon
             :icon-set="FEATURE_ICON.main.set"
             :path="FEATURE_ICON.main.path"
@@ -152,19 +149,11 @@ function onEditBtnClicked(): void {
             {{ index + 1 }}
           </div>
         </div>
-        <ContentSlate
-          :content-index="index"
-          :enable-text-select="!props.enableClick"
-        >
+        <ContentSlate :content-index="index" :enable-text-select="true">
         </ContentSlate>
       </div>
-    </button>
-    <button
-      v-else
-      class="mt-4 px-2 w-full"
-      :class="props.enableClick ? 'cursor-pointer' : 'cursor-default'"
-      @click="onGalleryClicked"
-    >
+    </div>
+    <div v-else class="mt-4 px-2 w-full">
       <Flicking
         ref="carouselFlicker"
         :options="{
@@ -187,6 +176,6 @@ function onEditBtnClicked(): void {
           </ContentSlate>
         </div>
       </Flicking>
-    </button>
+    </div>
   </div>
 </template>

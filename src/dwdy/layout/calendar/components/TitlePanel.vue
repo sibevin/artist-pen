@@ -10,9 +10,5 @@ const currentDt = computed<Date>(() => {
 });
 </script>
 <template>
-  <YmdNavPanel
-    v-if="currentDt"
-    :current-date="currentDt"
-    :enable-selector="false"
-  ></YmdNavPanel>
+  <YmdNavPanel v-if="currentDt" :current-date="currentDt"></YmdNavPanel>
 </template>

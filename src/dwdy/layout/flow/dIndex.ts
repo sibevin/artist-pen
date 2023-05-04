@@ -10,16 +10,16 @@ import { genUid } from "~/services/db";
 import { DiaryEntryBunch, BunchFetchOption } from "~/types/dwdy/bunch";
 
 export const LAYOUT_FLOW = {
-  insertNewEntry: insertNewEntryByDIndex,
+  fetchOrInsertEntry: fetchOrInsertEntryByDIndex,
   fetchEntryByRouteQuery: fetchEntryByDIndexQuery,
-  insertNewEntryByRouteQuery: insertNewEntryByDIndexQuery,
+  fetchOrInsertEntryByRouteQuery: fetchOrInsertEntryByDIndexQuery,
   fetchBunchByEntry: fetchBunchByEntryDIndex,
   updateBunchByEntry: updateBunchByEntryDIndex,
   findPrevEntry: findPrevDIndexEntry,
   findNextEntry: findNextDIndexEntry,
 };
 
-async function insertNewEntryByDIndex(
+async function fetchOrInsertEntryByDIndex(
   diary: Diary,
   entryParams: DiaryEntryParams = {},
   target: DiaryInsertEntryTarget
@@ -40,12 +40,12 @@ async function insertNewEntryByDIndex(
   }
 }
 
-async function insertNewEntryByDIndexQuery(
+async function fetchOrInsertEntryByDIndexQuery(
   diary: Diary,
   query: LocationQuery
 ): Promise<DiaryEntry> {
   if (query.ai) {
-    return await insertNewEntryByDIndex(
+    return await fetchOrInsertEntryByDIndex(
       diary,
       {},
       { afterDIndex: query.ai as string }

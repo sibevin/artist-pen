@@ -4,6 +4,7 @@ import ContentGallery from "./components/ContentGallery.vue";
 import SearchQuerySelector from "./components/SearchQuerySelector.vue";
 import SearchMenuEntry from "./components/SearchMenuEntry.vue";
 import SearchHistoryEntry from "./components/SearchHistoryEntry.vue";
+import ConfigPanel from "./components/ConfigPanel.vue";
 
 export const FEATURE_COMPONENT: DiaryFeatureComponent = {
   editorMain: EditorMain,
@@ -11,4 +12,5 @@ export const FEATURE_COMPONENT: DiaryFeatureComponent = {
   searchQuerySelector: SearchQuerySelector,
   searchMenuEntry: SearchMenuEntry,
   searchHistoryEntry: SearchHistoryEntry,
+  configPanel: ConfigPanel,
 };

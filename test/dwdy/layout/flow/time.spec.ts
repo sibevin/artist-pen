@@ -7,12 +7,12 @@ import { LAYOUT_FLOW } from "~/dwdy/layout/flow/time";
 import { dtToEntryTs, getNeighborTs } from "~/services/dwdy/dateUtils";
 
 describe("Flow::Time", () => {
-  describe("#insertNewEntryByRouteQuery", () => {
+  describe("#fetchOrInsertEntryByRouteQuery", () => {
     describe("when diary is not stored", () => {
       it("raises a 'diary_not_stored' error", async () => {
         const diary = build();
         try {
-          await LAYOUT_FLOW.insertNewEntryByRouteQuery(diary, {});
+          await LAYOUT_FLOW.fetchOrInsertEntryByRouteQuery(diary, {});
         } catch (error) {
           expect((error as AppError).code).toEqual("diary_not_stored");
         }
@@ -25,7 +25,7 @@ describe("Flow::Time", () => {
       it("raises a 'timestamp_required' error", async () => {
         const diary = await create();
         try {
-          await LAYOUT_FLOW.insertNewEntryByRouteQuery(diary, {});
+          await LAYOUT_FLOW.fetchOrInsertEntryByRouteQuery(diary, {});
         } catch (error) {
           expect((error as AppError).code).toEqual("timestamp_required");
         }
@@ -40,7 +40,7 @@ describe("Flow::Time", () => {
         const diary = await create();
         const timestamp = dtToEntryTs(new Date());
         const entry = await diary.appendEntry({ timestamp });
-        const insertedEntry = await LAYOUT_FLOW.insertNewEntryByRouteQuery(
+        const insertedEntry = await LAYOUT_FLOW.fetchOrInsertEntryByRouteQuery(
           diary,
           {
             ts: String(timestamp),
@@ -57,7 +57,7 @@ describe("Flow::Time", () => {
       it("inserts a new entry with the given timestamp", async () => {
         const diary = await create();
         const timestamp = dtToEntryTs(new Date());
-        const insertedEntry = await LAYOUT_FLOW.insertNewEntryByRouteQuery(
+        const insertedEntry = await LAYOUT_FLOW.fetchOrInsertEntryByRouteQuery(
           diary,
           {
             ts: String(timestamp),
@@ -84,7 +84,7 @@ describe("Flow::Time", () => {
           unit: "day",
         });
         const entryAfter = await diary.appendEntry({ timestamp: tsAfter });
-        const insertedEntry = await LAYOUT_FLOW.insertNewEntryByRouteQuery(
+        const insertedEntry = await LAYOUT_FLOW.fetchOrInsertEntryByRouteQuery(
           diary,
           {
             ts: String(timestamp),

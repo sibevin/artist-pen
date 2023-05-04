@@ -1,5 +1,4 @@
 import { mdiCircle } from "@mdi/js";
-import { DiaryLayout } from "~/dwdy/layout/def";
 import {
   DisplayIconFormat,
   LAYOUT_DISPLAY_FEATURES,
@@ -7,7 +6,7 @@ import {
 import { Diary } from "~/models/dwdy/diary";
 import { DiaryEntry } from "~/models/dwdy/diaryEntry";
 import { DiaryFeature } from "~/dwdy/feature/def";
-import { featureIcon } from "~/dwdy/feature/map";
+import { stickerCategories } from "~/dwdy/feature/sticker/data";
 
 export function buildDisplayIcons(
   diary: Diary,
@@ -16,47 +15,74 @@ export function buildDisplayIcons(
   if (!entry.hasContents) {
     return [];
   }
-  const displayIcon = diary.fetchLayoutConfig(DiaryLayout.Calendar).displayIcon;
   let icons: DisplayIconFormat[] = [];
-  if (displayIcon === "content") {
-    for (const feature of LAYOUT_DISPLAY_FEATURES) {
-      if (!diary.enabledFeatures.includes(feature)) {
-        continue;
-      }
-      const contents = entry.fetchContents(feature);
-      if (contents.length > 0) {
-        icons.push({
-          icon: featureIcon(feature),
-          size: 1.2,
-        });
-      }
-      if (icons.length > 0) {
-        break;
-      }
+  if (
+    !diary.enabledFeatures.includes(DiaryFeature.Sticker) ||
+    diary.fetchFeatureConfig(DiaryFeature.Sticker).displayIconTarget === "none"
+  ) {
+    icons = fetchDotDisplay(diary, entry);
+  } else {
+    icons = fetchStickerDisplay(diary, entry);
+    if (icons.length === 0) {
+      icons = fetchDotDisplay(diary, entry);
     }
   }
-  if (displayIcon === "dot") {
-    let contentLength = 0;
-    for (const feature of LAYOUT_DISPLAY_FEATURES) {
-      if (!diary.enabledFeatures.includes(feature)) {
-        continue;
-      }
-      const contents = entry.fetchContents(feature);
-      contentLength += contents.length;
+  return icons;
+}
+
+function fetchDotDisplay(diary: Diary, entry: DiaryEntry): DisplayIconFormat[] {
+  const icons: DisplayIconFormat[] = [];
+  let contentLength = 0;
+  for (const feature of LAYOUT_DISPLAY_FEATURES) {
+    if (!diary.enabledFeatures.includes(feature)) {
+      continue;
     }
-    const size = (contentLength / 20 + 1) * 0.5;
-    icons.push({
-      icon: { set: "mdi", path: mdiCircle },
-      size: size >= 1.2 ? 1.2 : size,
-    });
+    const contents = entry.fetchContents(feature);
+    contentLength += contents.length;
   }
-  if (displayIcon === "sticker") {
+  if (contentLength === 0) {
+    return [];
+  }
+  const size = (contentLength / 20 + 1) * 0.5;
+  icons.push({
+    icon: { set: "mdi", path: mdiCircle },
+    size: size >= 1.2 ? 1.2 : size,
+  });
+  return icons;
+}
+
+function fetchStickerDisplay(
+  diary: Diary,
+  entry: DiaryEntry
+): DisplayIconFormat[] {
+  let icons: DisplayIconFormat[] = [];
+  const displayIconTarget = diary.fetchFeatureConfig(
+    DiaryFeature.Sticker
+  ).displayIconTarget;
+  if (displayIconTarget === "first") {
     icons = entry
       .fetchContents<DiaryFeature.Sticker>(DiaryFeature.Sticker)
       .map((code) => {
         return { stickerCode: code };
       });
-    icons = (icons[0] && [icons[0]]) || [];
+  } else {
+    icons = entry
+      .fetchContents<DiaryFeature.Sticker>(DiaryFeature.Sticker)
+      .filter((code) => getCategoryStickers(displayIconTarget).includes(code))
+      .map((code) => {
+        return { stickerCode: code };
+      });
   }
+  icons = (icons[0] && [icons[0]]) || [];
   return icons;
+}
+
+function getCategoryStickers(categoryCode: string): string[] {
+  for (let i = 0; i < stickerCategories.length; i++) {
+    const category = stickerCategories[i];
+    if (category.code === categoryCode) {
+      return category.stickerCodes;
+    }
+  }
+  return [];
 }

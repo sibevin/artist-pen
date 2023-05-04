@@ -6,9 +6,6 @@ export enum DiaryLayout {
   Notebook = "notebook",
 }
 
-export const DISPLAY_ICONS = ["dot", "sticker", "content"] as const;
-export type DisplayIcon = typeof DISPLAY_ICONS[number];
-
 export type DiaryLayoutComponent = {
   contentMain?: any;
   contentNavMenu?: any;

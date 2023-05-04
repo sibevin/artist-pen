@@ -25,7 +25,7 @@ async function onIsCalendarShownToggled(): Promise<void> {
 </script>
 <template>
   <label
-    class="swap ml-2 btn btn-ghost rounded-full"
+    class="swap btn btn-ghost rounded-full"
     :class="{
       'swap-active': calendarConfig.isCalendarShown,
     }"
@@ -38,7 +38,12 @@ async function onIsCalendarShownToggled(): Promise<void> {
         :path="mdiCalendarMultiselect"
         :size="24"
       ></SvgIcon>
-      <SvgIcon icon-set="mdi" :path="mdiToggleSwitch" :size="32"></SvgIcon>
+      <SvgIcon
+        class="text-primary"
+        icon-set="mdi"
+        :path="mdiToggleSwitch"
+        :size="32"
+      ></SvgIcon>
     </div>
     <div class="swap-off flex items-center">
       <SvgIcon

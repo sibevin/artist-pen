@@ -59,5 +59,5 @@ export type SearchResultEntry = {
 
 export type SearchResult = {
   query: SearchQuery;
-  results: SearchResultEntry[];
+  entries: SearchResultEntry[];
 };

@@ -145,37 +145,48 @@ function isSearchQueryEqual(queryA: SearchQuery, queryB: SearchQuery): boolean {
   return JSON.stringify(queryA) === JSON.stringify(queryB);
 }
 
-export async function applySearch(
+export async function applyDiaryEntrySearch(
   dUid: DUid,
   query: SearchQuery
 ): Promise<SearchResult> {
   const collection = buildSearchCollection(dUid, query);
+  console.log("collection", collection);
   collection.filter((entryDoc) => {
     const dEntry = new DiaryEntry(entryDoc);
-    if (query.keywords.length > 0 && dEntry.isKeywordsFound(query)) {
-      return true;
+    console.log("dEntry", dEntry.doc);
+    console.log("isKeywordsFound", dEntry.isKeywordsFound(query));
+    if (query.keywords.length > 0 && !dEntry.isKeywordsFound(query)) {
+      return false;
     }
     if (query.feature["tag"]) {
       const tags = dEntry.fetchContents<DiaryFeature.Tag>(DiaryFeature.Tag);
+      let found = false;
       for (let i = 0; i < query.feature["tag"].length; i++) {
         const tag = query.feature["tag"][i];
         if (tags.includes(tag)) {
-          return true;
+          found = true;
         }
+      }
+      if (!found) {
+        return false;
       }
     }
     if (query.feature["sticker"]) {
       const stickers = dEntry.fetchContents<DiaryFeature.Sticker>(
         DiaryFeature.Sticker
       );
+      let found = false;
       for (let i = 0; i < query.feature["sticker"].length; i++) {
         const sticker = query.feature["sticker"][i];
         if (stickers.includes(sticker)) {
-          return true;
+          found = true;
         }
       }
+      if (!found) {
+        return false;
+      }
     }
-    return false;
+    return true;
   });
   const querySort = query.sorts[0];
   let entries;
@@ -188,9 +199,10 @@ export async function applySearch(
   } else {
     entries = await collection.distinct().reverse().sortBy("timestamp");
   }
+  console.log("entries:", entries);
   return {
     query,
-    results: buildSearchResultEntries(query, entries),
+    entries: buildSearchResultEntries(query, entries),
   };
 }
 

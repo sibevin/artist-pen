@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { computed } from "vue";
 import { mdiCircleSmall } from "@mdi/js";
 import { useDwdyState } from "~/states/useDwdyState";
 import { LocaleActor } from "~/services/locale";
@@ -20,7 +20,6 @@ const props = defineProps({
 
 const la = new LocaleActor("dwdy.core");
 const dwdyState = useDwdyState();
-const navInfo = ref(await dwdyState.entry.value.navInfo);
 
 const diaryConfig = computed(() => {
   return dwdyState.diary.value.fetchDiaryConfig();
@@ -51,13 +50,6 @@ const wDayDisplay = computed<string>(() => {
     }) as string[]
   )[props.currentDate.getDay()];
 });
-
-watch(
-  () => dwdyState.entry.value,
-  async () => {
-    navInfo.value = await dwdyState.entry.value.navInfo;
-  }
-);
 
 function isHighlightedWeekDay(givenDt: Date): boolean {
   return diaryConfig.value.highlightedWeekDays.includes(

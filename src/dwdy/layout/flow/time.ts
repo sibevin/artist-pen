@@ -10,16 +10,16 @@ import { dtToEntryTs, getNeighborTs } from "~/services/dwdy/dateUtils";
 import { DiaryEntryBunch, BunchFetchOption } from "~/types/dwdy/bunch";
 
 export const LAYOUT_FLOW = {
-  insertNewEntry: insertNewEntryByTimestamp,
+  fetchOrInsertEntry: fetchOrInsertEntryByTimestamp,
   fetchEntryByRouteQuery: fetchEntryByTimestampQuery,
-  insertNewEntryByRouteQuery: insertNewEntryByTimestampQuery,
+  fetchOrInsertEntryByRouteQuery: fetchOrInsertEntryByTimestampQuery,
   fetchBunchByEntry: fetchBunchByEntryTimestamp,
   updateBunchByEntry: updateBunchByEntryTimestamp,
   findPrevEntry: findPrevTsEntry,
   findNextEntry: findNextTsEntry,
 };
 
-async function insertNewEntryByTimestamp(
+async function fetchOrInsertEntryByTimestamp(
   diary: Diary,
   entryParams: DiaryEntryParams = {},
   target: DiaryInsertEntryTarget
@@ -49,12 +49,12 @@ async function insertNewEntryByTimestamp(
   }
 }
 
-async function insertNewEntryByTimestampQuery(
+async function fetchOrInsertEntryByTimestampQuery(
   diary: Diary,
   query: LocationQuery
 ): Promise<DiaryEntry> {
   const timestamp = getOrInitTsFromRoute(query);
-  return await insertNewEntryByTimestamp(diary, {}, { timestamp });
+  return await fetchOrInsertEntryByTimestamp(diary, {}, { timestamp });
 }
 
 async function fetchEntryByTimestampQuery(

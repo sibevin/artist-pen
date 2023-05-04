@@ -63,9 +63,11 @@ const wDayDisplay = computed(() => {
 });
 
 watch(
-  () => dwdyState.entry.value,
+  () => [dwdyState.entry.value, props.enableNav],
   async () => {
-    navInfo.value = await dwdyState.entry.value.navInfo;
+    if (props.enableNav) {
+      navInfo.value = await dwdyState.entry.value.navInfo;
+    }
   }
 );
 

@@ -25,6 +25,7 @@ import FullViewerModal from "~/components/dwdy/DiaryPage/FullViewerModal.vue";
 import SearchMainModal from "~/components/dwdy/DiaryPage/search/MainModal.vue";
 import FeatureSelectorModal from "~/components/dwdy/common/FeatureSelectorModal.vue";
 import SearchHistoryModal from "~/components/dwdy/DiaryPage/search/HistoryModal.vue";
+import DisplayIconSelectorModal from "~/components/dwdy/DiaryPage/DisplayIconSelectorModal.vue";
 
 const router = useRouter();
 const appState = useAppState();
@@ -39,6 +40,7 @@ const controlMenuSelectedBtn = ref<string>();
 const isDiarySettingsMoodalOn = ref(false);
 const isCurrentDateSelectorModalOn = ref(false);
 const isContentFullViewerModalOn = ref(false);
+const isDisplayIconSelectorOn = ref(false);
 const isEditorSelectorModalOn = ref(false);
 const isDiarySearchModalOn = ref(false);
 const isSearchMainModalOn = ref(false);
@@ -198,6 +200,8 @@ function triggerAction(params: DiaryPageActionParams): void {
     if (contentFullViewer.value) {
       contentFullViewer.value.openModal(params.cfi);
     }
+  } else if (params.action === "open-display-icon-selector") {
+    isDisplayIconSelectorOn.value = true;
   } else if (params.action === "open-search-main-modal") {
     isSearchMainModalOn.value = true;
   } else if (params.action === "open-search-history-modal") {
@@ -335,6 +339,12 @@ function triggerAction(params: DiaryPageActionParams): void {
         class="fixed z-10"
         @select="onContentEditorOpen"
       ></FeatureSelectorModal>
+      <DisplayIconSelectorModal
+        v-if="dwdyState.diary.value.isStored"
+        ref="displayIconSelector"
+        v-model="isDisplayIconSelectorOn"
+        class="fixed z-10"
+      ></DisplayIconSelectorModal>
       <FullViewerModal
         v-if="dwdyState.diary.value.isStored"
         ref="contentFullViewer"

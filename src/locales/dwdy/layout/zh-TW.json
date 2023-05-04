@@ -25,7 +25,7 @@
         "sort": "搜尋排序"
       },
       "ConfigPanel": {
-        "example": "圖例",
+        "preview": "預覽",
         "calendarDisplay": "日曆顯示",
         "displayIcon": "日曆圖示",
         "highlightedWeekDays": "標記星期",

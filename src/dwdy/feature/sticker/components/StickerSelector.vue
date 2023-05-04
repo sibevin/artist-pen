@@ -106,7 +106,7 @@ defineExpose({ selectSticker, clearAllStickers, updateRecentStickers });
         </div>
       </div>
     </div>
-    <div class="flex-none">
+    <div v-if="recentStickers.length > 0" class="flex-none">
       <div class="cell-block mt-4">
         <div class="cell-title flex items-center uppercase px-2">
           <SvgIcon

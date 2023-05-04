@@ -5,7 +5,7 @@ import {
   FeatureStat,
   FeatureConfig,
 } from "~/dwdy/feature/sticker/def";
-import { stickerMap } from "~/dwdy/feature/sticker/data";
+import { stickerCategories, stickerMap } from "~/dwdy/feature/sticker/data";
 
 export function buildContent(): FeatureMeta {
   return randomPick(Object.keys(stickerMap));
@@ -24,5 +24,9 @@ export function buildStat(): FeatureStat {
 export function buildConfig(): FeatureConfig {
   return {
     recentRecords: randomSample(Object.keys(stickerMap)),
+    displayIconTarget: randomPick([
+      "first",
+      ...stickerCategories.map((group) => group.code),
+    ]),
   };
 }

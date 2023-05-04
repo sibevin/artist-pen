@@ -15,6 +15,7 @@ export type FeatureStat = {
 
 export type FeatureConfig = {
   recentRecords: FeatureMeta[];
+  displayIconTarget: string; // "first" or sticker category code
 };
 
 export interface DiaryStickerIcon {
@@ -51,4 +52,5 @@ export const DEFAULT_FEATURE_STAT: FeatureStat = {
 
 export const DEFAULT_FEATURE_CONFIG: FeatureConfig = {
   recentRecords: [],
+  displayIconTarget: "first",
 };
