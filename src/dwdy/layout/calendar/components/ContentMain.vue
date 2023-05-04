@@ -16,8 +16,10 @@ import SvgIcon from "~/components/SvgIcon.vue";
 import CalendarPanel from "./CalendarPanel.vue";
 import CalendarSwitchBtn from "./CalendarSwitchBtn.vue";
 import DisplayIconSwitchBtn from "./DisplayIconSwitchBtn.vue";
+import FeatureEditorSelectorPanel from "~/components/dwdy/DiaryPage/FeatureEditorSelectorPanel.vue";
 import YmNavPanel from "~/components/dwdy/common/YmNavPanel.vue";
 import YmdNavPanel from "~/components/dwdy/common/YmdNavPanel.vue";
+import { DiaryFeature } from "~/dwdy/feature/def";
 
 const emit = defineEmits<{
   (e: "triggerAction", params: DiaryPageActionParams): void;
@@ -68,6 +70,10 @@ function onOpenFeatureEditor(cfi: DiaryContentFeatureIndex): void {
   nextTick(() => {
     emit("triggerAction", { action: "open-feature-editor", cfi });
   });
+}
+
+function onFeatureEditorSelected(feature: DiaryFeature): void {
+  onOpenFeatureEditor({ feature });
 }
 
 async function updateStateEntryByTs(timestamp: number): Promise<void> {
@@ -155,6 +161,10 @@ defineExpose({ moveToEntry });
               @move-nav-date="onMoveDateTriggered"
             ></CalendarPanel>
           </Transition>
+          <FeatureEditorSelectorPanel
+            class="self-center"
+            @select="onFeatureEditorSelected"
+          ></FeatureEditorSelectorPanel>
         </div>
       </div>
       <div class="mt-2 min-h-0 overflow-y-auto">
@@ -246,6 +256,10 @@ defineExpose({ moveToEntry });
                 @move-nav-date="onMoveDateTriggered"
               ></CalendarPanel>
             </Transition>
+            <FeatureEditorSelectorPanel
+              class="self-center"
+              @select="onFeatureEditorSelected"
+            ></FeatureEditorSelectorPanel>
           </div>
         </div>
         <div class="mt-3 w-full min-h-0 overflow-y-auto">

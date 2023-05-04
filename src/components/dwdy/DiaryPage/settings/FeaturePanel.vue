@@ -286,13 +286,12 @@ onMounted(() => {
         >
           <div v-if="featureComponent(feature, 'configPanel')">
             <div
-              class="h-full flex justify-center items-center border rounded-lg"
+              class="h-full flex flex-col justify-center items-center gap-2 border rounded-lg"
             >
               <SvgIcon
-                class="mr-2"
                 :icon-set="featureIcon(feature).set"
                 :path="featureIcon(feature).path"
-                :size="24"
+                :size="28"
               ></SvgIcon>
               {{ featureText(feature, la) }}
             </div>
