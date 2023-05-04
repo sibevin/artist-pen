@@ -3,6 +3,8 @@ import { computed, nextTick } from "vue";
 import { mdiPlus } from "@mdi/js";
 import { LocaleActor } from "~/services/locale";
 import { useDwdyState } from "~/states/useDwdyState";
+import { useAudioState } from "~/dwdy/feature/sound/state/useAudioState";
+import { DiaryFeature } from "~/dwdy/feature/def";
 import { featureIcon, featureText } from "~/dwdy/feature/map";
 import { DiaryLayout } from "~/dwdy/layout/def";
 import { featureComponent } from "~/dwdy/feature/component";
@@ -19,13 +21,13 @@ import DisplayIconSwitchBtn from "./DisplayIconSwitchBtn.vue";
 import FeatureEditorSelectorPanel from "~/components/dwdy/DiaryPage/FeatureEditorSelectorPanel.vue";
 import YmNavPanel from "~/components/dwdy/common/YmNavPanel.vue";
 import YmdNavPanel from "~/components/dwdy/common/YmdNavPanel.vue";
-import { DiaryFeature } from "~/dwdy/feature/def";
 
 const emit = defineEmits<{
   (e: "triggerAction", params: DiaryPageActionParams): void;
 }>();
 
 const dwdyState = useDwdyState();
+const audioState = useAudioState();
 const la = new LocaleActor("pages.dwdy.DiaryPage.calendar.contentPanel");
 const calendarConfig = computed(() => {
   return dwdyState.diary.value.fetchLayoutConfig(DiaryLayout.Calendar);
@@ -91,6 +93,7 @@ function triggerAction(params: DiaryPageActionParams): void {
 }
 
 async function moveToEntry(params: DiaryEntryMovementParams): Promise<void> {
+  audioState.stopAllAudioDevices();
   let targetDIndex;
   if (params.direction === "next" || params.direction === "prev") {
     if (params.unit === "page") {
