@@ -4,7 +4,10 @@ import {
   DiaryAttachmentDocMap,
 } from "~/models/dwdy/diaryAttachment";
 import { displayFileName, genRandomFileName } from "~/services/file";
-import { DiaryEntryIdentityParams } from "~/types/dwdy/core";
+import {
+  DiaryEntryIdentity,
+  DiaryEntryIdentityParams,
+} from "~/types/dwdy/core";
 import { Diary } from "~/models/dwdy/diary";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import {
@@ -17,16 +20,21 @@ import {
 const THUMBNAIL_W = 120;
 
 async function buildImageInfo(
-  srcData: string,
+  srcBlob: Blob,
   fileType: string
 ): Promise<{ width: number; height: number; thumbnail: string }> {
   return new Promise((resolve) => {
     const img = new Image();
-    let thumbnail;
+    let thumbnail: string;
     img.onload = () => {
       const { naturalWidth: width, naturalHeight: height } = img;
       if (width === 0 || height === 0 || width < THUMBNAIL_W) {
-        thumbnail = srcData;
+        const reader = new FileReader();
+        reader.readAsDataURL(srcBlob); // read blob as data URL
+        reader.onloadend = () => {
+          thumbnail = reader.result as string;
+          resolve({ width, height, thumbnail });
+        };
       } else {
         const hwRatio = height / width;
         const canvas = document.createElement("canvas");
@@ -50,7 +58,7 @@ async function buildImageInfo(
       }
       resolve({ width, height, thumbnail });
     };
-    img.src = srcData;
+    img.src = URL.createObjectURL(srcBlob);
   });
 }
 
@@ -75,9 +83,10 @@ async function updateDiaryImageStat(
 export async function importImage(
   dei: DiaryEntryIdentityParams,
   file: File,
-  data: string
+  buffer: ArrayBuffer
 ): Promise<void> {
-  const imageInfo = await buildImageInfo(data, file.type);
+  const blob = new Blob([buffer], { type: file.type });
+  const imageInfo = await buildImageInfo(blob, file.type);
   const fileExt = displayFileName(file.name).ext;
   await dbDwdy.transaction(
     "rw",
@@ -90,11 +99,11 @@ export async function importImage(
         return Promise<void>;
       }
       const { diary, entry } = fetchedResult;
-      const da = await DiaryAttachment.upload(dei, {
+      const da = await DiaryAttachment.upload(dei as DiaryEntryIdentity, {
         fileName: genRandomFileName(fileExt),
         fileType: file.type,
         size: file.size,
-        data,
+        blob,
       });
       const imageContent = {
         daUid: da.doc.daUid,
@@ -155,9 +164,10 @@ export async function replaceImage(
   dei: DiaryEntryIdentityParams,
   index: number,
   file: File,
-  data: string
+  buffer: ArrayBuffer
 ): Promise<void> {
-  const imageInfo = await buildImageInfo(data, file.type);
+  const blob = new Blob([buffer], { type: file.type });
+  const imageInfo = await buildImageInfo(blob, file.type);
   const fileExt = displayFileName(file.name).ext;
   const fetchedResult = await Diary.fetchDiaryAndEntry(dei);
   if (!fetchedResult) {
@@ -192,7 +202,7 @@ export async function replaceImage(
             fileName: genRandomFileName(fileExt),
             fileType: file.type,
             size: file.size,
-            data,
+            blob,
           }
         );
         entry.assignContent<DiaryFeature.Image>(DiaryFeature.Image, index, {

@@ -95,10 +95,10 @@ async function fetchImage(): Promise<void> {
     return;
   }
   const da = await dwdyState.entry.value.fetchAttachment(imageMeta.value.daUid);
-  if (!da) {
+  if (!da || !da.doc.blob) {
     return;
   }
-  imageDataUrl.value = da.doc.data;
+  imageDataUrl.value = URL.createObjectURL(da.doc.blob);
   fileSize.value = displayFileSize(imageMeta.value.fileSize);
   imageComment.value = imageMeta.value.comment;
 }
@@ -137,7 +137,7 @@ async function onReplaceFileSelected(event: Event): Promise<void> {
   isInLoading.value = true;
   const fr = new FileReader();
   fr.onload = async () => {
-    const result = fr.result as string;
+    const result = fr.result as ArrayBuffer;
     if (result) {
       await replaceImage(
         dwdyState.entry.value.identity,
@@ -149,7 +149,7 @@ async function onReplaceFileSelected(event: Event): Promise<void> {
       isInLoading.value = false;
     }
   };
-  fr.readAsDataURL(file);
+  fr.readAsArrayBuffer(file);
 }
 
 async function onUploadFileSelected(event: Event): Promise<void> {
@@ -164,7 +164,7 @@ async function onUploadFileSelected(event: Event): Promise<void> {
   for (const file of files as FileList) {
     const fr = new FileReader();
     fr.onload = async () => {
-      const result = fr.result as string;
+      const result = fr.result as ArrayBuffer;
       if (result) {
         await importImage(dwdyState.entry.value.identity, file, result);
         storedCount++;
@@ -175,7 +175,7 @@ async function onUploadFileSelected(event: Event): Promise<void> {
         }
       }
     };
-    fr.readAsDataURL(file);
+    fr.readAsArrayBuffer(file);
   }
 }
 
@@ -300,7 +300,7 @@ function onCurrentPageSelected(): void {
       {{ la.t(".uploadImage") }}
       <div v-if="isInLoading">
         <SvgIcon
-          class="animate-spin-slow mr-2"
+          class="animate-spin-slow mx-2"
           icon-set="mdi"
           :path="mdiDotsCircle"
           :size="20"

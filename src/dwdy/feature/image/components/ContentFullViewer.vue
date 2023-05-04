@@ -63,10 +63,10 @@ async function fetchImages(): Promise<void> {
         dIndex: dwdyState.entry.value.doc.dIndex,
         daUid: content.daUid,
       });
-      if (daDoc) {
+      if (daDoc && daDoc.blob) {
         imagePacks.value[index] = Object.assign(
           {
-            dataUrl: daDoc.data,
+            dataUrl: URL.createObjectURL(daDoc.blob),
           },
           content
         );

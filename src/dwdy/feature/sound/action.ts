@@ -13,7 +13,11 @@ import {
   SoundSource,
   DEFAULT_FEATURE_STAT,
 } from "~/dwdy/feature/sound/def";
-import { DUid, DiaryEntryIdentityParams } from "~/types/dwdy/core";
+import {
+  DUid,
+  DiaryEntryIdentityParams,
+  DiaryEntryIdentity,
+} from "~/types/dwdy/core";
 import { Diary } from "~/models/dwdy/diary";
 import { displayFileName, genRandomFileName } from "~/services/file";
 
@@ -52,7 +56,7 @@ export async function addSound(
         return Promise<void>;
       }
       const { diary, entry } = fetchedResult;
-      const da = await DiaryAttachment.upload(dei, {
+      const da = await DiaryAttachment.upload(dei as DiaryEntryIdentity, {
         fileName: `${genUid()}.webm`,
         fileType: "audio/webm",
         size: blob.size,
@@ -136,7 +140,7 @@ export async function importAudio(
         return Promise<void>;
       }
       const { diary, entry } = fetchedResult;
-      const da = await DiaryAttachment.upload(dei, {
+      const da = await DiaryAttachment.upload(dei as DiaryEntryIdentity, {
         fileName: genRandomFileName(fileExt),
         fileType: file.type,
         size: file.size,
