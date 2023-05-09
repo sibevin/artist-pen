@@ -181,6 +181,7 @@ defineExpose({ moveToEntry });
               class="p-2 pt-4 pb-0"
               @open-full-viewer="onOpenFullViewer"
               @open-feature-editor="onOpenFeatureEditor"
+              @trigger-action="triggerAction"
             ></component>
           </div>
         </div>
@@ -276,6 +277,7 @@ defineExpose({ moveToEntry });
                 class="p-2 pt-4 pb-0"
                 @open-full-viewer="onOpenFullViewer"
                 @open-feature-editor="onOpenFeatureEditor"
+                @trigger-action="triggerAction"
               ></component>
             </div>
           </div>
@@ -322,6 +324,7 @@ defineExpose({ moveToEntry });
               class="pt-4 pr-4 pb-0"
               @open-full-viewer="onOpenFullViewer"
               @open-feature-editor="onOpenFeatureEditor"
+              @trigger-action="triggerAction"
             ></component>
           </div>
         </div>

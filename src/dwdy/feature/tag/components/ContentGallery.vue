@@ -1,22 +1,25 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useDwdyState } from "~/states/useDwdyState";
+import { useSearchState } from "~/states/useSearchState";
 import { DiaryFeature } from "~/dwdy/feature/def";
-import { buildTagQuery } from "~/dwdy/feature/tag/action";
+import { DiaryPageActionParams } from "~/types/dwdy/core";
 import ContentSlate from "~/dwdy/feature/tag/components/ContentSlate.vue";
 
 const emit = defineEmits<{
   (e: "openSearch", query?: string): void;
+  (e: "triggerAction", params: DiaryPageActionParams): void;
 }>();
 
 const props = defineProps({
   enableClick: {
     type: Boolean,
-    default: false,
+    default: true,
   },
 });
 
 const dwdyState = useDwdyState();
+const searchState = useSearchState();
 
 const currentTags = computed<string[]>(() => {
   return dwdyState.entry.value.fetchContents<DiaryFeature.Tag>(
@@ -26,7 +29,8 @@ const currentTags = computed<string[]>(() => {
 
 function onTagClicked(tag: string): void {
   if (props.enableClick) {
-    emit("openSearch", buildTagQuery(tag));
+    searchState.query.value.feature.tag = [tag];
+    emit("triggerAction", { action: "apply-search" });
   }
 }
 </script>

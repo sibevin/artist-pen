@@ -142,6 +142,9 @@ async function applySearch(fromKeywordInput = false): Promise<void> {
     PAGE_SIZE
   );
   console.log("apply-search: result", result.value);
+  if (!isModalOn.value) {
+    isModalOn.value = true;
+  }
   if (result.value.entries.length > 0) {
     nextTick(() => {
       console.log("searchResultEntry", searchResultEntry.value);
