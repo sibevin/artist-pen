@@ -30,6 +30,8 @@ import PaginationPanel from "~/components/PaginationPanel.vue";
 import SvgIcon from "~/components/SvgIcon.vue";
 import ModalBase from "~/components/ModalBase.vue";
 import MhlPanel from "./MatchHightlightPanel.vue";
+import { normalizeTag } from "~/dwdy/feature/tag/action";
+import { DiaryFeature } from "~/dwdy/feature/def";
 
 const props = defineProps({
   modelValue: {
@@ -119,9 +121,30 @@ async function applySearch(fromKeywordInput = false): Promise<void> {
     return;
   }
   if (fromKeywordInput) {
-    searchState.query.value.keywords = keywordInput.value
+    const inputKeywords = keywordInput.value
       .split(" ")
       .filter((word) => word !== "");
+    if (dwdyState.diary.value.enabledFeatures.includes(DiaryFeature.Tag)) {
+      const tags: string[] = [];
+      const queryKeywords: string[] = [];
+      for (let i = 0; i < inputKeywords.length; i++) {
+        const keyword = inputKeywords[i];
+        if (keyword.at(0) === "#") {
+          tags.push(normalizeTag(keyword));
+        } else {
+          queryKeywords.push(keyword);
+        }
+      }
+      if (!searchState.query.value.feature.tag) {
+        searchState.query.value.feature.tag = tags;
+      } else {
+        searchState.query.value.feature.tag =
+          searchState.query.value.feature.tag.concat(tags);
+      }
+      searchState.query.value.keywords = queryKeywords;
+    } else {
+      searchState.query.value.keywords = inputKeywords;
+    }
   }
   keywordInput.value = searchState.query.value.keywords.join(" ");
   addToSearchHistories(
@@ -261,7 +284,7 @@ defineExpose({ applySearch });
           >
             <div
               v-if="searchStatus === 'init'"
-              class="flex flex-col items-center"
+              class="flex flex-col items-center gap-2"
             >
               <SvgIcon
                 class="text-base-200"
@@ -273,7 +296,7 @@ defineExpose({ applySearch });
             </div>
             <div
               v-if="searchStatus === 'in-searching'"
-              class="flex flex-col items-center"
+              class="flex flex-col items-center gap-2"
             >
               <SvgIcon
                 class="text-base-200"
@@ -285,7 +308,7 @@ defineExpose({ applySearch });
             </div>
             <div
               v-if="searchStatus === 'done'"
-              class="flex flex-col items-center"
+              class="flex flex-col items-center gap-2"
             >
               <SvgIcon
                 class="text-base-200"
