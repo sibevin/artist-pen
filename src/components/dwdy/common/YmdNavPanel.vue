@@ -103,6 +103,7 @@ function onNextDayBtnClicked(): void {
     <button
       class="rounded-full flex items-end"
       :class="props.enableSelector ? 'btn btn-ghost pb-1' : 'cursor-default'"
+      :tabindex="props.enableSelector ? 0 : -1"
       @click="onDateSelectorOpen"
     >
       <div class="flex items-center text-lg pl-2 pr-1 pb-1 text-primary">

@@ -6,7 +6,7 @@ import { LocaleActor } from "~/services/locale";
 import { useSearchState } from "~/states/useSearchState";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { featureText } from "~/dwdy/feature/map";
-import { FEATURE_ICON } from "~/dwdy/feature/sticker/def";
+import { FEATURE_ICON, StickerValue } from "~/dwdy/feature/sticker/def";
 import StickerSelector from "~/dwdy/feature/sticker/components/StickerSelector.vue";
 import StickerIcon from "~/dwdy/feature/sticker/components/StickerIcon.vue";
 import ModalBase from "~/components/ModalBase.vue";
@@ -21,14 +21,14 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
-  (e: "change", value: string[]): void;
+  (e: "select", value: StickerValue[]): void;
 }>();
 
 const MODAL_ID = "diary-search-feature-sticker-modal";
 const la = new LocaleActor("dwdy.feature.sticker");
 const searchState = useSearchState();
 const isModalOn = ref(false);
-const currentStickers = ref<string[]>([]);
+const currentStickers = ref<StickerValue[]>([]);
 const stickerSelector = ref();
 
 watch(
@@ -48,13 +48,14 @@ watch(
   }
 );
 
-function onStickersChanged(stickers: string[]): void {
+function onStickersChanged(stickers: StickerValue[]): void {
   currentStickers.value = stickers;
 }
 
 function onApplyBtnClicked(): void {
-  searchState.query.value.feature.sticker = currentStickers.value;
+  searchState.query.value.feature.sticker = [...currentStickers.value];
   isModalOn.value = false;
+  emit("select", [...currentStickers.value]);
 }
 </script>
 <template>
@@ -75,7 +76,7 @@ function onApplyBtnClicked(): void {
       </h2>
     </template>
     <template #modal-fixed-bottom-panel>
-      <div class="max-h-v60 flex flex-col">
+      <div class="w-full max-h-v60 flex flex-col">
         <StickerSelector
           ref="stickerSelector"
           class="min-h-0 flex-1"

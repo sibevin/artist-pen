@@ -17,6 +17,7 @@ export async function initEsState(): Promise<void> {
 export async function dispatchEntry(): Promise<void> {
   const router = useRouter();
   const esState = useEscortState();
+  console.log("start dispatch");
 
   try {
     if ((await esState.authenticate()).gain) {

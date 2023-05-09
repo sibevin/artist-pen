@@ -15,13 +15,12 @@ const props = defineProps({
 
 const hlStrs = computed<string[]>(() => {
   let prefix, highlight, suffix;
-  if (
-    props.match.index === 0 &&
-    props.match.match.length === props.match.highlight.length
-  ) {
+  if (props.match.index === 0) {
     prefix = "";
-    highlight = props.match.highlight;
-    suffix = "";
+    highlight = props.match.highlight.slice(0, props.match.match.length);
+    suffix = props.match.highlight.slice(
+      props.match.match.length - props.match.highlight.length
+    );
   } else {
     prefix = props.match.highlight.slice(0, props.match.index + 1);
     highlight = props.match.highlight.slice(
@@ -45,7 +44,9 @@ const hlStrs = computed<string[]>(() => {
       :key="index"
       :class="index % 2 === 0 ? '' : props.highlightedClass"
     >
-      {{ str }}
+      <span class="whitespace-nowrap">
+        {{ str }}
+      </span>
     </div>
   </div>
 </template>

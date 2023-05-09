@@ -28,7 +28,7 @@ import {
 import { repeatOpts, REPEAT_ICON_MAP } from "~/dwdy/feature/sound/map";
 import { chooseNextTrackIndex } from "~/dwdy/feature/sound/action";
 import { useAudioState } from "~/dwdy/feature/sound/state/useAudioState";
-import { nextEntry } from "~/services/loopArray";
+import { nextEntry } from "~/services/arrayLooper";
 import AudioVisualizer from "~/dwdy/feature/sound/components/AudioVisualizer.vue";
 import SvgIcon from "~/components/SvgIcon.vue";
 

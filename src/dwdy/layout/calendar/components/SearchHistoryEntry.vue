@@ -26,7 +26,7 @@ const currentDisplay = computed<string | undefined>(() => {
 <template>
   <div
     v-if="currentDisplay"
-    class="h-fit btn btn-primary rounded-xl text-sm font-bold font-mono flex justify-start items-center flex-nowrap py-1 pr-4"
+    class="h-fit btn btn-primary rounded-lg text-sm font-bold font-mono flex justify-start items-center flex-nowrap py-1 pr-4"
     :class="
       props.enableHover
         ? 'btn-outline'

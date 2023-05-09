@@ -36,7 +36,7 @@ function onSearchSortBtnClicked(): void {
   <template v-for="opt in searchSortOpts(la)" :key="opt.value">
     <button
       v-if="sortOption === opt.value"
-      class="btn btn-primary btn-outline rounded-xl flex items-center flex-nowrap"
+      class="btn btn-primary btn-outline rounded-lg flex items-center flex-nowrap"
       @click="onSearchSortBtnClicked"
     >
       <SvgIcon

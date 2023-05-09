@@ -45,7 +45,10 @@
         "clear": "Clear query",
         "recentHistories": "Recent",
         "storedHistories": "Stored",
-        "noHistories": "No histories"
+        "noHistories": "No histories",
+        "initHint": "Please provide keywords or conditions for searching",
+        "inSearchingHint": "Searching ...",
+        "notFoundHint": "No data found"
       }
     }
   }

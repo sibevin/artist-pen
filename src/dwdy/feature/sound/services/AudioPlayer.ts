@@ -1,4 +1,4 @@
-import { nextEntry, prevEntry } from "~/services/loopArray";
+import { nextEntry, prevEntry } from "~/services/arrayLooper";
 import { SoundSource, SoundTrack } from "~/dwdy/feature/sound/def";
 
 const PLAYER_REPEAT_MODES = ["off", "all", "once"] as const;

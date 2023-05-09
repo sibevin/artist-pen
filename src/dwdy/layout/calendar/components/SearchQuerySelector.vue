@@ -19,7 +19,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
-  (e: "select", value: string): void;
+  (e: "select", value: SearchDateRangeQuery): void;
 }>();
 
 const MODAL_ID = "layout-calendar-search-main";
@@ -73,6 +73,7 @@ function onApplyBtnClicked(): void {
     query: dateRangeQuery.value.value,
   };
   isModalOn.value = false;
+  emit("select", dateRangeQuery.value);
 }
 
 function onDateRangeSelected(query: SearchDateRangeQuery): void {

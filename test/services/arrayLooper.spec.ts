@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { faker } from "@faker-js/faker";
-import { nextEntry, prevEntry } from "~/services/loopArray";
+import { nextEntry, prevEntry } from "~/services/arrayLooper";
 import { genRandomIndex } from "test/support/randomUtils";
 
-describe("services/loopArray", () => {
+describe("services/arrayLooper", () => {
   describe(".nextEntry", () => {
     describe("when no entry is given", () => {
       it("retures the first entry", () => {

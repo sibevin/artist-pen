@@ -34,7 +34,7 @@ function reloadPage(): void {
     >
       <template v-if="Component">
         <Transition name="page-tran">
-          <KeepAlive exclude="DiaryEditorPage">
+          <KeepAlive :include="['DiaryPage', 'SettingsPage', 'AboutPage']">
             <Suspense>
               <!-- main content -->
               <component :is="Component" :key="$route.fullPath"></component>

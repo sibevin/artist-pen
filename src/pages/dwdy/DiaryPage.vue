@@ -14,6 +14,7 @@ import {
   DiaryContentFeatureIndex,
   DiaryEntryMovementParams,
   DiaryPageActionParams,
+  MoveDirection,
 } from "~/types/dwdy/core";
 import { dtToEntryTs } from "~/services/dwdy/dateUtils";
 import SvgIcon from "~/components/SvgIcon.vue";
@@ -171,7 +172,11 @@ function moveToEntry(params: DiaryEntryMovementParams): void {
 }
 
 function triggerAction(params: DiaryPageActionParams): void {
-  if (params.action === "select-date") {
+  if (params.action === "move-to-entry") {
+    moveToEntry(
+      Object.assign(params, { direction: "current" as MoveDirection })
+    );
+  } else if (params.action === "select-date") {
     isCurrentDateSelectorModalOn.value = true;
   } else if (params.action === "select-feature-editor") {
     isEditorSelectorModalOn.value = true;
@@ -387,7 +392,10 @@ function triggerAction(params: DiaryPageActionParams): void {
       ></SearchHistoryModal>
       <component
         :is="
-          layoutComponent(dwdyState.diary.value.doc.layout, 'searchMainModal')
+          layoutComponent(
+            dwdyState.diary.value.doc.layout,
+            'searchQuerySelector'
+          )
         "
         v-if="dwdyState.diary.value.isStored"
         v-model="isSearchMainModalOn"
@@ -395,7 +403,10 @@ function triggerAction(params: DiaryPageActionParams): void {
       ></component>
       <component
         :is="
-          layoutComponent(dwdyState.diary.value.doc.layout, 'searchSortModal')
+          layoutComponent(
+            dwdyState.diary.value.doc.layout,
+            'searchSortSelector'
+          )
         "
         v-if="dwdyState.diary.value.isStored"
         v-model="isSearchSortModalOn"

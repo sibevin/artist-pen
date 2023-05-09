@@ -45,7 +45,10 @@
         "clear": "重設條件",
         "recentHistories": "近期",
         "storedHistories": "已儲存",
-        "noHistories": "沒有記錄"
+        "noHistories": "沒有記錄",
+        "initHint": "請輸入關鍵字或是設定條件進行搜尋",
+        "inSearchingHint": "搜尋中...",
+        "notFoundHint": "沒有找到符合條件的資料"
       }
     }
   }

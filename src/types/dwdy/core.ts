@@ -60,6 +60,7 @@ export type DiaryPageActionParams = {
   action:
     | "select-date"
     | "select-feature-editor"
+    | "move-to-entry"
     | "open-feature-editor"
     | "open-full-viewer"
     | "open-display-icon-selector"

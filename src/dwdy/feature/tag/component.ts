@@ -5,6 +5,7 @@ import ContentSlate from "./components/ContentSlate.vue";
 import SearchQuerySelector from "./components/SearchQuerySelector.vue";
 import SearchMenuEntry from "./components/SearchMenuEntry.vue";
 import SearchHistoryEntry from "./components/SearchHistoryEntry.vue";
+import SearchResultEntry from "./components/SearchResultEntry.vue";
 
 export const FEATURE_COMPONENT: DiaryFeatureComponent = {
   editorMain: EditorMain,
@@ -13,4 +14,5 @@ export const FEATURE_COMPONENT: DiaryFeatureComponent = {
   searchQuerySelector: SearchQuerySelector,
   searchMenuEntry: SearchMenuEntry,
   searchHistoryEntry: SearchHistoryEntry,
+  searchResultEntry: SearchResultEntry,
 };

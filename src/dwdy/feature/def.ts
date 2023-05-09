@@ -1,5 +1,7 @@
 import { DiaryEntryIdentityParams } from "~/types/dwdy/core";
 import { Icon } from "~/models/app/types";
+import { DiaryEntry } from "~/models/dwdy/diaryEntry";
+import { SearchKeywordMatch } from "~/types/dwdy/search";
 
 export enum DiaryFeature {
   Text = "text",
@@ -23,6 +25,11 @@ export type DiaryFeatureFlow = {
     dei: DiaryEntryIdentityParams,
     index: number
   ) => Promise<void>;
+  foundKeyword?: (entry: DiaryEntry, keywords: string[]) => boolean;
+  applyKeywordSearch?: (
+    entry: DiaryEntry,
+    keywords: string[]
+  ) => SearchKeywordMatch[];
 };
 
 export type DiaryFeatureIcon = {
@@ -43,4 +50,5 @@ export type DiaryFeatureComponent = {
   searchQuerySelector?: any;
   searchMenuEntry?: any;
   searchHistoryEntry?: any;
+  searchResultEntry?: any;
 };

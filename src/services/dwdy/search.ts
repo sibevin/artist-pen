@@ -158,7 +158,7 @@ export async function applyDiaryEntrySearch(
     if (query.keywords.length > 0 && !dEntry.isKeywordsFound(query)) {
       return false;
     }
-    if (query.feature["tag"]) {
+    if (query.feature["tag"] && query.feature["tag"].length > 0) {
       const tags = dEntry.fetchContents<DiaryFeature.Tag>(DiaryFeature.Tag);
       let found = false;
       for (let i = 0; i < query.feature["tag"].length; i++) {
@@ -171,7 +171,7 @@ export async function applyDiaryEntrySearch(
         return false;
       }
     }
-    if (query.feature["sticker"]) {
+    if (query.feature["sticker"] && query.feature["sticker"].length > 0) {
       const stickers = dEntry.fetchContents<DiaryFeature.Sticker>(
         DiaryFeature.Sticker
       );

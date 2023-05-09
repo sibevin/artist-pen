@@ -28,7 +28,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
-  (e: "change", value: string[]): void;
+  (e: "select", value: TagValue[]): void;
 }>();
 
 const MODAL_ID = "diary-search-feature-tag-modal";
@@ -157,6 +157,7 @@ function clearAllTags(): void {
 function onApplyBtnClicked(): void {
   searchState.query.value.feature.tag = [...currentTags.value];
   isModalOn.value = false;
+  emit("select", [...currentTags.value]);
 }
 </script>
 <template>

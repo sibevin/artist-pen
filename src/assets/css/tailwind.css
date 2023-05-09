@@ -8,11 +8,16 @@
 }
 
 .select:focus {
-  outline: none;
+  outline: 2px solid theme(colors.transparent);
 }
 
 .input:focus {
-  outline: none;
+  outline: 2px solid theme(colors.transparent);
+}
+
+:focus-visible {
+  outline: 2px solid theme(colors.primary);
+  outline-offset: 0;
 }
 
 .btn {

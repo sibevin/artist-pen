@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { PropType } from "vue";
-import { mdiText } from "@mdi/js";
+import { computed, PropType } from "vue";
+import {
+  mdiSortClockAscendingOutline,
+  mdiSortClockDescendingOutline,
+  mdiText,
+} from "@mdi/js";
 import { useDwdyState } from "~/states/useDwdyState";
 import { SearchQuery } from "~/types/dwdy/search";
 import { layoutComponent } from "~/dwdy/layout/component";
@@ -15,13 +19,25 @@ const props = defineProps({
 });
 
 const dwdyState = useDwdyState();
+
+const sortIconPath = computed<string | null>(() => {
+  if (!props.query.sorts[0]) {
+    return mdiSortClockAscendingOutline;
+  }
+  if (props.query.sorts[0].order === "asc") {
+    return mdiSortClockDescendingOutline;
+  } else if (props.query.sorts[0].order === "desc") {
+    return mdiSortClockAscendingOutline;
+  }
+  return null;
+});
 </script>
 
 <template>
   <div class="flex flex-wrap gap-2">
     <div
       v-if="props.query.keywords.length > 0"
-      class="max-w-full h-fit btn btn-primary text-primary bg-base-100 hover:text-primary hover:bg-base-100 rounded-xl cursor-default flex justify-start items-center flex-nowrap py-2 pr-4"
+      class="max-w-full h-fit btn btn-primary text-primary bg-base-100 hover:text-primary hover:bg-base-100 rounded-lg cursor-default flex justify-start items-center flex-nowrap py-2 pr-4"
     >
       <SvgIcon
         class="flex-none mr-2"
@@ -50,5 +66,11 @@ const dwdyState = useDwdyState();
         :query="props.query"
       ></component>
     </template>
+    <div
+      v-if="sortIconPath"
+      class="max-w-full h-fit btn btn-primary text-primary bg-base-100 hover:text-primary hover:bg-base-100 rounded-lg cursor-default flex justify-start items-center flex-nowrap py-2"
+    >
+      <SvgIcon icon-set="mdi" :path="sortIconPath" :size="24"></SvgIcon>
+    </div>
   </div>
 </template>

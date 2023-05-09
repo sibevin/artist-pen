@@ -4,10 +4,10 @@ import ContentNavMenu from "./components/ContentNavMenu.vue";
 import TitlePanel from "./components/TitlePanel.vue";
 import LastContentPanel from "./components/LastContentPanel.vue";
 import ConfigPanel from "./components/ConfigPanel.vue";
-import SearchMainMenuEntry from "./components/SearchMainMenuEntry.vue";
-import SearchMainModal from "./components/SearchMainModal.vue";
+import SearchQueryMenuEntry from "./components/SearchQueryMenuEntry.vue";
+import SearchQuerySelector from "./components/SearchQuerySelector.vue";
 import SearchSortMenuEntry from "./components/SearchSortMenuEntry.vue";
-import SearchSortModal from "./components/SearchSortModal.vue";
+import SearchSortSelector from "./components/SearchSortSelector.vue";
 import SearchHistoryEntry from "./components/SearchHistoryEntry.vue";
 
 export const LAYOUT_COMPONENT: DiaryLayoutComponent = {
@@ -16,9 +16,9 @@ export const LAYOUT_COMPONENT: DiaryLayoutComponent = {
   titlePanel: TitlePanel,
   lastContentPanel: LastContentPanel,
   configPanel: ConfigPanel,
-  searchMainMenuEntry: SearchMainMenuEntry,
-  searchMainModal: SearchMainModal,
+  searchQueryMenuEntry: SearchQueryMenuEntry,
+  searchQuerySelector: SearchQuerySelector,
   searchSortMenuEntry: SearchSortMenuEntry,
-  searchSortModal: SearchSortModal,
+  searchSortSelector: SearchSortSelector,
   searchHistoryEntry: SearchHistoryEntry,
 };

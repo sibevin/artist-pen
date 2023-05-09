@@ -14,10 +14,10 @@ export type DiaryLayoutComponent = {
   editorMain?: any;
   lastContentPanel?: any;
   configPanel?: any;
-  searchMainMenuEntry?: any;
-  searchMainModal?: any;
+  searchQueryMenuEntry?: any;
+  searchQuerySelector?: any;
   searchSortMenuEntry?: any;
-  searchSortModal?: any;
+  searchSortSelector?: any;
   searchResultEntry?: any;
   searchHistoryEntry?: any;
 };
