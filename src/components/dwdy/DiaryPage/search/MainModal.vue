@@ -155,7 +155,7 @@ async function applySearch(fromKeywordInput = false): Promise<void> {
   console.log("apply-search: query", searchState.query.value);
   searchStatus.value = "in-searching";
   const appliedResult = await applyDiaryEntrySearch(
-    dwdyState.diary.value.doc.dUid,
+    new Diary(dwdyState.diary.value.doc),
     searchState.query.value
   );
   searchStatus.value = "done";

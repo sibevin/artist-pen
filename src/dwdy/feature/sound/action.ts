@@ -20,6 +20,9 @@ import {
 } from "~/types/dwdy/core";
 import { Diary } from "~/models/dwdy/diary";
 import { displayFileName, genRandomFileName } from "~/services/file";
+import { DiaryEntry } from "~/models/dwdy/diaryEntry";
+import { SearchKeywordMatch, SearchQuery } from "~/types/dwdy/search";
+import { findKeywordMatch } from "~/services/dwdy/search";
 
 async function updateDiarySoundStat(
   diary: Diary,
@@ -231,4 +234,52 @@ async function buildAudioInfo(file: File): Promise<{ duration: number }> {
     };
     audio.src = URL.createObjectURL(file);
   });
+}
+
+export function isKeywordFound(
+  entry: DiaryEntry,
+  keyword: string,
+  query: SearchQuery
+): boolean {
+  const contents = entry.fetchContents<DiaryFeature.Sound>(DiaryFeature.Sound);
+  if (contents.length === 0) {
+    return false;
+  }
+  for (let j = 0; j < contents.length; j++) {
+    const comment = contents[j].comment;
+    if (
+      comment &&
+      findKeywordMatch(keyword, comment, query.keywordOption, false).index >= 0
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function applyKeywordSearch(
+  entry: DiaryEntry,
+  keyword: string,
+  query: SearchQuery
+): SearchKeywordMatch[] | null {
+  const contents = entry.fetchContents<DiaryFeature.Sound>(DiaryFeature.Sound);
+  if (contents.length === 0) {
+    return null;
+  }
+  const kms: SearchKeywordMatch[] = [];
+  for (let j = 0; j < contents.length; j++) {
+    const comment = contents[j].comment;
+    if (comment) {
+      const km = findKeywordMatch(keyword, comment, query.keywordOption);
+      if (km.index >= 0) {
+        kms.push(
+          Object.assign(
+            { source: "feature", feature: DiaryFeature.Sound },
+            km
+          ) as SearchKeywordMatch
+        );
+      }
+    }
+  }
+  return kms;
 }

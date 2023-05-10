@@ -5,6 +5,9 @@ import { DiaryEntryDoc } from "~/models/dwdy/diaryEntry";
 import { getStringBytes } from "~/services/file";
 import { DiaryFeature } from "~/dwdy/feature/def";
 import { TagValue } from "~/dwdy/feature/tag/def";
+import { DiaryEntry } from "~/models/dwdy/diaryEntry";
+import { SearchKeywordMatch, SearchQuery } from "~/types/dwdy/search";
+import { findKeywordMatch } from "~/services/dwdy/search";
 
 const DEFAULT_STAT = {
   count: 0,
@@ -176,4 +179,52 @@ export function normalizeTag(tag: TagValue): TagValue {
 
 export function buildTagQuery(tag: TagValue): string {
   return `#${tag}`;
+}
+
+export function isKeywordFound(
+  entry: DiaryEntry,
+  keyword: string,
+  query: SearchQuery
+): boolean {
+  const contents = entry.fetchContents<DiaryFeature.Tag>(DiaryFeature.Tag);
+  if (contents.length === 0) {
+    return false;
+  }
+  for (let j = 0; j < contents.length; j++) {
+    const tag = contents[j];
+    if (
+      tag &&
+      findKeywordMatch(keyword, tag, query.keywordOption, false).index >= 0
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function applyKeywordSearch(
+  entry: DiaryEntry,
+  keyword: string,
+  query: SearchQuery
+): SearchKeywordMatch[] | null {
+  const contents = entry.fetchContents<DiaryFeature.Tag>(DiaryFeature.Tag);
+  if (contents.length === 0) {
+    return null;
+  }
+  const kms: SearchKeywordMatch[] = [];
+  for (let j = 0; j < contents.length; j++) {
+    const tag = contents[j];
+    if (tag) {
+      const km = findKeywordMatch(keyword, tag, query.keywordOption);
+      if (km.index >= 0) {
+        kms.push(
+          Object.assign(
+            { source: "feature", feature: DiaryFeature.Tag },
+            km
+          ) as SearchKeywordMatch
+        );
+      }
+    }
+  }
+  return kms;
 }

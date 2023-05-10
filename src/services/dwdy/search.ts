@@ -15,6 +15,8 @@ import { dtToEntryTs, dsToDt, getNeighborDt } from "~/services/dwdy/dateUtils";
 import { getRecentRangeDays } from "~/services/recentRange";
 import { DiaryEntry, DiaryEntryExistingDoc } from "~/models/dwdy/diaryEntry";
 import { DiaryFeature } from "~/dwdy/feature/def";
+import { SearchKeywordMatch } from "~/types/dwdy/search";
+import { featureFlow } from "~/dwdy/feature/flow";
 
 const MAX_HISTORY_SIZE = 10;
 
@@ -146,16 +148,19 @@ function isSearchQueryEqual(queryA: SearchQuery, queryB: SearchQuery): boolean {
 }
 
 export async function applyDiaryEntrySearch(
-  dUid: DUid,
+  diary: Diary,
   query: SearchQuery
 ): Promise<SearchResult> {
-  const collection = buildSearchCollection(dUid, query);
-  console.log("collection", collection);
+  if (!diary.doc.dUid) {
+    return {
+      query,
+      entries: [],
+    };
+  }
+  const collection = buildSearchCollection(diary.doc.dUid, query);
   collection.filter((entryDoc) => {
     const dEntry = new DiaryEntry(entryDoc);
-    console.log("dEntry", dEntry.doc);
-    console.log("isKeywordsFound", dEntry.isKeywordsFound(query));
-    if (query.keywords.length > 0 && !dEntry.isKeywordsFound(query)) {
+    if (query.keywords.length > 0 && !isKeywordsFound(diary, dEntry, query)) {
       return false;
     }
     if (query.feature["tag"] && query.feature["tag"].length > 0) {
@@ -202,11 +207,12 @@ export async function applyDiaryEntrySearch(
   console.log("entries:", entries);
   return {
     query,
-    entries: buildSearchResultEntries(query, entries),
+    entries: buildSearchResultEntries(diary, query, entries),
   };
 }
 
 function buildSearchResultEntries(
+  diary: Diary,
   query: SearchQuery,
   entries: DiaryEntryExistingDoc[]
 ): SearchResultEntry[] {
@@ -214,7 +220,7 @@ function buildSearchResultEntries(
     const dEntry = new DiaryEntry(entryDoc);
     return {
       entry: dEntry,
-      matches: dEntry.getKeywordMatches(query.keywords, query.keywordOption),
+      matches: getKeywordMatches(diary, dEntry, query),
     };
   });
 }
@@ -309,4 +315,73 @@ export function findKeywordMatch(
     highlight = "";
   }
   return { index, match, highlight };
+}
+
+function isKeywordsFound(
+  diary: Diary,
+  entry: DiaryEntry,
+  query: SearchQuery
+): boolean {
+  for (let i = 0; i < query.keywords.length; i++) {
+    const keyword = query.keywords[i];
+    let isKeywordFound = false;
+    if (
+      entry.doc.title &&
+      findKeywordMatch(keyword, entry.doc.title, query.keywordOption, false)
+        .index >= 0
+    ) {
+      isKeywordFound = true;
+      continue;
+    }
+    for (let i = 0; i < diary.enabledFeatures.length; i++) {
+      const feature = diary.enabledFeatures[i];
+      const isKeywordFoundFn = featureFlow(feature)["isKeywordFound"];
+      if (isKeywordFoundFn && isKeywordFoundFn(entry, keyword, query)) {
+        isKeywordFound = true;
+        continue;
+      }
+    }
+    if (!isKeywordFound) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function getKeywordMatches(
+  diary: Diary,
+  entry: DiaryEntry,
+  query: SearchQuery
+): Record<string, SearchKeywordMatch[]> {
+  if (query.keywords.length === 0) {
+    return {};
+  }
+  const matches: Record<string, SearchKeywordMatch[]> = {};
+  for (let i = 0; i < query.keywords.length; i++) {
+    const keyword = query.keywords[i];
+    matches[keyword] = [];
+    if (entry.doc.title) {
+      const km = findKeywordMatch(
+        keyword,
+        entry.doc.title,
+        query.keywordOption
+      );
+      if (km.index >= 0) {
+        matches[keyword].push(
+          Object.assign({ source: "title" }, km) as SearchKeywordMatch
+        );
+      }
+    }
+    for (let i = 0; i < diary.enabledFeatures.length; i++) {
+      const feature = diary.enabledFeatures[i];
+      const applyKeywordSearchFn = featureFlow(feature)["applyKeywordSearch"];
+      if (applyKeywordSearchFn) {
+        const kms = applyKeywordSearchFn(entry, keyword, query);
+        if (kms) {
+          matches[keyword] = matches[keyword].concat(kms);
+        }
+      }
+    }
+  }
+  return matches;
 }

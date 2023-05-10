@@ -24,8 +24,8 @@ import {
   DiaryConfigAttrs,
   DiaryConfigParams,
 } from "~/models/dwdy/config";
-import { SearchQuery } from "~/types/dwdy/search";
 import { AppError } from "~/models/app/error";
+import { SearchQuery } from "~/types/dwdy/search";
 
 export interface DiaryTemplate {
   mobile: DiaryFeature[];

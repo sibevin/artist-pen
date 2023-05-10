@@ -8,6 +8,9 @@ import {
   FeatureStat,
   DEFAULT_FEATURE_STAT,
 } from "~/dwdy/feature/text/def";
+import { DiaryEntry } from "~/models/dwdy/diaryEntry";
+import { SearchKeywordMatch, SearchQuery } from "~/types/dwdy/search";
+import { findKeywordMatch } from "~/services/dwdy/search";
 
 async function updateDiaryTextStat(
   diary: Diary,
@@ -131,4 +134,52 @@ export async function updateText(
       });
     }
   );
+}
+
+export function isKeywordFound(
+  entry: DiaryEntry,
+  keyword: string,
+  query: SearchQuery
+): boolean {
+  const contents = entry.fetchContents<DiaryFeature.Text>(DiaryFeature.Text);
+  if (contents.length === 0) {
+    return false;
+  }
+  for (let j = 0; j < contents.length; j++) {
+    const rawText = contents[j].raw;
+    if (
+      rawText &&
+      findKeywordMatch(keyword, rawText, query.keywordOption, false).index >= 0
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function applyKeywordSearch(
+  entry: DiaryEntry,
+  keyword: string,
+  query: SearchQuery
+): SearchKeywordMatch[] | null {
+  const contents = entry.fetchContents<DiaryFeature.Text>(DiaryFeature.Text);
+  if (contents.length === 0) {
+    return null;
+  }
+  const kms: SearchKeywordMatch[] = [];
+  for (let j = 0; j < contents.length; j++) {
+    const rawText = contents[j].raw;
+    if (rawText) {
+      const km = findKeywordMatch(keyword, rawText, query.keywordOption);
+      if (km.index >= 0) {
+        kms.push(
+          Object.assign(
+            { source: "feature", feature: DiaryFeature.Text },
+            km
+          ) as SearchKeywordMatch
+        );
+      }
+    }
+  }
+  return kms;
 }

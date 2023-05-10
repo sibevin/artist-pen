@@ -1,11 +1,8 @@
 import { DiaryFeatureFlow } from "~/dwdy/feature/def";
-import { deleteSound } from "~/dwdy/feature/sound/action";
+import { deleteSound, isKeywordFound, applyKeywordSearch } from "./action";
 
 export const FEATURE_FLOW: DiaryFeatureFlow = {
-  creation: {
-    customized: true,
-  },
-  deletion: {
-    delete: deleteSound,
-  },
+  deleteContent: deleteSound,
+  isKeywordFound: isKeywordFound,
+  applyKeywordSearch: applyKeywordSearch,
 };
